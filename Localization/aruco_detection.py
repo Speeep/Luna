@@ -4,12 +4,22 @@ import cv2.aruco as aruco
 from cv2 import VideoCapture
 
 
+# Define Camera to Use
 cam = cv.VideoCapture(0)
 
+# Define green color
 GREEN = (0, 255, 0)
 
-# Check if the camera is connected
+# Function to clean corners
+def clean_corners(corners):
+    clean_corners = []
+    corners = (corners[0][0][0], corners[0][0][1], corners[0][0][2], corners[0][0][3])
+    for corner in corners:
+        corner = (corner[0], corner[1])
+        clean_corners.append(corner)
+    return clean_corners
 
+# Check if the camera is connected
 if not cam.isOpened():
     print("Camera not found. Make sure your webcam is connected.")
     exit()
@@ -17,9 +27,6 @@ if not cam.isOpened():
 while True:
     # Read a frame from the camera
     ret, frame = cam.read()
-
-    # Convert the frame to grayscale
-    frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
     if not ret:
         print("Failed to grab frame.")
@@ -33,7 +40,14 @@ while True:
 
     # Draw detected markers on the frame.
     if ids is not None:
-        aruco.drawDetectedMarkers(frame, corners, ids, GREEN)
+        corners = clean_corners(corners=corners)
+        print(type(corners[0]))
+        print(corners[0])
+        cv.line(frame, corners[0], corners[1], GREEN, 2)
+        cv.line(frame, corners[1], corners[2], GREEN, 2)
+        cv.line(frame, corners[2], corners[3], GREEN, 2)
+        cv.line(frame, corners[3], corners[0], GREEN, 2)
+
 
     # display the image
     cv.imshow('frame.jpg', frame)
@@ -42,28 +56,7 @@ while True:
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
 
-    # cv.imshow('Image with ArUco Markers', frame)
-    # ArUco marker detection parameters object
-    # parameters = aruco.DetectorParameters_create()
-
-    # __, frame = cam.read()
-    # cv2.imshow('Image with ArUco Markers', frame)
-
-    # Detect ArUco markers in the frame
-    # corners, ids, rejectedImgPoints = aruco.detectMarkers(gray_frame, dictionary, parameters=parameters)
-
-    # if ids is not None:
-    #     # Draw rectangles around the detected markers with green borders
-    #     frame_with_markers = aruco.drawDetectedMarkers(frame.copy(), corners, ids, borderColor=(0, 255, 0))
-
-    #     # Display the frame with markers
-    #     cv.imshow('Image with ArUco Markers', frame_with_markers)
-
-    # if cv2.waitKey(1) & 0xFF == ord('q'):
-    #     break
-
 # Release the camera and close all OpenCV windows
-print("no")
 cam.release()
 cv.destroyAllWindows()
 
