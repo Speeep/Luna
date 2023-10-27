@@ -15,21 +15,22 @@ from pip._internal.utils import virtualenv
 # cam = cv.VideoCapture(0)                                   #taken out for testing
 
 # Check if the camera is connected
-#taken out for testing
+
+                                                            # taken out for testing
 # if not cam.isOpened():
 #     print("Camera not found. Make sure your webcam is connected.")
-#     exit()
+#     exit()                                                # til here
 
 while True:
     # Read a frame from the camera
-    # ret, frame = cam.read()                                   taken out for testing
+    # ret, frame = cam.read()                                   #taken out for testing
 
     # if not ret:
     #     print("Failed to grab frame.")
-    #     break                                                    til here
+    #     break                                                    #til here
 
     # write the image
-    #cv.imwrite('Current_image.jpg', frame)                       taken out for testing
+    # cv.imwrite('Current_image.jpg', frame)                       #taken out for testing
 
     frame = cv.imread('Current_image.jpg')
 
