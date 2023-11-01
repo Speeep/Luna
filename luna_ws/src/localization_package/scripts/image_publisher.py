@@ -5,6 +5,7 @@ from cv_bridge import CvBridge
 import cv2 as cv
 import numpy
 import cv2.aruco as aruco
+from std_msgs.msg import Int32
 
 
 # Function to clean corners
@@ -16,9 +17,26 @@ def clean_corners(corners):
         clean_corners.append(corner)
     return clean_corners
 
+# Function to calculate the centroid of 4 points
+def calculate_centroid(points):
+    if len(points) != 4:
+        raise ValueError("Input list must contain exactly 4 (x, y) pairs.")
+    
+    # Calculate the sum of x and y coordinates
+    sum_x = sum(point[0] for point in points)
+    sum_y = sum(point[1] for point in points)
+    
+    # Calculate the centroid coordinates
+    centroid_x = int(sum_x / 4)
+    centroid_y = int(sum_y / 4)
+    
+    return (centroid_x, centroid_y)
+
 def main():
     rospy.init_node('image_publisher')
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
+    servo_error_publisher = rospy.Publisher('servo_error', Int32, queue_size=10)
+
     bridge = CvBridge()
 
     # Define Camera to Use
@@ -44,12 +62,13 @@ def main():
             # Draw detected markers on the frame.
             if ids is not None:
                 corners = clean_corners(corners=corners)
-                print(type(corners[0]))
-                print(corners[0])
+                centroid = calculate_centroid(corners)
                 cv.line(frame, corners[0], corners[1], GREEN, 2)
                 cv.line(frame, corners[1], corners[2], GREEN, 2)
                 cv.line(frame, corners[2], corners[3], GREEN, 2)
                 cv.line(frame, corners[3], corners[0], GREEN, 2)
+                cv.circle(frame, (centroid[0], centroid[1]), 5, GREEN, -1)
+                servo_error_publisher.publish(centroid[0])
 
             # Convert the OpenCV image to a ROS Image message
             image_message = bridge.cv2_to_imgmsg(frame, "bgr8")
