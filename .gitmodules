@@ -1,0 +1,3 @@
+[submodule "luna_ws/luna_ws/src/rosserial"]
+	path = luna_ws/luna_ws/src/rosserial
+	url = https://github.com/ros-drivers/rosserial.git
