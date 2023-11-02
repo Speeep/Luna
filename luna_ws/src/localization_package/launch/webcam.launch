@@ -17,4 +17,11 @@
     name="listener"
     output="screen"
   />
+  <arg name="port" default="/dev/ttyUSB0" />
+  <arg name="baud" default="57600" />
+  
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+    <param name="port" value="$(arg port)" />
+    <param name="baud" value="$(arg baud)" />
+  </node>
 </launch> 
