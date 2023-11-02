@@ -59,6 +59,8 @@ def main():
             # Detect ArUco markers in the frame.
             corners, ids, _ = aruco.detectMarkers(frame, dictionary)
 
+            height, width, channels = frame.shape
+
             # Draw detected markers on the frame.
             if ids is not None:
                 corners = clean_corners(corners=corners)
@@ -68,7 +70,7 @@ def main():
                 cv.line(frame, corners[2], corners[3], GREEN, 2)
                 cv.line(frame, corners[3], corners[0], GREEN, 2)
                 cv.circle(frame, (centroid[0], centroid[1]), 5, GREEN, -1)
-                servo_error_publisher.publish(centroid[0])
+                servo_error_publisher.publish((width//2) - centroid[0])
 
             # Convert the OpenCV image to a ROS Image message
             image_message = bridge.cv2_to_imgmsg(frame, "bgr8")
