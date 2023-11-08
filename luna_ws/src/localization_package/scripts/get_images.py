@@ -2,6 +2,7 @@
 
 
 import cv2
+import os
 
 cap = cv2.VideoCapture(2)
 
@@ -17,7 +18,7 @@ while cap.isOpened():
         break
     elif k == ord('s'): # wait for 's' key to save and exit
         try:
-            cv2.imwrite('./images/img' + str(num) + '.png', img)
+            cv2.imwrite('./luna_ws/src/localization_package/scripts/images1/img' + str(num) + '.png', img)
             print("image saved!")
             num += 1
         except Exception as e:
