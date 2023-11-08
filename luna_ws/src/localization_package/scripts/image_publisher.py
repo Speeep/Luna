@@ -10,8 +10,8 @@ from std_msgs.msg import Int32
 import pickle
 
 # Load the pickles
-matrix_path = '/home/speeep/Development/Luna/luna_ws/src/localization_package/scripts/pkls/cameraMatrix.pkl'
-dist_path = '/home/speeep/Development/Luna/luna_ws/src/localization_package/scripts/pkls/dist.pkl'
+matrix_path = '/home/speeep/Development/Luna/luna_ws/src/localization_package/scripts/pkls027/cameraMatrix.pkl'
+dist_path = '/home/speeep/Development/Luna/luna_ws/src/localization_package/scripts/pkls027/dist.pkl'
 
 with open(matrix_path, 'rb') as file:
     camera_matrix = pickle.load(file)
@@ -20,7 +20,7 @@ with open(dist_path, 'rb') as file:
     dist = pickle.load(file)
 
 # Define ArUco Characteristics
-MARKER_SIZE = 19 # Centimeters TODO: Change if we make marker bigger
+MARKER_SIZE = 50 # Centimeters TODO: Change if we make marker bigger
 
 # Load the ArUco dictionary
 dictionary = aruco.getPredefinedDictionary(cv.aruco.DICT_4X4_250)
