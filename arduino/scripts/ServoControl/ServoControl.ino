@@ -26,40 +26,26 @@ ros::NodeHandle  nh;
 
 Servo servo;
 
-float p = 0.005;
+float p = 0.001;
 
-std_msgs::Int32 servo_pos_msg; // Define the message for servo_pos
-ros::Publisher servo_pos_pub("servo_pos", &servo_pos_msg); // Create a publisher for servo_pos
+std_msgs::Int32 servo_speed_msg;
+ros::Publisher pub("servo_speed", &servo_speed_msg);
 
 void servo_cb( const std_msgs::Int32& cmd_msg){
   uint32_t error = cmd_msg.data;
 
-  // Read Current Position
-  int current_position = servo.read();
-
   // Calculate what the new position should be
-  int new_position = current_position + (error * p);
-
-  if (abs(new_position - current_position) < 1) {
-    new_position = current_position;
-  }
+  int speed = 90 + int(error * p);
 
   // Ensure the new position is within the valid range (0-180)
-  if (new_position < 0) {
-    new_position = 0;
-  } else if (new_position > 180) {
-    new_position = 180;
+  if (speed < 0) {
+    speed = 0;
+  } else if (speed > 180) {
+    speed = 180;
   }
-
-  servo_pos_msg.data = new_position;
-  servo_pos_pub.publish(&servo_pos_msg);
   
-  Serial.print("Current Position: ");
-  Serial.println(current_position);
-  Serial.print("New Position: ");
-  Serial.println(new_position);
+  servo.write(speed); //set servo angle, should be from 0-180
   
-  servo.write(new_position); //set servo angle, should be from 0-180  
   digitalWrite(13, HIGH-digitalRead(13));  //toggle led  
 }
 
@@ -74,6 +60,7 @@ void setup(){
 
   nh.initNode();
   nh.subscribe(sub);
+  nh.advertise(pub);
   
   servo.attach(2); //attach it to pin 2
 }

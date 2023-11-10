@@ -83,20 +83,22 @@ def main():
             # Draw detected markers on the frame.
             if ids is not None:
 
-                # Calculate Rotation and Translation
-                rVec, tVec, _ = aruco.estimatePoseSingleMarkers(
-                    marker_corners, MARKER_SIZE, camera_matrix, dist
-                )
+                # Find the index of the marker with ID 42
+                marker_index = np.where(ids == 42)[0]
 
-                # Total number of markers detected
-                num_markers = range(0, ids.size)
+                if len(marker_index) > 0:
+                    i = marker_index[0]  # Use the first occurrence of marker with ID 42
 
-                for id, corners, i in zip(ids, marker_corners, num_markers):
+                    # Calculate Rotation and Translation for the selected marker
+                    rVec, tVec, _ = aruco.estimatePoseSingleMarkers(
+                        [marker_corners[i]], MARKER_SIZE, camera_matrix, dist
+                    )
 
                     cv.polylines(
-                        frame, [corners.astype(np.int32)], True, (0, 255, 255), 4, cv.LINE_AA
+                        frame, [marker_corners[i].astype(np.int32)], True, (0, 255, 255), 4, cv.LINE_AA
                     )
-                    corners = corners.reshape(4, 2)
+
+                    corners = marker_corners[i].reshape(4, 2)
                     corners = corners.astype(int)
                     top_right = tuple(corners[0].ravel())
                     top_left = tuple(corners[1].ravel())
@@ -104,41 +106,37 @@ def main():
                     bottom_left = tuple(corners[3].ravel())
 
                     # Calculating the distance
-                    distance = np.sqrt(
-                        tVec[i][0][2] ** 2 + tVec[i][0][0] ** 2 + tVec[i][0][1] ** 2
-                    )
+                    distance = np.sqrt(tVec[0][0][2] ** 2 + tVec[0][0][0] ** 2 + tVec[0][0][1] ** 2)
 
                     # Draw the pose of the marker
-                    point = cv.drawFrameAxes(frame, camera_matrix, dist, rVec[i], tVec[i], 4, 4)
+                    point = cv.drawFrameAxes(frame, camera_matrix, dist, rVec[0], tVec[0], 4, 4)
 
                     cv.putText(
                         img=frame,
-                        text=f"id: {ids[0]} Dist: {round(distance, 2)}",
+                        text=f"id: {ids[i]} Dist: {round(distance, 2)}",
                         org=top_right,
                         fontFace=cv.FONT_HERSHEY_PLAIN,
                         fontScale=1.3,
-                        color=GREEN,
+                        color=GREEN,  # Change color to green
                         thickness=2,
                         lineType=cv.LINE_AA,
                     )
                     cv.putText(
                         img=frame,
-                        text=f"x:{round(tVec[i][0][0],1)} y: {round(tVec[i][0][1],1)} ",
+                        text=f"x:{round(tVec[0][0][0], 1)} y: {round(tVec[0][0][1], 1)} ",
                         org=bottom_right,
                         fontFace=cv.FONT_HERSHEY_PLAIN,
                         fontScale=1.0,
-                        color=GREEN,
+                        color=GREEN,  # Change color to green
                         thickness=2,
                         lineType=cv.LINE_AA,
                     )
 
+                    centroid = calculate_centroid(corners)
+                    servo_error_publisher.publish((width//2) - centroid[0])
 
-                # centroid = calculate_centroid(corners)
-                # servo_error_publisher.publish((width//2) - centroid[0])
-
-
-            # else: 
-            #     servo_error_publisher.publish(0)
+            else: 
+                servo_error_publisher.publish(0)
 
             # Convert the OpenCV image to a ROS Image message
             image_message = bridge.cv2_to_imgmsg(frame, "bgr8")
