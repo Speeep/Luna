@@ -75,6 +75,15 @@ def main():
             # BGR 2 Gray
             gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
+            # Gamma correction param
+            gamma = 3
+
+            # Apply gamma correction to enhance contrast
+            gray_frame = np.power(gray_frame / float(np.max(gray_frame)), gamma) * 255.0
+
+            # Convert to uint8
+            gray_frame = np.uint8(gray_frame)
+
             # Detect ArUco markers in the frame.
             marker_corners, ids, _ = aruco.detectMarkers(gray_frame, dictionary)
 
@@ -134,6 +143,9 @@ def main():
 
                     centroid = calculate_centroid(corners)
                     servo_error_publisher.publish((width//2) - centroid[0])
+
+                    # cv.imshow('gray', gray_frame)
+                    # cv.waitKey(0)
 
             else: 
                 servo_error_publisher.publish(0)
