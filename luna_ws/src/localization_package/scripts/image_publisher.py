@@ -75,18 +75,19 @@ def main():
             # BGR 2 Gray
             gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
-            # Gamma correction param
-            gamma = 3
-
             # Apply gamma correction to enhance contrast
+            gamma = 3
             gray_frame = np.power(gray_frame / float(np.max(gray_frame)), gamma) * 255.0
+
+            # Threshold image to get better ArUco detection
+            threshold_value = 20
+            thresh_ret, gray_frame = cv.threshold(gray_frame, threshold_value, 255, cv.THRESH_BINARY)
 
             # Convert to uint8
             gray_frame = np.uint8(gray_frame)
 
             # Detect ArUco markers in the frame.
             marker_corners, ids, _ = aruco.detectMarkers(gray_frame, dictionary)
-
             height, width, channels = frame.shape
 
             # Draw detected markers on the frame.
@@ -115,24 +116,17 @@ def main():
                     bottom_left = tuple(corners[3].ravel())
 
                     # Calculating the distance
-                    distance = np.sqrt(tVec[0][0][2] ** 2 + tVec[0][0][0] ** 2 + tVec[0][0][1] ** 2)
+                    distance = np.sqrt(tVec[0][0][2] ** 2 + tVec[0][0][1] ** 2)
 
                     # Draw the pose of the marker
                     point = cv.drawFrameAxes(frame, camera_matrix, dist, rVec[0], tVec[0], 4, 4)
 
+                    x = round(tVec[0][0][2], 1)
+                    y = round(tVec[0][0][1], 1)
+
                     cv.putText(
                         img=frame,
-                        text=f"id: {ids[i]} Dist: {round(distance, 2)}",
-                        org=top_right,
-                        fontFace=cv.FONT_HERSHEY_PLAIN,
-                        fontScale=1.3,
-                        color=GREEN,  # Change color to green
-                        thickness=2,
-                        lineType=cv.LINE_AA,
-                    )
-                    cv.putText(
-                        img=frame,
-                        text=f"x:{round(tVec[0][0][0], 1)} y: {round(tVec[0][0][1], 1)} ",
+                        text=f"x: {x} y: {y}",
                         org=bottom_right,
                         fontFace=cv.FONT_HERSHEY_PLAIN,
                         fontScale=1.0,
@@ -141,11 +135,14 @@ def main():
                         lineType=cv.LINE_AA,
                     )
 
+                    # Define the starting and ending points of the line
+                    start_point = (frame.shape[1] // 2, 0)
+                    end_point = (frame.shape[1] // 2, frame.shape[0])
+                    RED = (0, 0, 255)
+                    cv.line(frame, start_point, end_point, RED, 1)
+
                     centroid = calculate_centroid(corners)
                     servo_error_publisher.publish((width//2) - centroid[0])
-
-                    # cv.imshow('gray', gray_frame)
-                    # cv.waitKey(0)
 
             else: 
                 servo_error_publisher.publish(0)
