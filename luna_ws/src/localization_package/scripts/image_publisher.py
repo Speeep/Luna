@@ -4,10 +4,12 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2 as cv
 import numpy as np
+from math import sinh, cosh
 import cv2.aruco as aruco
 from geometry_msgs.msg import Pose
 from std_msgs.msg import Int32
 import pickle
+from scipy.spatial.transform import Rotation as R
 
 # Load the pickles
 matrix_path = '/home/speeep/Development/Luna/luna_ws/src/localization_package/scripts/pkls027/cameraMatrix.pkl'
@@ -104,6 +106,24 @@ def main():
                         [marker_corners[i]], MARKER_SIZE, camera_matrix, dist
                     )
 
+                    # Convert rotation vector to rotation matrix using Rodrigues' rotation formula
+                    rotation_matrix, _ = cv.Rodrigues(rVec)
+
+                    # Extract the yaw from the rotation matrix
+                    theta = np.arctan2(-rotation_matrix[2, 0], np.sqrt(rotation_matrix[2, 1]**2 + rotation_matrix[2, 2]**2))
+
+                    # Extract x, y, and z from the translation vector
+                    x, y, z = tVec[0][0][0], tVec[0][0][1], tVec[0][0][2]
+
+                    print("x:", x)
+                    print("y:", y)
+                    print("z:", z)
+
+                    xw = round((x*cosh(theta) - z*sinh(theta)), 1)
+                    yw = round((z*cosh(theta) - x*sinh(theta)), 1)
+
+                    print(f'Xw: {xw}cm, Yw: {yw}cm')
+
                     cv.polylines(
                         frame, [marker_corners[i].astype(np.int32)], True, (0, 255, 255), 4, cv.LINE_AA
                     )
@@ -115,25 +135,19 @@ def main():
                     bottom_right = tuple(corners[2].ravel())
                     bottom_left = tuple(corners[3].ravel())
 
-                    # Calculating the distance
-                    distance = np.sqrt(tVec[0][0][2] ** 2 + tVec[0][0][1] ** 2)
-
                     # Draw the pose of the marker
                     point = cv.drawFrameAxes(frame, camera_matrix, dist, rVec[0], tVec[0], 4, 4)
 
-                    x = round(tVec[0][0][2], 1)
-                    y = round(tVec[0][0][1], 1)
-
-                    cv.putText(
-                        img=frame,
-                        text=f"x: {x} y: {y}",
-                        org=bottom_right,
-                        fontFace=cv.FONT_HERSHEY_PLAIN,
-                        fontScale=1.0,
-                        color=GREEN,  # Change color to green
-                        thickness=2,
-                        lineType=cv.LINE_AA,
-                    )
+                    # cv.putText(
+                    #     img=frame,
+                    #     text=f"x: {x} y: {y}",
+                    #     org=bottom_right,
+                    #     fontFace=cv.FONT_HERSHEY_PLAIN,
+                    #     fontScale=1.0,
+                    #     color=GREEN,  # Change color to green
+                    #     thickness=2,
+                    #     lineType=cv.LINE_AA,
+                    # )
 
                     # Define the starting and ending points of the line
                     start_point = (frame.shape[1] // 2, 0)
