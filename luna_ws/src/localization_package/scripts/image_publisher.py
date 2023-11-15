@@ -4,7 +4,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2 as cv
 import numpy as np
-from math import sinh, cosh
+from math import sin, cos
 import cv2.aruco as aruco
 from geometry_msgs.msg import Pose
 from std_msgs.msg import Int32
@@ -115,14 +115,15 @@ def main():
                     # Extract x, y, and z from the translation vector
                     x, y, z = tVec[0][0][0], tVec[0][0][1], tVec[0][0][2]
 
-                    print("x:", x)
-                    print("y:", y)
-                    print("z:", z)
+                    distance = round(np.sqrt(x**2 + y**2 + z**2), 1)
 
-                    xw = round((x*cosh(theta) - z*sinh(theta)), 1)
-                    yw = round((z*cosh(theta) - x*sinh(theta)), 1)
+                    # xw = round(distance * cos(theta), 1)
+                    # yw = round((distance * sin(theta)  + 51), 1)
 
-                    print(f'Xw: {xw}cm, Yw: {yw}cm')
+                    xw = round((z * cos(theta) - x * sin(theta)), 1)
+                    yw = round(abs((x * cos(theta) - z * sin(theta)))+43, 1)
+
+                    print(f'Distance: {distance} cm,\t Theta: {round(theta, 2)} rad,\t Xw: {xw} cm,\t Yw: {yw} cm')
 
                     cv.polylines(
                         frame, [marker_corners[i].astype(np.int32)], True, (0, 255, 255), 4, cv.LINE_AA
