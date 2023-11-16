@@ -123,7 +123,22 @@ def main():
                     xw = round((z * cos(theta) - x * sin(theta)), 1)
                     yw = round(abs((x * cos(theta) - z * sin(theta)))+43, 1)
 
-                    print(f'Distance: {distance} cm,\t Theta: {round(theta, 2)} rad,\t Xw: {xw} cm,\t Yw: {yw} cm')
+                    xws = []
+                    yws = []
+
+                    if len(xws) >= 10:
+                        xws.pop(0)
+
+                    if len(yws) >= 10:
+                        yws.pop(0)
+
+                    xws.append(xw)
+                    yws.append(yw)
+
+                    avg_xw = round(sum(xws) / len(xws), 1)
+                    avg_yw = round(sum(yws) / len(yws), 1)
+
+                    print(f'Distance: {distance} cm,\t Theta: {round(theta, 2)} rad,\t Xw: {avg_xw} cm,\t Yw: {avg_yw} cm')
 
                     cv.polylines(
                         frame, [marker_corners[i].astype(np.int32)], True, (0, 255, 255), 4, cv.LINE_AA
