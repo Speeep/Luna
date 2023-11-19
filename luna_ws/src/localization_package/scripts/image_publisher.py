@@ -10,6 +10,7 @@ from geometry_msgs.msg import Pose
 from std_msgs.msg import Int32
 import pickle
 from scipy.spatial.transform import Rotation as R
+from localization_package.src.detect_marker import detect
 
 # Load the pickles
 matrix_path = '/home/speeep/Development/Luna/luna_ws/src/localization_package/scripts/pkls027/cameraMatrix.pkl'
@@ -26,6 +27,9 @@ MARKER_SIZE = 50 # Centimeters TODO: Change if we make marker bigger
 
 # Load the ArUco dictionary
 dictionary = aruco.getPredefinedDictionary(cv.aruco.DICT_4X4_250)
+
+xws = []
+yws = []
 
 
 # Function to clean corners
@@ -96,10 +100,10 @@ def main():
             if ids is not None:
 
                 # Find the index of the marker with ID 42
-                marker_index = np.where(ids == 42)[0]
+                index_42 = np.where(ids == 42)[0]
 
-                if len(marker_index) > 0:
-                    i = marker_index[0]  # Use the first occurrence of marker with ID 42
+                if len(index_42) > 0:
+                    i = index_42[0]  # Use the first occurrence of marker with ID 42
 
                     # Calculate Rotation and Translation for the selected marker
                     rVec, tVec, _ = aruco.estimatePoseSingleMarkers(
@@ -117,19 +121,13 @@ def main():
 
                     distance = round(np.sqrt(x**2 + y**2 + z**2), 1)
 
-                    # xw = round(distance * cos(theta), 1)
-                    # yw = round((distance * sin(theta)  + 51), 1)
-
                     xw = round((z * cos(theta) - x * sin(theta)), 1)
                     yw = round(abs((x * cos(theta) - z * sin(theta)))+43, 1)
 
-                    xws = []
-                    yws = []
-
-                    if len(xws) >= 10:
+                    if len(xws) >= 100:
                         xws.pop(0)
 
-                    if len(yws) >= 10:
+                    if len(yws) >= 100:
                         yws.pop(0)
 
                     xws.append(xw)
@@ -146,24 +144,9 @@ def main():
 
                     corners = marker_corners[i].reshape(4, 2)
                     corners = corners.astype(int)
-                    top_right = tuple(corners[0].ravel())
-                    top_left = tuple(corners[1].ravel())
-                    bottom_right = tuple(corners[2].ravel())
-                    bottom_left = tuple(corners[3].ravel())
 
                     # Draw the pose of the marker
                     point = cv.drawFrameAxes(frame, camera_matrix, dist, rVec[0], tVec[0], 4, 4)
-
-                    # cv.putText(
-                    #     img=frame,
-                    #     text=f"x: {x} y: {y}",
-                    #     org=bottom_right,
-                    #     fontFace=cv.FONT_HERSHEY_PLAIN,
-                    #     fontScale=1.0,
-                    #     color=GREEN,  # Change color to green
-                    #     thickness=2,
-                    #     lineType=cv.LINE_AA,
-                    # )
 
                     # Define the starting and ending points of the line
                     start_point = (frame.shape[1] // 2, 0)
