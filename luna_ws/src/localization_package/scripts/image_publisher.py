@@ -22,10 +22,10 @@ with open(dist_path, 'rb') as file:
     dist = pickle.load(file)
 
 # Define ArUco Characteristics
-MARKER_SIZE = 50 # Centimeters TODO: Change if we make marker bigger
+MARKER_SIZE = 88 # Centimeters TODO: Change if we make marker bigger
 
 # Load the ArUco dictionary
-dictionary = aruco.getPredefinedDictionary(cv.aruco.DICT_4X4_250)
+dictionary = aruco.getPredefinedDictionary(cv.aruco.DICT_5X5_1000)
 
 xws = []
 yws = []
@@ -80,15 +80,12 @@ def main():
             # BGR 2 Gray
             gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
-            # Apply gamma correction to enhance contrast
-            gamma = 3
-            gray_frame = np.power(gray_frame / float(np.max(gray_frame)), gamma) * 255.0
+            # Blur to remove noise
+            gray_frame = cv.blur(gray_frame, (5,5))
 
             # Threshold image to get better ArUco detection
-            threshold_value = 20
+            threshold_value = 80
             thresh_ret, gray_frame = cv.threshold(gray_frame, threshold_value, 255, cv.THRESH_BINARY)
-
-            gray_frame = np.uint8(gray_frame)
 
             # cv.imshow('gray', gray_frame)
             # cv.waitKey(0)
@@ -101,7 +98,7 @@ def main():
             if ids is not None:
 
                 # Find the index of the marker with ID 42
-                index_42 = np.where(ids == 42)[0]
+                index_42 = np.where(ids == 256)[0]
 
                 if len(index_42) > 0:
                     i = index_42[0]  # Use the first occurrence of marker with ID 42
@@ -123,7 +120,7 @@ def main():
                     distance = round(np.sqrt(x**2 + y**2 + z**2), 1)
 
                     xw = round((z * cos(theta) - x * sin(theta)), 1)
-                    yw = round(abs((x * cos(theta) - z * sin(theta)))+248, 1)
+                    yw = round(abs((x * cos(theta) - z * sin(theta))), 1)
 
                     if len(xws) >= 100:
                         xws.pop(0)
