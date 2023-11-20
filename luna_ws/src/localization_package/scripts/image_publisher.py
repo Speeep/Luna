@@ -10,7 +10,6 @@ from geometry_msgs.msg import Pose
 from std_msgs.msg import Int32
 import pickle
 from scipy.spatial.transform import Rotation as R
-from localization_package.src.detect_marker import detect
 
 # Load the pickles
 matrix_path = '/home/speeep/Development/Luna/luna_ws/src/localization_package/scripts/pkls027/cameraMatrix.pkl'
@@ -89,8 +88,10 @@ def main():
             threshold_value = 20
             thresh_ret, gray_frame = cv.threshold(gray_frame, threshold_value, 255, cv.THRESH_BINARY)
 
-            # Convert to uint8
             gray_frame = np.uint8(gray_frame)
+
+            # cv.imshow('gray', gray_frame)
+            # cv.waitKey(0)
 
             # Detect ArUco markers in the frame.
             marker_corners, ids, _ = aruco.detectMarkers(gray_frame, dictionary)
@@ -122,7 +123,7 @@ def main():
                     distance = round(np.sqrt(x**2 + y**2 + z**2), 1)
 
                     xw = round((z * cos(theta) - x * sin(theta)), 1)
-                    yw = round(abs((x * cos(theta) - z * sin(theta)))+43, 1)
+                    yw = round(abs((x * cos(theta) - z * sin(theta)))+248, 1)
 
                     if len(xws) >= 100:
                         xws.pop(0)
