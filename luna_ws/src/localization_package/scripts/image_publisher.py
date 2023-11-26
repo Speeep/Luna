@@ -153,7 +153,9 @@ def main():
                     cv.line(frame, start_point, end_point, RED, 1)
 
                     centroid = calculate_centroid(corners)
-                    servo_error_publisher.publish((width//2) - centroid[0])
+                    servo_error = int((width//2) - centroid[0])
+                    print(servo_error)
+                    servo_error_publisher.publish(servo_error)
 
             else: 
                 servo_error_publisher.publish(0)

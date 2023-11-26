@@ -1,6 +1,12 @@
 <launch>
   <node
     pkg="localization_package"
+    type="robot.py"
+    name="robot" 
+    output="screen"
+  />
+  <node
+    pkg="localization_package"
     type="image_subscriber.py"
     name="image_subscriber" 
     output="screen"
