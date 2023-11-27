@@ -209,6 +209,8 @@ catkin_install_python(PROGRAMS
   scripts/image_subscriber.py 
   scripts/image_publisher.py 
   scripts/listener.py 
+  scripts/depth_publisher.py
+  scripts/depth_subscriber.py
   src/robot.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
