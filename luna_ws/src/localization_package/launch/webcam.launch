@@ -1,5 +1,5 @@
 <launch>
-  <node
+  <!-- <node
     pkg="localization_package"
     type="robot.py"
     name="robot" 
@@ -22,7 +22,7 @@
     type="listener.py"
     name="listener"
     output="screen"
-  />
+  /> -->
   <!-- <arg name="port" default="/dev/ttyACM0" />
   <arg name="baud" default="57600" />
   
@@ -30,4 +30,16 @@
     <param name="port" value="$(arg port)" />
     <param name="baud" value="$(arg baud)" />
   </node> -->
+  <node
+    pkg="localization_package"
+    type="depth_subscriber.py"
+    name="depth_subscriber" 
+    output="screen"
+  />
+  <node
+    pkg="localization_package"
+    type="depth_publisher.py"
+    name="depth_publisher"
+    output="screen"
+  />
 </launch> 

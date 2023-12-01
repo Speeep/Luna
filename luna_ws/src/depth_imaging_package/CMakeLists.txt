@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(localization_package)
+project(depth_imaging_package)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -9,7 +9,10 @@ project(localization_package)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  roslib
+  rospack
   rospy
+  rostime
   std_msgs
 )
 
@@ -104,8 +107,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES localization_package
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  LIBRARIES depth_imaging_package
+#  CATKIN_DEPENDS roscpp roslib rospack rospy rostime std_msgs
 #  DEPENDS system_lib
 )
 
@@ -122,7 +125,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/localization_package.cpp
+#   src/${PROJECT_NAME}/depth_imaging_package.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -133,7 +136,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/localization_package_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/depth_imaging_package_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -197,7 +200,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_localization_package.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_depth_imaging_package.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
@@ -206,9 +209,7 @@ include_directories(
 # catkin_add_nosetests(test)
 
 catkin_install_python(PROGRAMS 
-  scripts/image_subscriber.py 
-  scripts/image_publisher.py 
-  scripts/listener.py 
-  src/robot.py
+  src/depth_publisher.py
+  src/depth_subscriber.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

@@ -1,0 +1,14 @@
+<launch>
+  <node
+    pkg="depth_imaging_package"
+    type="depth_subscriber.py"
+    name="depth_subscriber" 
+    output="screen"
+  />
+  <node
+    pkg="depth_imaging_package"
+    type="depth_publisher.py"
+    name="depth_publisher"
+    output="screen"
+  />
+</launch> 
