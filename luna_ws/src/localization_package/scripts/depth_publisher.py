@@ -2,7 +2,7 @@ import rospy
 import cv2
 import numpy as np
 import pyrealsense2 as rs
-# import librealsense2 as lib
+import library as lib
 
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
@@ -28,6 +28,9 @@ def main():
     #creates pointcloud reference
     pc = rs.pointcloud()
     colorizer = rs.colorizer()
+
+    # coordinates of object
+    object_coordinates = []
 
     # Start streaming
     profile = pipeline.start(config)
@@ -76,41 +79,47 @@ def main():
 
             depth_cm = np.asanyarray(colorizer.colorize(depth_frame).get_data())
 
-            key = cv2.waitKey(1)
+            object_coordinates = lib.detect_objects(depth_frame)
+
+            # key = cv2.waitKey(1)
             
-            if key == ord('d'):
+            # if key == ord('d'):
 
-                min_distance = 1e-6
+            #     min_distance = 1e-6
 
-                vtx = points.get_vertices()
+            #     vtx = points.get_vertices()
 
-                vertices = np.asanyarray(vtx).view(np.float32).reshape(-1,3) #Reshaping for xyz
+            #     vertices = np.asanyarray(vtx).view(np.float32).reshape(-1,3) #Reshaping for xyz
 
-                h,w,_ = color_image.shape
+            #     h,w,_ = color_image.shape
 
-                rw_cords=[]
+            #     rw_cords=[]
 
-                counter = 0
+            #     counter = 0
 
-                for i in range(points.size()):
+            #     for i in range(points.size()):
 
-                    rw_cords.append(vertices[i])
+            #         rw_cords.append(vertices[i])
 
-                # print("Number of pixels ignored:", counter)
+            #     # print("Number of pixels ignored:", counter)
 
-                # pos = lib.pass_coordinate(depth_res[0]/2,depth_res[1]/2,depth_res[0])
+            #     pos = lib.pass_coordinate(depth_res[0]/2,depth_res[1]/2,depth_res[0])
 
-                # print("SDK point:",
+            #     x = rw_cords[pos][0]
+            #     y = rw_cords[pos][1]
+            #     z = rw_cords[pos][2]
 
-                #         "index =", pos,
+            #     # print("SDK point:",
 
-                #         "x =", rw_cords[pos][0],
+            #     #         "index =", pos,
 
-                #         "y =", rw_cords[pos][1],
+            #     #         "x =", rw_cords[pos][0],
 
-                #         "z =", rw_cords[pos][2]
+            #     #         "y =", rw_cords[pos][1],
 
-                #         ) 
+            #     #         "z =", rw_cords[pos][2]
+
+            #     #         ) 
 
             # Publish depth image to ROS
             depth_ros_msg = bridge.cv2_to_imgmsg(depth_cm, encoding="passthrough")
