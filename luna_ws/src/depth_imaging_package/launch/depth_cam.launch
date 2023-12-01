@@ -11,4 +11,10 @@
     name="depth_publisher"
     output="screen"
   />
+  <node
+    pkg="depth_imaging_package"
+    type="contour_subscriber.py"
+    name="contour_subscriber"
+    output="screen"
+  />
 </launch> 
