@@ -12,12 +12,7 @@
  * http://www.arduino.cc/en/Reference/Servo
  */
 
-#if (ARDUINO >= 100)
- #include <Arduino.h>
-#else
- #include <WProgram.h>
-#endif
-
+#include <Arduino.h>
 #include <Servo.h> 
 #include <ros.h>
 #include <std_msgs/Int32.h>
@@ -26,27 +21,26 @@ ros::NodeHandle  nh;
 
 Servo servo;
 
-float p = 0.001;
+int speed = 0;
+int outSpeed;
+
+float p = -0.04;
 
 std_msgs::Int32 servo_speed_msg;
 ros::Publisher pub("servo_speed", &servo_speed_msg);
 
 void servo_cb( const std_msgs::Int32& cmd_msg){
-  uint32_t error = cmd_msg.data;
+  int32_t error = cmd_msg.data;
 
-  // Calculate what the new position should be
-  int speed = 90 + int(error * p);
+  speed = int(p * error);
+  servo_speed_msg.data = speed;
 
-  // Ensure the new position is within the valid range (0-180)
-  if (speed < 0) {
-    speed = 0;
-  } else if (speed > 180) {
-    speed = 180;
+  // Publish the message and check for success
+  if (pub.publish(&servo_speed_msg)) {
+    nh.spinOnce();
+  } else {
+    Serial.println("Failed to publish servo_speed_msg");
   }
-  
-  servo.write(speed); //set servo angle, should be from 0-180
-  
-  digitalWrite(13, HIGH-digitalRead(13));  //toggle led  
 }
 
 
@@ -55,17 +49,31 @@ ros::Subscriber<std_msgs::Int32> sub("servo_error", servo_cb);
 void setup(){
 
   Serial.begin(9600);
-  
-  pinMode(13, OUTPUT);
 
   nh.initNode();
   nh.subscribe(sub);
   nh.advertise(pub);
   
-  servo.attach(2); //attach it to pin 2
+  servo.attach(2);
+  servo.write(91);
 }
 
 void loop(){
   nh.spinOnce();
+
+  //Speed Vals can be from -10 to +10
+
+  if (speed < 0) {
+    outSpeed = map(speed, -10, 0, 85, 86);
+  }
+  else if (speed > 0) {
+    outSpeed = map(speed, 0, 10, 92, 94);
+  }
+  else {
+    outSpeed = 91;
+  }
+
+  servo.write(outSpeed);
+  
   delay(1);
 }
