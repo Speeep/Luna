@@ -44,6 +44,9 @@ def main():
             # Convert depth frame to depth image
             depth_data = np.asanyarray(depth_frame.get_data())
 
+            # Apply spatial smoothing (Gaussian blur)
+            smoothed_depth_data = cv2.GaussianBlur(depth_data, (3, 3), 0)
+
             # Apply temporal smoothing
             depth_buffer.append(depth_data)
             smoothed_depth_data = np.mean(depth_buffer, axis=0)
