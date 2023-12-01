@@ -17,20 +17,16 @@ ros::Publisher Magnetic_pos_pub("magnetic_pos", &Magnetic_pos_msg);
 
 //Magnetic sensor things
 int magnetStatus = 0; //value of the status register (MD, ML, MH)
+float startAngle = 53.00; //starting angle 
+                          // NOTE: in future this will need to be an array for multiple encoders
 
+//I2C things
 int lowbyte; //raw angle 7:0
 word highbyte; //raw angle 7:0 and 11:8
-int rawAngle; //final raw angle 
-float degAngle; //raw angle in degrees (360/4096 * [value between 0-4095])
 
-int quadrantNumber, previousquadrantNumber; //quadrant IDs
-float numberofTurns = 0; //number of turns
-float correctedAngle = 0; //tared angle - based on the startup value
-float startAngle = 0; //starting angle
-float totalAngle = 0; //total absolute angular displacement
-float previoustotalAngle = 0; //for the display printing
 
-void ReadRawAngle()
+// NOTE: in future this needs to be reworked for multiplexing
+float ReadAngle()
 { 
   //7:0 - bits
   Wire.beginTransmission(0x36); //connect to the sensor
@@ -61,25 +57,21 @@ void ReadRawAngle()
   //Low:  00000000|00001111
   //      -----------------
   //H|L:  00001111|00001111
-  rawAngle = highbyte | lowbyte; //int is 16 bits (as well as the word)
+  int rawAngle = (highbyte | lowbyte) & 0x0fff; //extract last 12 bits
 
   //We need to calculate the angle:
   //12 bit -> 4096 different levels: 360° is divided into 4096 equal parts:
   //360/4096 = 0.087890625
   //Multiply the output of the encoder with 0.087890625
-  degAngle = rawAngle * 0.087890625;
-  
-  //Serial.print("Deg angle: ");
-  //Serial.println(degAngle, 2); //absolute position of the encoder within the 0-360 circle
-  
+  degAngle = (float)rawAngle * 0.087890625 - startAngle;
+
+  if(degAngle < 0){
+    degAngle += 360;
+  }
+
+  return degAngle;
 }
 
-void correctAngle()
-{
-  degAngle  = (int)degAngle % 360;
-  //Serial.print("Corrected angle: ");
-  //Serial.println(correctedAngle, 2); //print the corrected/tared angle  
-}
 
 void checkMagnetPresence()
 {  
@@ -108,7 +100,7 @@ void setup() {
   Wire.begin(); //start i2C  
 	Wire.setClock(800000L); //fast clock
   checkMagnetPresence(); //check the magnet (blocks until magnet is found)
-  ReadRawAngle();
+  ReadAngle();
   startAngle = degAngle; //update startAngle with degAngle - for taring
 
   nh.initNode(); //make a reading so the degAngle gets updated
@@ -117,11 +109,10 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:  
-  ReadRawAngle(); //ask the value from the sensor
-  correctAngle(); //tare the value
+  float angle = ReadAngle(); //ask the value from the sensor
   
   // Publish the magnetic sensor data to the ROS topic
-  Magnetic_pos_msg.data = static_cast<int32_t>(degAngle);
+  Magnetic_pos_msg.data = static_cast<float>(angle);
   Magnetic_pos_pub.publish(&Magnetic_pos_msg);
   
   nh.spinOnce();
