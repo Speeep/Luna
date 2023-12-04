@@ -212,5 +212,6 @@ catkin_install_python(PROGRAMS
   src/depth_publisher.py
   src/depth_subscriber.py
   src/contour_subscriber.py
+  src/obstacle_localizer.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

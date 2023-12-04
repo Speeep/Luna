@@ -1,27 +1,21 @@
 import rospy
 from std_msgs.msg import Float32MultiArray
 import numpy as np
-from math import cos, sin
+from math import cos, sin, sqrt
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-webcam_theta = 0
+webcam_theta = 0.785398 # 45 Deg in Radians
 
-y_rot = np.array(
-    [
-        [0.5253, 0, 0.8509],
-        [0, 1, 0],
-        [-0.8509, 0, 0.5253]
-    ]
-)
+transformation_matrix = np.array([
+    [cos(webcam_theta - 1.5708), (sqrt(2)/2)*sin(webcam_theta - 1.5708), -(sqrt(2)/2)*sin(webcam_theta - 1.5708), -(8.76*sin(webcam_theta - 1.5708))],
+    [sin(webcam_theta - 1.5708), -(sqrt(2)/2)*cos(webcam_theta - 1.5708), (sqrt(2)/2)*cos(webcam_theta - 1.5708), 8.76*cos(webcam_theta - 1.5708)],
+    [0, -sqrt(2)/2, -sqrt(2)/2, -6.91],
+    [0, 0, 0, 1]
+])
 
-z_rot = np.array(
-    [
-        [cos(webcam_theta), -sin(webcam_theta), 0],
-        [sin(webcam_theta), cos(webcam_theta), 0],
-        [0, 0, 1]
-    ]
-)
-
-print()
+print("Transformation Matrix:")
+print(transformation_matrix)
 
 def update_obstacle_pose(data):
     print(f'Obstacle Pose in Realsense Frame is: {data.data}')
