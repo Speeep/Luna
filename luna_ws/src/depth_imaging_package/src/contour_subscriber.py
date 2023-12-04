@@ -4,41 +4,6 @@ from cv_bridge import CvBridge
 import cv2
 import json
 
-# File Path to RealSense Calibration Data
-file_path = '/home/speeep/Development/Luna/luna_ws/src/depth_imaging_package/src/d455_calib_data'
-
-with open(file_path, 'r') as file:
-    calibration_data = json.load(file)
-
-def pixel_to_cartesian(u, v, depth, baseline, intrinsic, rectified):
-    # Intrinsic parameters
-    fx = intrinsic[0]
-    fy = intrinsic[1]
-    cx = intrinsic[2]
-    cy = intrinsic[3]
-
-    # Rectified parameters
-    ppx = rectified[0]
-    ppy = rectified[1]
-
-    # Convert pixel coordinates to normalized image coordinates
-    x_normalized = (u - ppx) / fx
-    y_normalized = (v - ppy) / fy
-
-    # Convert normalized image coordinates to rectified camera coordinates
-    x_rectified = depth * x_normalized
-    y_rectified = depth * y_normalized
-
-    # Apply baseline to get disparity
-    disparity = baseline / x_rectified
-
-    # Convert rectified camera coordinates to Cartesian coordinates
-    x_cartesian = disparity
-    y_cartesian = disparity * y_normalized
-    z_cartesian = disparity * depth
-
-    return x_cartesian, y_cartesian, z_cartesian
-
 # # Example usage
 # u_pixel = 100  # Replace with your pixel coordinates
 # v_pixel = 150  # Replace with your pixel coordinates
