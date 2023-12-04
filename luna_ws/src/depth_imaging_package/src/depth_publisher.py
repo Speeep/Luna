@@ -127,7 +127,6 @@ def main():
 
                                 x, y, z = map(lambda val: round(val, 2), (x, y, z))
 
-                                print(f"Depth: {depth}")
                                 print(f"X: {x}, Y: {y}, Z: {z}")
 
             # Apply temporal smoothing
