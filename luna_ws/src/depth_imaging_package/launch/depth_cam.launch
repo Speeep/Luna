@@ -17,4 +17,10 @@
     name="contour_subscriber"
     output="screen"
   />
+  <node
+    pkg="depth_imaging_package"
+    type="obstacle_localizer.py"
+    name="obstacle_localizer"
+    output="screen"
+  />
 </launch> 
