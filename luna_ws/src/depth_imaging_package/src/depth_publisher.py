@@ -5,6 +5,7 @@ import pyrealsense2 as rs
 from collections import deque
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
+from std_msgs.msg import Float32MultiArray
 
 # Set up a queue for temporal smoothing
 depth_buffer = deque(maxlen=5)
@@ -39,6 +40,7 @@ def main():
     # Set up ROS publisher
     image_pub = rospy.Publisher('/realsense/depth/image_aligned', Image, queue_size=10)
     contour_pub = rospy.Publisher('/realsense/depth/contour_image', Image, queue_size=10)
+    obstacle_pub = rospy.Publisher('/realsense/depth/obstacle', Float32MultiArray, queue_size=10)
     bridge = CvBridge()
 
     try:
@@ -127,7 +129,10 @@ def main():
 
                                 x, y, z = map(lambda val: round(val, 2), (x, y, z))
 
-                                print(f"X: {x}, Y: {y}, Z: {z}")
+                                # Publish Obstacle pose in Realsense Camera Frame
+                                obstacle_msg = Float32MultiArray()
+                                obstacle_msg.data = [x, y, z]
+                                obstacle_pub.publish(obstacle_msg)
 
             # Apply temporal smoothing
             depth_buffer.append(depth_data)
