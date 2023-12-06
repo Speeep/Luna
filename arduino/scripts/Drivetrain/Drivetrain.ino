@@ -5,6 +5,9 @@
 #include <MsTimer2.h>
 #include <FastPID.h>
 
+#include <ros.h>
+// #include <std_msgs/Int32.h>
+
 #ifdef PARAM_SHIFT
 #undef PARAM_SHIFT
 #define PARAM_SHIFT 4
@@ -13,6 +16,11 @@
 // ******************************* Parameter Configuration ******************************* //
 #define pos_interval 10 // 10ms position loop calculation interval
 #define interval 2000   // 2ms sampling interval in microseconds
+
+ros::NodeHandle  nh;
+
+// std_msgs::_Float64 servo_speed_msg;
+// ros::Publisher pub("servo_speed", &servo_speed_msg);
 
 // Position loop PID parameters. After implementing the velocity loop, usually only the P term is needed.
 const float pos_Kp = 0.05;  // 0.15  
@@ -205,7 +213,7 @@ inline int toRealData(unsigned char DataH, unsigned char DataL)
 
 inline bool CANmsgComing()
 {
-  return mcp2515.readMessage(&canMsgIn) == MCP2515::ERROR_OK;
+  return mcp2515.readMessage(&canMsgIn) == MCP2515::ERROR_OK;setMotorCurrent
 }
 
 void checkCANmsg()

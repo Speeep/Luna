@@ -5,14 +5,17 @@
 #endif
 
 #include <Wire.h>
+
+#!/usr/bin/env python
+
 #include <ros.h>
-#include <std_msgs/Int32.h>
+#include <std_msgs/Float32.h>
 
 ros::NodeHandle nh;
 
 Wire wire;
 
-std_msgs::Int32 Magnetic_pos_msg;
+std_msgs::Float32 Magnetic_pos_msg;
 ros::Publisher Magnetic_pos_pub("magnetic_pos", &Magnetic_pos_msg);
 
 //Magnetic sensor things
@@ -20,10 +23,14 @@ int magnetStatus = 0; //value of the status register (MD, ML, MH)
 float startAngle = 53.00; //starting angle 
                           // NOTE: in future this will need to be an array for multiple encoders
 
+// Kalman myFilter(0.05, 16, 1023, 0); // Kalman filter
+
 //I2C things
 int lowbyte; //raw angle 7:0
 word highbyte; //raw angle 7:0 and 11:8
 
+float degAngle;
+float radAngle;
 
 // NOTE: in future this needs to be reworked for multiplexing
 float ReadAngle()
@@ -36,8 +43,8 @@ float ReadAngle()
   
   while(Wire.available() == 0); //wait until it becomes available 
   lowbyte = Wire.read(); //Reading the data after the request
- 
-  //11:8 - 4 bits
+
+  // //11:8 - 4 bits
   Wire.beginTransmission(0x36);
   Wire.write(0x0C); //figure 21 - register map: Raw angle (11:8)
   Wire.endTransmission();
@@ -63,13 +70,19 @@ float ReadAngle()
   //12 bit -> 4096 different levels: 360° is divided into 4096 equal parts:
   //360/4096 = 0.087890625
   //Multiply the output of the encoder with 0.087890625
-  degAngle = (float)rawAngle * 0.087890625 - startAngle;
+  degAngle = static_cast<float>(rawAngle) * 0.087890625 - startAngle;
 
   if(degAngle < 0){
     degAngle += 360;
   }
 
-  return degAngle;
+  if(degAngle > 180){
+    degAngle -= 360;
+  }
+
+  radAngle = degAngle *(M_PI/180);
+
+  return radAngle;
 }
 
 
@@ -94,6 +107,8 @@ void checkMagnetPresence()
   }   
 }
 
+ros::Subscriber<std_msgs::_Float32> sub("magnetic_error", ReadAngle);
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600); //start serial - tip: don't use serial if you don't need it (speed considerations)
@@ -101,10 +116,15 @@ void setup() {
 	Wire.setClock(800000L); //fast clock
   checkMagnetPresence(); //check the magnet (blocks until magnet is found)
   ReadAngle();
-  startAngle = degAngle; //update startAngle with degAngle - for taring
+  // startAngle = degAngle; //update startAngle with degAngle - for taring
+
+  // pinMode(13, OUTPUT); // output on pin 14
 
   nh.initNode(); //make a reading so the degAngle gets updated
+  nh.subscribe(sub);
   nh.advertise(Magnetic_pos_pub);  // Advertise the magnetic_pos topic
+
+  // wire.attach(2); // attach it to pin 3
 }
 
 void loop() {
@@ -112,8 +132,9 @@ void loop() {
   float angle = ReadAngle(); //ask the value from the sensor
   
   // Publish the magnetic sensor data to the ROS topic
-  Magnetic_pos_msg.data = static_cast<float>(angle);
+  Magnetic_pos_msg.data = angle;
   Magnetic_pos_pub.publish(&Magnetic_pos_msg);
+  
   
   nh.spinOnce();
   delay(1);
