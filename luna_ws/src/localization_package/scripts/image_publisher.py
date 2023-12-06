@@ -7,7 +7,7 @@ import numpy as np
 from math import sin, cos
 import cv2.aruco as aruco
 from geometry_msgs.msg import Pose
-from std_msgs.msg import Int32
+from std_msgs.msg import Int32, Float32MultiArray
 import pickle
 from scipy.spatial.transform import Rotation as R
 
@@ -60,6 +60,7 @@ def main():
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
     pose_publisher = rospy.Publisher('aruco_pose', Pose, queue_size=10)
     servo_error_publisher = rospy.Publisher('servo_error', Int32, queue_size=10)
+    aruco_data_publisher = rospy.Publisher('aruco_data', Float32MultiArray, queue_size=10)
 
     bridge = CvBridge()
 
@@ -134,7 +135,10 @@ def main():
                     avg_xw = round(sum(xws) / len(xws), 1)
                     avg_yw = round(sum(yws) / len(yws), 1)
 
-                    print(f'Distance: {distance} cm,\t Theta: {round(theta, 2)} rad,\t Xw: {avg_xw} cm,\t Yw: {avg_yw} cm')
+                    # Publish Theta to 'aruco_theta'
+                    aruco_data_msg = Float32MultiArray()
+                    aruco_data_msg.data = [avg_xw, avg_yw, theta]
+                    aruco_data_publisher.publish(aruco_data_msg)
 
                     cv.polylines(
                         frame, [marker_corners[i].astype(np.int32)], True, (0, 255, 255), 4, cv.LINE_AA
@@ -154,7 +158,6 @@ def main():
 
                     centroid = calculate_centroid(corners)
                     servo_error = int((width//2) - centroid[0])
-                    print(servo_error)
                     servo_error_publisher.publish(servo_error)
 
             else: 
