@@ -65,7 +65,7 @@ def main():
     bridge = CvBridge()
 
     # Define Camera to Use
-    cam = cv.VideoCapture(2)
+    cam = cv.VideoCapture(8)
 
     # Define green color
     GREEN = (0, 255, 0)
