@@ -203,3 +203,10 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+catkin_install_python(PROGRAMS 
+  src/robot.py
+  src/drivetrain.py
+  src/listener.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
