@@ -2,7 +2,7 @@ import rospy
 from std_msgs.msg import Int8
 
 def callback(data):
-    print(f'Wheel angle is: {data.data}')
+    pass
 
 def listener():
 
