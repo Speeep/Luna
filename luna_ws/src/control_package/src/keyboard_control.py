@@ -95,7 +95,6 @@ class KeyControlNode:
             self.robot_enable = True
             enable.data = self.robot_enable
             self.drivetrain_enable_pub.publish(self.robot_enable)
-            print('enabling!')
         elif self.key_states['p']:
             disable = Bool()
             self.robot_enable = False

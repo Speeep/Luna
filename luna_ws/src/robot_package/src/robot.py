@@ -3,6 +3,9 @@ import rospy
 from std_msgs.msg import Bool
 
 
+# Keyboard control flag
+KEYBOARD_CONTROL = True
+
 # Flag to define if the robot is enabled or diabled
 robot_enable = False
 
@@ -36,8 +39,9 @@ def main():
     # Code gets looped here
     while not rospy.is_shutdown():
         
-        # Publish to all robot systems if robot is enabled or disabled
-        publish_robot_enable(robot_enable)
+        if not KEYBOARD_CONTROL:
+            # Publish to all robot systems if robot is enabled or disabled
+            publish_robot_enable(robot_enable)
 
     rate.sleep()
     
