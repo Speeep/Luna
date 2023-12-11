@@ -10,6 +10,7 @@ drive_speed = 0
 angled = False
 rotate_speed = 0
 left_wheelpod_angle = 0
+left_wheelpod_angle_setpoint = 0
 right_wheelpod_angle = 0
 
 def toggle_drivetrain_enable(data):
@@ -32,12 +33,14 @@ def set_wheel_angle(angle):
     angle_setpoint_pub.publish(wheel_angle)
 
 def toggle_wheelpod_angle(data):
-    global angled, left_wheelpod_angle
+    global angled, left_wheelpod_angle, left_wheelpod_angle_setpoint
     angled = data.data
     if angled:
-        set_wheel_angle(0.785398)
+        left_wheelpod_angle_setpoint = 0.785398
+        set_wheel_angle(left_wheelpod_angle_setpoint)
     else:
-        set_wheel_angle(0.0)
+        left_wheelpod_angle_setpoint = 0.0
+        set_wheel_angle(left_wheelpod_angle_setpoint)
 
 def set_rotate_speed(data):
     global rotate_speed
@@ -59,7 +62,7 @@ def main():
     rospy.Subscriber('/drivetrain/drive', Float32, set_drive_speed)
     rospy.Subscriber('/drivetrain/angle', Bool, toggle_wheelpod_angle)
     rospy.Subscriber('/drivetrain/rotate', Float32, set_rotate_speed)
-    rospy.Subscriber('drivetrain/left_wheelpod_angle', Float32, left_wheelpod_angle_cb)
+    rospy.Subscriber('/drivetrain/left_wheelpod_angle', Float32, left_wheelpod_angle_cb)
     
     # Publish at 10 Hz
     rate = rospy.Rate(10)
@@ -71,7 +74,8 @@ def main():
         if drivetrain_enabled:
 
             print('\t')
-            print(f'Left wheel angle is: {left_wheelpod_angle} degrees')
+            print(f'Left wheel angle is: {left_wheelpod_angle} radians')
+            print(f'Left wheel angle setpoint is: {left_wheelpod_angle_setpoint} radians')
             print(f'Drive speed is: {drive_speed}')
             print(f'Rotating speed is: {rotate_speed}')
             print(f'The wheel pods are angled: {angled}')
