@@ -24,13 +24,20 @@ def set_drive_speed(data):
     and abs(right_wheelpod_angle) < WHEELPOD_ANGLE_THRESHOLD):
         drive_speed = data.data
 
+# Function to publish the drivetrain wheel angle setpoint to the arduino
+def set_wheel_angle(angle):
+    angle_setpoint_pub = rospy.Publisher('/arduino/left_wheelpod_angle_setpoint', Float32, queue_size=10)
+    wheel_angle = Float32()
+    wheel_angle.data = angle
+    angle_setpoint_pub.publish(wheel_angle)
+
 def toggle_wheelpod_angle(data):
-    global angled, left_wheelpod_angle, right_wheelpod_angle
+    global angled, left_wheelpod_angle
     angled = data.data
     if angled:
-        left_wheelpod_angle, right_wheelpod_angle = 45, 45
+        set_wheel_angle(0.785398)
     else:
-        left_wheelpod_angle, right_wheelpod_angle = 0, 0
+        set_wheel_angle(0.0)
 
 def set_rotate_speed(data):
     global rotate_speed
@@ -40,12 +47,9 @@ def set_rotate_speed(data):
     and abs(45 - right_wheelpod_angle) < WHEELPOD_ANGLE_THRESHOLD):
         rotate_speed = data.data
 
-# Function to publish the drivetrain wheel angle for duplex turning.
-def set_wheel_angle(angle):
-    wheel_angle_pub = rospy.Publisher('/drivetrain/wheel_angle', Int8, queue_size=10)
-    wheel_angle = Int8()
-    wheel_angle.data = angle
-    wheel_angle_pub.publish(wheel_angle)
+def left_wheelpod_angle_cb(data):
+    global left_wheelpod_angle
+    left_wheelpod_angle = data.data
 
 def main():
 
@@ -55,6 +59,7 @@ def main():
     rospy.Subscriber('/drivetrain/drive', Float32, set_drive_speed)
     rospy.Subscriber('/drivetrain/angle', Bool, toggle_wheelpod_angle)
     rospy.Subscriber('/drivetrain/rotate', Float32, set_rotate_speed)
+    rospy.Subscriber('drivetrain/left_wheelpod_angle', Float32, left_wheelpod_angle_cb)
     
     # Publish at 10 Hz
     rate = rospy.Rate(10)
@@ -67,7 +72,6 @@ def main():
 
             print('\t')
             print(f'Left wheel angle is: {left_wheelpod_angle} degrees')
-            print(f'Right wheel angle is: {right_wheelpod_angle} degrees')
             print(f'Drive speed is: {drive_speed}')
             print(f'Rotating speed is: {rotate_speed}')
             print(f'The wheel pods are angled: {angled}')
