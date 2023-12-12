@@ -10,7 +10,11 @@
             "includePath": [
                 "/home/speeep/Development/Luna/Platformio/include",
                 "/home/speeep/Development/Luna/Platformio/src",
+                "/home/speeep/Development/Luna/Platformio/lib/mcp2515",
                 "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "/home/speeep/Development/Luna/Platformio/lib/Kalman",
+                "/home/speeep/Development/Luna/Platformio/lib/BasicLinearAlgebra",
+                "/home/speeep/Development/Luna/Platformio/.pio/libdeps/megaatmega2560/MCP2515",
                 "/home/speeep/Development/Luna/Platformio/lib/ros_lib",
                 "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                 "/home/speeep/.platformio/packages/framework-arduino-avr/cores/arduino",
@@ -25,7 +29,11 @@
                 "path": [
                     "/home/speeep/Development/Luna/Platformio/include",
                     "/home/speeep/Development/Luna/Platformio/src",
+                    "/home/speeep/Development/Luna/Platformio/lib/mcp2515",
                     "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "/home/speeep/Development/Luna/Platformio/lib/Kalman",
+                    "/home/speeep/Development/Luna/Platformio/lib/BasicLinearAlgebra",
+                    "/home/speeep/Development/Luna/Platformio/.pio/libdeps/megaatmega2560/MCP2515",
                     "/home/speeep/Development/Luna/Platformio/lib/ros_lib",
                     "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                     "/home/speeep/.platformio/packages/framework-arduino-avr/cores/arduino",
