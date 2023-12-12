@@ -9,7 +9,7 @@ class CANController {
 public:
     CANController();
 
-    void init(int csPin, int intPin);
+    void init();
 
     void setMotorSpeed(int);
 

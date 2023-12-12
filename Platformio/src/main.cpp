@@ -28,13 +28,14 @@ ros::Subscriber<std_msgs::Float32> angleSetpointSub("/arduino/left_wheelpod_angl
 
 void setup()
 {
-  Serial.begin(57600);
+  Serial.begin(9600);
+  SPI.begin();
   Wire.begin();
   Wire.setClock(800000L);
 
   left_turn_motor.init();
   left_wheelpod_encoder.init(1, 0.0);
-  can_controller.init(MCP_CS, MCP_INT);
+  can_controller.init();
 
   nh.initNode();
   nh.advertise(left_wheelpod_angle_pub);
@@ -42,23 +43,23 @@ void setup()
 }
 void loop()
 {
-  nh.spinOnce();
-  float angle = left_wheelpod_encoder.getAngle();
+  // nh.spinOnce();
+  // float angle = left_wheelpod_encoder.getAngle();
 
-  // Publish the magnetic sensor data to the ROS topic
-  left_wheelpod_angle_msg.data = angle;
-  left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
+  // // Publish the magnetic sensor data to the ROS topic
+  // left_wheelpod_angle_msg.data = angle;
+  // left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
 
-  float p = 50;
-  float error = angle - angleSetpoint;
+  // float p = 50;
+  // float error = angle - angleSetpoint;
 
-  // normalize error within -pi to pi
-  if (error > PI) { error -= 2 * PI; }
-  if (error < -PI) { error += 2 * PI; }
+  // // normalize error within -pi to pi
+  // if (error > PI) { error -= 2 * PI; }
+  // if (error < -PI) { error += 2 * PI; }
 
-  int effort = (int)(error * p);
-  left_turn_motor.setEffort(0);
-  delay(100);
+  // int effort = (int)(error * p);
+  // left_turn_motor.setEffort(0);
+  delay(5);
 
-  can_controller.setMotorSpeed(0);
+  can_controller.setMotorSpeed(10);
 }
