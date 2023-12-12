@@ -6,11 +6,13 @@
 #include <std_msgs/Int32.h>
 #include "./peripheral/snowblower.h"
 #include "./peripheral/encoder.h"
+#include "./peripheral/CANController.h"
 
 ros::NodeHandle nh;
 
 Snowblower left_turn_motor;
 Encoder left_wheelpod_encoder;
+CANController can_controller;
 
 std_msgs::Float32 left_wheelpod_angle_msg;
 ros::Publisher left_wheelpod_angle_pub("/drivetrain/left_wheelpod_angle", &left_wheelpod_angle_msg);
@@ -32,6 +34,7 @@ void setup()
 
   left_turn_motor.init();
   left_wheelpod_encoder.init(1, 0.0);
+  can_controller.init(MCP_CS, MCP_INT);
 
   nh.initNode();
   nh.advertise(left_wheelpod_angle_pub);
@@ -46,7 +49,7 @@ void loop()
   left_wheelpod_angle_msg.data = angle;
   left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
 
-  float p = 10;
+  float p = 50;
   float error = angle - angleSetpoint;
 
   // normalize error within -pi to pi
@@ -54,6 +57,8 @@ void loop()
   if (error < -PI) { error += 2 * PI; }
 
   int effort = (int)(error * p);
-  left_turn_motor.setEffort(effort);
+  left_turn_motor.setEffort(0);
   delay(100);
+
+  can_controller.setMotorSpeed(0);
 }

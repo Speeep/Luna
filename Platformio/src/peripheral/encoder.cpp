@@ -11,8 +11,8 @@
 Encoder::Encoder(){}
 
 void Encoder::init(int id, float start) {
-    int encoderNumber = id;
-    float startAngle = start;
+    encoderNumber = id;
+    startAngle = start;
 }
 
 float Encoder::getAngle()
