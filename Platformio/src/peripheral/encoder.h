@@ -1,9 +1,3 @@
-/*
- * encoder.h
- * 
- *  Created on: Dec 11, 2023
- *      Author: Speeep
- */
 #pragma once
 
 #include "Arduino.h"
@@ -14,10 +8,14 @@ class Encoder {
 
   Encoder();
 
-  void init();
+  void init(int id, float start);
 
   float getAngle();
 
  private:
-  const int pin = LIMIT_SWITCH_PIN;
+    float startAngle;
+    float radAngle;
+    int lowbyte;   // raw angle 7:0
+    word highbyte; // raw angle 7:0 and 11:8
+    int encoderNumber;
 };

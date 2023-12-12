@@ -1,0 +1,58 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "/home/speeep/Development/Luna/Platformio/include",
+                "/home/speeep/Development/Luna/Platformio/src",
+                "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "/home/speeep/Development/Luna/Platformio/lib/ros_lib",
+                "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "/home/speeep/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "/home/speeep/.platformio/packages/framework-arduino-avr/variants/mega",
+                "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/home/speeep/Development/Luna/Platformio/include",
+                    "/home/speeep/Development/Luna/Platformio/src",
+                    "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "/home/speeep/Development/Luna/Platformio/lib/ros_lib",
+                    "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "/home/speeep/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "/home/speeep/.platformio/packages/framework-arduino-avr/variants/mega",
+                    "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60111",
+                "ARDUINO_AVR_MEGA2560",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega2560__",
+                ""
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "compilerPath": "/home/speeep/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
+            "compilerArgs": [
+                "-mmcu=atmega2560",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}
