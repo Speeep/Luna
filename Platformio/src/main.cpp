@@ -59,7 +59,6 @@ void loop()
 
   // int effort = (int)(error * p);
   // left_turn_motor.setEffort(0);
-  delay(5);
 
-  can_controller.setMotorSpeed(10);
+  // SET SPEED OF CAN CONTROLLER HERE
 }
