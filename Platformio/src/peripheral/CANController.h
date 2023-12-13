@@ -6,7 +6,6 @@
 #include "../robotMap.h"
 #include <Kalman.h>
 #include <TimerOne.h>
-#include <MsTimer2.h>
 #include <FastPID.h>
 
 class CANController {
@@ -31,13 +30,19 @@ public:
 
     int calcPosition(long, int);
 
-    void positionHandlerPID();
+    // void positionHandlerPID();
 
     void speedHandlerPID();
 
-    static void staticPositionHandlerPID();
+    // static void staticPositionHandlerPID();
 
     static void staticGetCanData();
+
+    static void staticSpeedHandlerPID();
+
+    void setSpeed(int, int, int, int);
+
+    int getSpeed(int);
 
 private:
     struct can_frame canMsgOut;
@@ -56,13 +61,10 @@ private:
     long setPos[4];
     int setSpeeds[4];
     int temps[4];
+    int errors[4];
+    int prevErrors[4];
+    int sums[4];
     float i1;
-    float pos_Kp;
-    int pos_Ki;         
-    int pos_Kd;
-    float speed_Kp;
-    float speed_Ki;
-    float speed_Kd;
     FastPID speed_PID_0;
     FastPID speed_PID_1;
     FastPID speed_PID_2;

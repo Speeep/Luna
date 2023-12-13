@@ -1,9 +1,8 @@
 #pragma once
 
 // BTS7960 motor driver constants
-#define R_IS 6
+#define IS 6
 #define R_PWM 3
-#define L_IS 7
 #define EN 4
 #define L_PWM 5
 
@@ -14,5 +13,13 @@
 #define MCP_SO 50 // Green Wire
 #define MCP_SCK 52 // Orange Wire
 
-#define POS_INTERVAL 10
-#define INTERVAL 2000
+#define INTERVAL 5000
+
+// Velocity loop PID parameters
+// Increase Ki based on load, fine-tune Kp
+#define SPEED_KP 10
+#define SPEED_KI 8
+#define SPEED_KD 0.4
+#define SPEED_SUMCAP 35
+
+#define POS_KP 0.05

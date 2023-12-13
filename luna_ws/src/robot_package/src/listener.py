@@ -1,14 +1,14 @@
 import rospy
-from std_msgs.msg import Int8
+from std_msgs.msg import Int32
 
 def callback(data):
-    pass
+    print("Motor speed: " + data.data)
 
 def listener():
 
     rospy.init_node('listener', anonymous=True)
 
-    rospy.Subscriber('/drivetrain/wheel_angle', Int8, callback)
+    rospy.Subscriber('/motorspeed', Int32, callback)
 
     rospy.spin()
 

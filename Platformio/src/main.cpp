@@ -17,7 +17,12 @@ CANController can_controller;
 std_msgs::Float32 left_wheelpod_angle_msg;
 ros::Publisher left_wheelpod_angle_pub("/drivetrain/left_wheelpod_angle", &left_wheelpod_angle_msg);
 
+std_msgs::Int32 motorSpeed;
+ros::Publisher motorSpeedPub("/motorspeed", &motorSpeed);
+
 float angleSetpoint = 1;
+
+int motorSpeedData = 0;
 
 void angleSetpointCallback(const std_msgs::Float32 &angle_msg)
 {
@@ -28,7 +33,7 @@ ros::Subscriber<std_msgs::Float32> angleSetpointSub("/arduino/left_wheelpod_angl
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(57600);
   SPI.begin();
   Wire.begin();
   Wire.setClock(800000L);
@@ -39,11 +44,12 @@ void setup()
 
   nh.initNode();
   nh.advertise(left_wheelpod_angle_pub);
+  nh.advertise(motorSpeedPub);
   nh.subscribe(angleSetpointSub);
 }
 void loop()
 {
-  // nh.spinOnce();
+  nh.spinOnce();
   // float angle = left_wheelpod_encoder.getAngle();
 
   // // Publish the magnetic sensor data to the ROS topic
@@ -60,5 +66,12 @@ void loop()
   // int effort = (int)(error * p);
   // left_turn_motor.setEffort(0);
 
-  // SET SPEED OF CAN CONTROLLER HERE
+  // Publish Motorspeed to ROS
+  can_controller.getCanData();
+  can_controller.setSpeed(1000, 0, 0, 0);
+  motorSpeedData = can_controller.getSpeed(0);
+  motorSpeed.data = motorSpeedData;
+  motorSpeedPub.publish(&motorSpeed);
+
+  delay(2);
 }

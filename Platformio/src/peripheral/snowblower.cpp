@@ -12,13 +12,11 @@ Snowblower::Snowblower() {}
 
 void Snowblower::init()
 {
-    pinMode(R_IS, OUTPUT);
+    pinMode(IS, OUTPUT);
     pinMode(R_PWM, OUTPUT);
-    pinMode(L_IS, OUTPUT);
     pinMode(EN, OUTPUT);
     pinMode(L_PWM, OUTPUT);
-    digitalWrite(R_IS, HIGH);
-    digitalWrite(L_IS, HIGH);
+    digitalWrite(IS, HIGH);
     digitalWrite(EN, HIGH);
 }
 
