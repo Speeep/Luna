@@ -1,5 +1,5 @@
 import rospy
-from std_msgs.msg import Float32, Bool
+from std_msgs.msg import Float32, Bool, Int32
 from pynput import keyboard
 
 class KeyControlNode:
@@ -7,7 +7,7 @@ class KeyControlNode:
         rospy.init_node('keyboard_control', anonymous=True)
 
         # Define publishers for different key presses
-        self.drivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
+        self.drivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Int32, queue_size=10)
         self.drivetrain_angle_pub = rospy.Publisher('/drivetrain/angle', Bool, queue_size=10)
         self.drivetrain_rotate_pub = rospy.Publisher('/drivetrain/rotate', Float32, queue_size=10)
         self.drivetrain_enable_pub = rospy.Publisher('/drivetrain/enable', Bool, queue_size=10)
@@ -53,16 +53,16 @@ class KeyControlNode:
     def check_key_presses(self, event):
         # Keys needed for driving forward and backward
         if self.key_states['w']:
-            drive_speed = Float32()
-            drive_speed.data = 0.1
+            drive_speed = Int32()
+            drive_speed.data = 1000
             self.drivetrain_drive_pub.publish(drive_speed)
         elif self.key_states['s']:
-            drive_speed = Float32()
-            drive_speed.data = -0.1
+            drive_speed = Int32()
+            drive_speed.data = -1000
             self.drivetrain_drive_pub.publish(drive_speed)
         else:
-            drive_speed = Float32()
-            drive_speed.data = 0.0
+            drive_speed = Int32()
+            drive_speed.data = 0
             self.drivetrain_drive_pub.publish(drive_speed)
 
         # Keys needed for angling the wheel pods in and out

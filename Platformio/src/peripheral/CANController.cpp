@@ -1,12 +1,7 @@
 #include "CANController.h"
 #include "robotMap.h"
 
-CANController::CANController() : mcp2515(MCP_CS), kalman(0.05, 16, 1023, 0) {}
-
-CANController& CANController::instance() {
-    static CANController instance;
-    return instance;
-}
+CANController::CANController() : mcp2515(MCP_CS), m0kalman(0.05, 16, 1023, 0), m1kalman(0.05, 16, 1023, 0), m2kalman(0.05, 16, 1023, 0), m3kalman(0.05, 16, 1023, 0) {}
 
 void CANController::init() {
     mcp2515.reset();
@@ -28,27 +23,25 @@ void CANController::init() {
     prevErrors[4] = {0};
     sums[4] = {0};
     i1 = 136.53333 / (1000000 / INTERVAL);
-
-
-    const long speed_Hz = 1000000 / INTERVAL;
-    FastPID speed_PID_0(SPEED_KP, SPEED_KI, SPEED_KD, speed_Hz, 15, true);
-    FastPID speed_PID_1(SPEED_KP, SPEED_KI, SPEED_KD, speed_Hz, 15, true);
-    FastPID speed_PID_2(SPEED_KP, SPEED_KI, SPEED_KD, speed_Hz, 15, true);
-    FastPID speed_PID_3(SPEED_KP, SPEED_KI, SPEED_KD, speed_Hz, 15, true);
 }
 
 void CANController::setMotorCurrent() {
     canMsgOut.can_id = 0x200;
     canMsgOut.can_dlc = 8;
 
-    canMsgOut.data[0] = (char)(setCurrents[0] / 256);
-    canMsgOut.data[1] = (char)(setCurrents[0] % 256);
-    canMsgOut.data[2] = (char)(setCurrents[1] / 256);
-    canMsgOut.data[3] = (char)(setCurrents[1] % 256);
-    canMsgOut.data[4] = (char)(setCurrents[2] / 256);
-    canMsgOut.data[5] = (char)(setCurrents[2] % 256);
-    canMsgOut.data[6] = (char)(setCurrents[3] / 256);
-    canMsgOut.data[7] = (char)(setCurrents[3] % 256);
+    int motorCurrent1 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    int motorCurrent2 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    int motorCurrent3 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    int motorCurrent4 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+
+    canMsgOut.data[0] = (char)(motorCurrent1 / 256);
+    canMsgOut.data[1] = (char)(motorCurrent1 % 256);
+    canMsgOut.data[2] = (char)(motorCurrent2 / 256);
+    canMsgOut.data[3] = (char)(motorCurrent2 % 256);
+    canMsgOut.data[4] = (char)(motorCurrent3 / 256);
+    canMsgOut.data[5] = (char)(motorCurrent3 % 256);
+    canMsgOut.data[6] = (char)(motorCurrent4 / 256);
+    canMsgOut.data[7] = (char)(motorCurrent4 % 256);
 
     mcp2515.sendMessage(&canMsgOut);
 }
@@ -96,16 +89,12 @@ void CANController::speedHandlerPID() {
     setMotorCurrent();
 }
 
-void CANController::staticSpeedHandlerPID() {
-    instance().speedHandlerPID();
-}
-
 void CANController::updateData(int motorID) {
 
     angles[motorID] = combineBytes(canMsgIn.data[0], canMsgIn.data[1]);
     rawSpeed = combineBytes(canMsgIn.data[2], canMsgIn.data[3]);
 
-    speeds[motorID] = (int)kalman.getFilteredValue(rawSpeed);
+    speeds[motorID] = rawSpeed;
 
     actualCurrents[motorID] = combineBytes(canMsgIn.data[4], canMsgIn.data[5]);
     temps[motorID] = canMsgIn.data[6];
@@ -144,10 +133,6 @@ void CANController::getCanData() {
     }
 }
 
-void CANController::staticGetCanData() {
-    instance().getCanData();
-}
-
 void CANController::setSpeed(int sp0, int sp1, int sp2, int sp3) {
     setSpeeds[0] = sp0;
     setSpeeds[1] = sp1;
@@ -158,6 +143,10 @@ void CANController::setSpeed(int sp0, int sp1, int sp2, int sp3) {
 }
 
 int CANController::getSpeed(int motorID) {
-
     return speeds[motorID];
+}
+
+void CANController::cutCurrent() {
+    setCurrents[4] = {0};
+    setMotorCurrent();
 }

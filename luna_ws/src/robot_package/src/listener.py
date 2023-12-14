@@ -2,7 +2,7 @@ import rospy
 from std_msgs.msg import Int32
 
 def callback(data):
-    print("Motor speed: " + data.data)
+    print("Motor speed: " + str(data.data))
 
 def listener():
 

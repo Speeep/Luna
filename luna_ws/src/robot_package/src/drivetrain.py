@@ -1,5 +1,5 @@
 import rospy
-from std_msgs.msg import Int8, Bool, Float32
+from std_msgs.msg import Int32, Bool, Float32
 
 
 # Constant to define the angle in which the drivetrain is acceptably straight
@@ -59,7 +59,7 @@ def main():
     # Initialize the ros node
     rospy.init_node('drivetrain')
     rospy.Subscriber('/drivetrain/enable', Bool, toggle_drivetrain_enable)
-    rospy.Subscriber('/drivetrain/drive', Float32, set_drive_speed)
+    rospy.Subscriber('/drivetrain/drive', Int32, set_drive_speed)
     rospy.Subscriber('/drivetrain/angle', Bool, toggle_wheelpod_angle)
     rospy.Subscriber('/drivetrain/rotate', Float32, set_rotate_speed)
     rospy.Subscriber('/drivetrain/left_wheelpod_angle', Float32, left_wheelpod_angle_cb)

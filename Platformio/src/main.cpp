@@ -4,15 +4,10 @@
 #include <ros.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Int32.h>
-#include "./peripheral/snowblower.h"
-#include "./peripheral/encoder.h"
-#include "./peripheral/CANController.h"
+#include <std_msgs/Bool.h>
+#include "./subsystems/drivetrain.h"
 
 ros::NodeHandle nh;
-
-Snowblower left_turn_motor;
-Encoder left_wheelpod_encoder;
-CANController can_controller;
 
 std_msgs::Float32 left_wheelpod_angle_msg;
 ros::Publisher left_wheelpod_angle_pub("/drivetrain/left_wheelpod_angle", &left_wheelpod_angle_msg);
@@ -20,16 +15,31 @@ ros::Publisher left_wheelpod_angle_pub("/drivetrain/left_wheelpod_angle", &left_
 std_msgs::Int32 motorSpeed;
 ros::Publisher motorSpeedPub("/motorspeed", &motorSpeed);
 
-float angleSetpoint = 1;
+Drivetrain drivetrain;
 
-int motorSpeedData = 0;
+int driveSpeed = 0;
 
-void angleSetpointCallback(const std_msgs::Float32 &angle_msg)
+bool drivetrainEnable = false;
+
+void driveSpeedCallback(const std_msgs::Int32 &driveSpeedMsg)
 {
-  angleSetpoint = angle_msg.data;
+  driveSpeed = driveSpeedMsg.data;
 }
 
-ros::Subscriber<std_msgs::Float32> angleSetpointSub("/arduino/left_wheelpod_angle_setpoint", &angleSetpointCallback);
+void drivetrainEnableCallback(const std_msgs::Bool &driveEnableMsg)
+{
+  drivetrainEnable = driveEnableMsg.data;
+
+  if (drivetrainEnable) {
+    drivetrain.enable();
+  } else {
+    drivetrain.disable();
+  }
+}
+
+ros::Subscriber<std_msgs::Int32> driveSpeedSub("/drivetrain/drive", &driveSpeedCallback);
+
+ros::Subscriber<std_msgs::Bool> driveEnableSub("/drivetrain/enable", &drivetrainEnableCallback);
 
 void setup()
 {
@@ -38,40 +48,23 @@ void setup()
   Wire.begin();
   Wire.setClock(800000L);
 
-  left_turn_motor.init();
-  left_wheelpod_encoder.init(1, 0.0);
-  can_controller.init();
+  drivetrain.init();
 
   nh.initNode();
   nh.advertise(left_wheelpod_angle_pub);
   nh.advertise(motorSpeedPub);
-  nh.subscribe(angleSetpointSub);
+  nh.subscribe(driveSpeedSub);
+  nh.subscribe(driveEnableSub);
 }
 void loop()
 {
   nh.spinOnce();
-  // float angle = left_wheelpod_encoder.getAngle();
 
-  // // Publish the magnetic sensor data to the ROS topic
-  // left_wheelpod_angle_msg.data = angle;
-  // left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
+  drivetrain.setWheelSpeeds(300, 300, 300, 300);
 
-  // float p = 50;
-  // float error = angle - angleSetpoint;
-
-  // // normalize error within -pi to pi
-  // if (error > PI) { error -= 2 * PI; }
-  // if (error < -PI) { error += 2 * PI; }
-
-  // int effort = (int)(error * p);
-  // left_turn_motor.setEffort(0);
-
-  // Publish Motorspeed to ROS
-  can_controller.getCanData();
-  can_controller.setSpeed(1000, 0, 0, 0);
-  motorSpeedData = can_controller.getSpeed(0);
-  motorSpeed.data = motorSpeedData;
+  int motor4speed = drivetrain.getSpeed(0);
+  motorSpeed.data = motor4speed;
   motorSpeedPub.publish(&motorSpeed);
 
-  delay(2);
+  // drivetrain.setWheelSpeeds(0, 0, 0, 0);
 }

@@ -10,14 +10,21 @@
 
 Snowblower::Snowblower() {}
 
-void Snowblower::init()
+void Snowblower::init(bool isLeft)
 {
-    pinMode(IS, OUTPUT);
-    pinMode(R_PWM, OUTPUT);
-    pinMode(EN, OUTPUT);
-    pinMode(L_PWM, OUTPUT);
-    digitalWrite(IS, HIGH);
-    digitalWrite(EN, HIGH);
+    leftSide = isLeft;
+
+    if (leftSide) {
+        pinMode(LEFT_R_PWM, OUTPUT);
+        pinMode(LEFT_L_PWM, OUTPUT);
+        R_PWM = LEFT_R_PWM;
+        L_PWM = LEFT_L_PWM;
+    } else {
+        pinMode(RIGHT_R_PWM, OUTPUT);
+        pinMode(RIGHT_L_PWM, OUTPUT);
+        R_PWM = RIGHT_R_PWM;
+        L_PWM = RIGHT_L_PWM;
+    }
 }
 
 void Snowblower::setEffort(int effort)

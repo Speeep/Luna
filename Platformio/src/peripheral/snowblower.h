@@ -8,10 +8,12 @@ class Snowblower {
 
   Snowblower();
 
-  void init();
+  void init(bool);
 
   void setEffort(int effort);
 
  private:
-
+    bool leftSide;
+    int L_PWM;
+    int R_PWM;
 };

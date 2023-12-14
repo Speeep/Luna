@@ -5,14 +5,10 @@
 #include <SPI.h>
 #include "../robotMap.h"
 #include <Kalman.h>
-#include <TimerOne.h>
-#include <FastPID.h>
 
 class CANController {
 public:
     CANController();
-
-    static CANController& instance();
 
     void init();
 
@@ -30,25 +26,22 @@ public:
 
     int calcPosition(long, int);
 
-    // void positionHandlerPID();
-
     void speedHandlerPID();
-
-    // static void staticPositionHandlerPID();
-
-    static void staticGetCanData();
-
-    static void staticSpeedHandlerPID();
 
     void setSpeed(int, int, int, int);
 
     int getSpeed(int);
 
+    void cutCurrent();
+
 private:
     struct can_frame canMsgOut;
     struct can_frame canMsgIn;
     MCP2515 mcp2515;
-    Kalman kalman;
+    Kalman m0kalman;
+    Kalman m1kalman;
+    Kalman m2kalman;
+    Kalman m3kalman;
     int rawSpeed;
     int angles[4];
     int lastAngles[4];
@@ -65,12 +58,4 @@ private:
     int prevErrors[4];
     int sums[4];
     float i1;
-    FastPID speed_PID_0;
-    FastPID speed_PID_1;
-    FastPID speed_PID_2;
-    FastPID speed_PID_3;
-    FastPID pos_PID_0;
-    FastPID pos_PID_1;
-    FastPID pos_PID_2;
-    FastPID pos_PID_3;
 };
