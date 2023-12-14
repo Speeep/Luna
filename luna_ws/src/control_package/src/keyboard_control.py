@@ -54,11 +54,11 @@ class KeyControlNode:
         # Keys needed for driving forward and backward
         if self.key_states['w']:
             drive_speed = Int32()
-            drive_speed.data = 1000
+            drive_speed.data = 500
             self.drivetrain_drive_pub.publish(drive_speed)
         elif self.key_states['s']:
             drive_speed = Int32()
-            drive_speed.data = -1000
+            drive_speed.data = -500
             self.drivetrain_drive_pub.publish(drive_speed)
         else:
             drive_speed = Int32()
@@ -90,19 +90,19 @@ class KeyControlNode:
             self.drivetrain_rotate_pub.publish(rotate_speed)
 
         # Keys needed for enabling and disabling the robot
-        if self.key_states['o']:
-            enable = Bool()
-            self.robot_enable = True
-            enable.data = self.robot_enable
-            self.drivetrain_enable_pub.publish(self.robot_enable)
-        elif self.key_states['p']:
+        if self.key_states['p']:
             disable = Bool()
             self.robot_enable = False
             disable.data = self.robot_enable
             self.drivetrain_enable_pub.publish(self.robot_enable)
+        elif self.key_states['o']:
+            enable = Bool()
+            self.robot_enable = True
+            enable.data = self.robot_enable
+            self.drivetrain_enable_pub.publish(self.robot_enable)
         else:
             disable = Bool()
-            disable.data = self.robot_enable
+            disable.data = False
             self.drivetrain_enable_pub.publish(self.robot_enable)
 
 if __name__ == '__main__':

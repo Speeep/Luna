@@ -36,11 +36,11 @@ void Snowblower::setEffort(int effort)
     }
 
     if (effort > 0) {
-        analogWrite(L_PWM, map(effort, 0, 100, 15, 100));
+        analogWrite(L_PWM, map(effort, 0, 100, 20, 255));
         analogWrite(R_PWM, 0);
     } else if (effort < 0) {
         analogWrite(L_PWM, 0);
-        analogWrite(R_PWM, map(abs(effort), 0, 100, 12, 100));
+        analogWrite(R_PWM, map(abs(effort), 0, 100, 20, 255));
     } else if (effort == 0) {
         analogWrite(L_PWM, 0);
         analogWrite(R_PWM, 0);

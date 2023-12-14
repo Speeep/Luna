@@ -5,6 +5,7 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/String.h>
 #include "./subsystems/drivetrain.h"
 
 ros::NodeHandle nh;
@@ -15,6 +16,12 @@ ros::Publisher left_wheelpod_angle_pub("/listener/left_wheelpod_angle", &left_wh
 std_msgs::Float32 left_wheelpod_angle_setpoint_msg;
 ros::Publisher left_wheelpod_angle_setpoint_pub("/listener/left_wheelpod_angle_setpoint", &left_wheelpod_angle_setpoint_msg);
 
+std_msgs::Bool enabbledMsg;
+ros::Publisher drivetrainIsEnabledPub("/listener/drivetrain_enabled", &enabbledMsg);
+
+std_msgs::String ianOutputMsg;
+ros::Publisher ianOutputPub("/listener/ian_output", &ianOutputMsg);
+
 std_msgs::Int32 motorSpeed;
 ros::Publisher motorSpeedPub("/listener/motorspeed", &motorSpeed);
 
@@ -24,18 +31,14 @@ int driveSpeed = 0;
 bool drivetrainEnable = false;
 bool drivetrainAngle = false;
 
-void driveSpeedCallback(const std_msgs::Int32 &driveSpeedMsg) {
-  driveSpeed = driveSpeedMsg.data;
-}
-
-void leftWheelpodAngleCallback(const std_msgs::Float32 &leftWheelpodAngleMsg) {
-  drivetrain.setLeftWheelpodAngleSetpoint(leftWheelpodAngleMsg.data);
+void drivetrainSpeedCallback(const std_msgs::Int32 &driveSpeedMsg) {
+  drivetrain.setDriveSpeed(driveSpeedMsg.data);
 }
 
 void drivetrainEnableCallback(const std_msgs::Bool &driveEnableMsg) {
   drivetrainEnable = driveEnableMsg.data;
 
-  if (drivetrainEnable) {
+  if (drivetrainEnable == true) {
     drivetrain.enable();
   } else {
     drivetrain.disable();
@@ -49,8 +52,7 @@ void drivetrainAngleCallback(const std_msgs::Bool &driveAngleMsg) {
 
 }
 
-ros::Subscriber<std_msgs::Int32> driveSpeedSub("/drivetrain/drive", &driveSpeedCallback);
-ros::Subscriber<std_msgs::Float32> leftWheelpodAngleSub("/drivetrain/left_wheelpod_angle_setpoint", &leftWheelpodAngleCallback);
+ros::Subscriber<std_msgs::Int32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Bool> driveEnableSub("/drivetrain/enable", &drivetrainEnableCallback);
 ros::Subscriber<std_msgs::Bool> driveAngleSub("/drivetrain/angle", &drivetrainAngleCallback);
 
@@ -65,27 +67,42 @@ void setup()
 
   nh.initNode();
   nh.advertise(left_wheelpod_angle_pub);
+  nh.advertise(left_wheelpod_angle_setpoint_pub);
+  nh.advertise(drivetrainIsEnabledPub);
+  nh.advertise(ianOutputPub);
   nh.advertise(motorSpeedPub);
   nh.subscribe(driveSpeedSub);
   nh.subscribe(driveEnableSub);
+  nh.subscribe(driveAngleSub);
 }
 void loop()
 {
   nh.spinOnce();
 
-  // drivetrain.setWheelSpeeds(300, 300, 300, 300);
-
   // int motor4speed = drivetrain.getSpeed(0);
   // motorSpeed.data = motor4speed;
   // motorSpeedPub.publish(&motorSpeed);
 
-  float left_wheelpod_angle = drivetrain.getLeftWheelpodAngle();
+  float left_wheelpod_angle = drivetrain.getRightWheelpodAngle();
   left_wheelpod_angle_msg.data = left_wheelpod_angle;
   left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
 
-  float left_wheelpod_angle_setpoint = drivetrain.getLeftWheelpodAngleSetpoint();
+  float left_wheelpod_angle_setpoint = drivetrain.getRightWheelpodAngleSetpoint();
   left_wheelpod_angle_setpoint_msg.data = left_wheelpod_angle_setpoint;
   left_wheelpod_angle_setpoint_pub.publish(&left_wheelpod_angle_setpoint_msg);
+
+  bool drivetrainIsEnabled = drivetrain.isEnabled();
+  enabbledMsg.data = drivetrainIsEnabled;
+  drivetrainIsEnabledPub.publish(&enabbledMsg);
+
+  String drivetrainWeel1Speed = String(drivetrain.getSpeed(0));
+  String drivetrainWeel2Speed = String(drivetrain.getSpeed(1));
+  String drivetrainWeel3Speed = String(drivetrain.getSpeed(2));
+  String drivetrainWeel4Speed = String(drivetrain.getSpeed(3));
+
+  String ianOutputString = "Wheel 1 speed: " + drivetrainWeel1Speed + "     Wheel 2 speed: " + drivetrainWeel2Speed + "     Wheel 3 speed: " + drivetrainWeel3Speed + "     Wheel 4 speed: " + drivetrainWeel4Speed;
+  ianOutputMsg.data = ianOutputString.c_str();
+  ianOutputPub.publish(&ianOutputMsg);
 
   drivetrain.loop();
 

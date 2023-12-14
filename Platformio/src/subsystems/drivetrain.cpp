@@ -15,11 +15,12 @@ void Drivetrain::init() {
     right_wheelpod_encoder.init(RIGHT_WHEELPOD_ENCODER_ID, RIGHT_WHEELPOD_ENCODER_START_ANGLE);
     can_controller.init();
     enabled = false;
-    leftWheelpodAngleSetpoint = 0;
-    rightWheelpodAngleSetpoint = 0;
+    leftWheelpodAngleSetpoint = 0.1;
+    rightWheelpodAngleSetpoint = 0.0;
     leftWheelpodAngle = 0;
     rightWheelpodAngle = 0;
     turnMotorEffort = 0;
+    driveSpeed = 0;
 }
 
 void Drivetrain::enable() {
@@ -41,16 +42,17 @@ void Drivetrain::loop() {
 
     if (isAngled) {
         setLeftWheelpodAngleSetpoint(0.7853);
-        setRightWheelpodAngleSetpoint(0.7853);
+        setRightWheelpodAngleSetpoint(-0.7853);
     } else {
-        setLeftWheelpodAngleSetpoint(0);
-        setRightWheelpodAngleSetpoint(0);
+        setLeftWheelpodAngleSetpoint(0.0);
+        setRightWheelpodAngleSetpoint(0.0);
     }
 
     // If enabled, control the motors, else cut current to the motors
     if (enabled) {
-        setTurnMotorEffort(int(leftWheelpodAngleSetpoint - leftWheelpodAngle) * LEFT_TURN_MOTOR_KP);
-        // right_turn_motor.setEffort((rightWheelpodAngleSetpoint - rightWheelpodAngle) * RIGHT_TURN_MOTOR_KP);
+        left_turn_motor.setEffort(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
+        right_turn_motor.setEffort(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
+        setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
     } else {
         can_controller.cutCurrent();
     }
@@ -88,11 +90,14 @@ float Drivetrain::getRightWheelpodAngleSetpoint() {
     return rightWheelpodAngleSetpoint;
 }
 
-void Drivetrain::setTurnMotorEffort(int motorEffort) {
-    left_turn_motor.setEffort(motorEffort);
-    // right_turn_motor.setEffort(motorEffort);
+void Drivetrain::setAngle(bool angle) {
+    isAngled = angle;
 }
 
-void Drivetrain::setAngle(bool angle) {
-    isAngled = true;
+bool Drivetrain::isEnabled() {
+    return enabled;
+}
+
+void Drivetrain::setDriveSpeed(int speed) {
+    driveSpeed = speed;
 }

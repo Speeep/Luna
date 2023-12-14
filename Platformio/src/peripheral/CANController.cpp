@@ -1,7 +1,7 @@
 #include "CANController.h"
 #include "robotMap.h"
 
-CANController::CANController() : mcp2515(MCP_CS), m0kalman(0.05, 16, 1023, 0), m1kalman(0.05, 16, 1023, 0), m2kalman(0.05, 16, 1023, 0), m3kalman(0.05, 16, 1023, 0) {}
+CANController::CANController() : mcp2515(MCP_CS) {}
 
 void CANController::init() {
     mcp2515.reset();
@@ -30,9 +30,9 @@ void CANController::setMotorCurrent() {
     canMsgOut.can_dlc = 8;
 
     int motorCurrent1 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
-    int motorCurrent2 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
-    int motorCurrent3 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
-    int motorCurrent4 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    int motorCurrent2 = constrain(setCurrents[1], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    int motorCurrent3 = constrain(setCurrents[2], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    int motorCurrent4 = constrain(setCurrents[3], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
 
     canMsgOut.data[0] = (char)(motorCurrent1 / 256);
     canMsgOut.data[1] = (char)(motorCurrent1 % 256);
@@ -76,6 +76,7 @@ void CANController::speedHandlerPID() {
     sums[2] = constrain(sums[2] + errors[2], -SPEED_SUMCAP, SPEED_SUMCAP);
     sums[3] = constrain(sums[3] + errors[3], -SPEED_SUMCAP, SPEED_SUMCAP);
 
+    // PID Here
     setCurrents[0] = SPEED_KP * errors[0] + SPEED_KI * sums[0] + SPEED_KD * (errors[0] - prevErrors[0]);
     setCurrents[1] = SPEED_KP * errors[1] + SPEED_KI * sums[1] + SPEED_KD * (errors[1] - prevErrors[1]);
     setCurrents[2] = SPEED_KP * errors[2] + SPEED_KI * sums[2] + SPEED_KD * (errors[2] - prevErrors[2]);
@@ -129,7 +130,10 @@ void CANController::updateData(int motorID) {
 void CANController::getCanData() {
     if (canMsgIncoming())
     {
-        updateData(canMsgIn.can_id - 0x201);
+        int motorID = canMsgIn.can_id - 0x201;
+        if (motorID >= 0 && motorID < 4) {
+            updateData(motorID);
+        }
     }
 }
 

@@ -38,10 +38,6 @@ private:
     struct can_frame canMsgOut;
     struct can_frame canMsgIn;
     MCP2515 mcp2515;
-    Kalman m0kalman;
-    Kalman m1kalman;
-    Kalman m2kalman;
-    Kalman m3kalman;
     int rawSpeed;
     int angles[4];
     int lastAngles[4];
