@@ -15,6 +15,11 @@ void Drivetrain::init() {
     right_wheelpod_encoder.init(RIGHT_WHEELPOD_ENCODER_ID, RIGHT_WHEELPOD_ENCODER_START_ANGLE);
     can_controller.init();
     enabled = false;
+    leftWheelpodAngleSetpoint = 0;
+    rightWheelpodAngleSetpoint = 0;
+    leftWheelpodAngle = 0;
+    rightWheelpodAngle = 0;
+    turnMotorEffort = 0;
 }
 
 void Drivetrain::enable() {
@@ -27,16 +32,67 @@ void Drivetrain::disable() {
     enabled = false;
 }
 
-void Drivetrain::setWheelSpeeds(int sp0, int sp1, int sp2, int sp3) {
-    if (enabled) {
-        can_controller.getCanData();
-        can_controller.setSpeed(-sp0, -sp1, sp2, sp3);
+void Drivetrain::loop() {
+
+    // Always Get Data
+    can_controller.getCanData();
+    leftWheelpodAngle = left_wheelpod_encoder.getAngle();
+    rightWheelpodAngle = right_wheelpod_encoder.getAngle();
+
+    if (isAngled) {
+        setLeftWheelpodAngleSetpoint(0.7853);
+        setRightWheelpodAngleSetpoint(0.7853);
     } else {
-        can_controller.getCanData();
+        setLeftWheelpodAngleSetpoint(0);
+        setRightWheelpodAngleSetpoint(0);
+    }
+
+    // If enabled, control the motors, else cut current to the motors
+    if (enabled) {
+        setTurnMotorEffort(int(leftWheelpodAngleSetpoint - leftWheelpodAngle) * LEFT_TURN_MOTOR_KP);
+        // right_turn_motor.setEffort((rightWheelpodAngleSetpoint - rightWheelpodAngle) * RIGHT_TURN_MOTOR_KP);
+    } else {
         can_controller.cutCurrent();
     }
 }
 
+void Drivetrain::setWheelSpeeds(int sp0, int sp1, int sp2, int sp3) {
+    can_controller.setSpeed(-sp0, -sp1, sp2, sp3);
+}
+
 int Drivetrain::getSpeed(int motorId) {
     return can_controller.getSpeed(motorId);
+}
+
+float Drivetrain::getLeftWheelpodAngle() {
+    return left_wheelpod_encoder.getAngle();
+}
+
+float Drivetrain::getRightWheelpodAngle() {
+    return right_wheelpod_encoder.getAngle();
+}
+
+void Drivetrain::setLeftWheelpodAngleSetpoint(float newSetPoint) {
+    leftWheelpodAngleSetpoint = newSetPoint;
+}
+
+void Drivetrain::setRightWheelpodAngleSetpoint(float newSetPoint) {
+    rightWheelpodAngleSetpoint = newSetPoint;
+}
+
+float Drivetrain::getLeftWheelpodAngleSetpoint() {
+    return leftWheelpodAngleSetpoint;
+}
+
+float Drivetrain::getRightWheelpodAngleSetpoint() {
+    return rightWheelpodAngleSetpoint;
+}
+
+void Drivetrain::setTurnMotorEffort(int motorEffort) {
+    left_turn_motor.setEffort(motorEffort);
+    // right_turn_motor.setEffort(motorEffort);
+}
+
+void Drivetrain::setAngle(bool angle) {
+    isAngled = true;
 }

@@ -17,6 +17,8 @@ class Drivetrain {
 
   void disable();
 
+  void loop();
+
   void setLeftWheelpodAngle(int);
 
   void setRightWheelpodAngle(int);
@@ -25,6 +27,22 @@ class Drivetrain {
 
   int getSpeed(int);
 
+  float getLeftWheelpodAngle();
+
+  float getRightWheelpodAngle();
+
+  void setLeftWheelpodAngleSetpoint(float);
+
+  void setRightWheelpodAngleSetpoint(float);
+
+  float getLeftWheelpodAngleSetpoint();
+
+  float getRightWheelpodAngleSetpoint();
+
+  void setTurnMotorEffort(int);
+
+  void setAngle(bool);
+
  private:
     Snowblower left_turn_motor;
     Snowblower right_turn_motor;
@@ -32,4 +50,10 @@ class Drivetrain {
     Encoder right_wheelpod_encoder;
     CANController can_controller;
     bool enabled;
+    float leftWheelpodAngleSetpoint;
+    float rightWheelpodAngleSetpoint;
+    float leftWheelpodAngle;
+    float rightWheelpodAngle;
+    int turnMotorEffort;
+    bool isAngled;
 };

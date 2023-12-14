@@ -27,7 +27,7 @@ def set_drive_speed(data):
 
 # Function to publish the drivetrain wheel angle setpoint to the arduino
 def set_wheel_angle(angle):
-    angle_setpoint_pub = rospy.Publisher('/arduino/left_wheelpod_angle_setpoint', Float32, queue_size=10)
+    angle_setpoint_pub = rospy.Publisher('/drivetrain/left_wheelpod_angle_setpoint', Float32, queue_size=10)
     wheel_angle = Float32()
     wheel_angle.data = angle
     angle_setpoint_pub.publish(wheel_angle)
