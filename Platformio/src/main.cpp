@@ -83,13 +83,9 @@ void loop()
   // motorSpeed.data = motor4speed;
   // motorSpeedPub.publish(&motorSpeed);
 
-  float left_wheelpod_angle = drivetrain.getRightWheelpodAngle();
+  float left_wheelpod_angle = drivetrain.getSpeed(0);
   left_wheelpod_angle_msg.data = left_wheelpod_angle;
   left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
-
-  float left_wheelpod_angle_setpoint = drivetrain.getRightWheelpodAngleSetpoint();
-  left_wheelpod_angle_setpoint_msg.data = left_wheelpod_angle_setpoint;
-  left_wheelpod_angle_setpoint_pub.publish(&left_wheelpod_angle_setpoint_msg);
 
   bool drivetrainIsEnabled = drivetrain.isEnabled();
   enabbledMsg.data = drivetrainIsEnabled;
@@ -100,7 +96,7 @@ void loop()
   String drivetrainWeel3Speed = String(drivetrain.getSpeed(2));
   String drivetrainWeel4Speed = String(drivetrain.getSpeed(3));
 
-  String ianOutputString = "Wheel 1 speed: " + drivetrainWeel1Speed + "     Wheel 2 speed: " + drivetrainWeel2Speed + "     Wheel 3 speed: " + drivetrainWeel3Speed + "     Wheel 4 speed: " + drivetrainWeel4Speed;
+  String ianOutputString = "1: " + drivetrainWeel1Speed + "     2: " + drivetrainWeel2Speed + "     2: " + drivetrainWeel3Speed + "     4: " + drivetrainWeel4Speed;
   ianOutputMsg.data = ianOutputString.c_str();
   ianOutputPub.publish(&ianOutputMsg);
 

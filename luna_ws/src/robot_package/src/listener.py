@@ -1,6 +1,8 @@
 import rospy
 from std_msgs.msg import Int32, Float32, Bool, String
 
+pidData = []
+
 def callback(data):
     print("Left Wheelpod Angle Setpoint: " + str(data.data))
 
