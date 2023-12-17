@@ -54,11 +54,11 @@ class KeyControlNode:
         # Keys needed for driving forward and backward
         if self.key_states['w']:
             drive_speed = Int32()
-            drive_speed.data = 1000
+            drive_speed.data = 1500
             self.drivetrain_drive_pub.publish(drive_speed)
         elif self.key_states['s']:
             drive_speed = Int32()
-            drive_speed.data = -1000
+            drive_speed.data = -1500
             self.drivetrain_drive_pub.publish(drive_speed)
         else:
             drive_speed = Int32()
