@@ -8,21 +8,20 @@ void CANController::init() {
     mcp2515.setBitrate(CAN_1000KBPS, MCP_8MHZ);
     mcp2515.setNormalMode();
 
-    angles[4] = {0};
-    lastAngles[4] = {0};
-    speeds[4] = {0};
-    actualCurrents[4] = {0};
-    temps[4] = {0};
-    positions[4] = {0};
-    setCurrents[4] = {0};
-    deltaPos[4] = {0};
-    sumDeltaPos[4] = {0};
-    setPos[4] = {0};
-    setSpeeds[4] = {0};
+    long lastTime = 0;
+    prevPositions[4] = {0};
     errors[4] = {0};
     prevErrors[4] = {0};
+    setSpeeds[4] = {0};
+    speeds[4] = {0};
     sums[4] = {0};
-    i1 = 136.53333 / (1000000 / INTERVAL);
+    setCurrents[4] = {0};
+    speedSetpoints[4] = {0};
+
+    motor1Encoder.init();
+    motor2Encoder.init();
+    motor3Encoder.init();
+    motor4Encoder.init();
 }
 
 void CANController::setMotorCurrent() {
@@ -44,22 +43,6 @@ void CANController::setMotorCurrent() {
     canMsgOut.data[7] = (char)(motorCurrent4 % 256);
 
     mcp2515.sendMessage(&canMsgOut);
-}
-
-inline bool CANController::canMsgIncoming() {
-  return mcp2515.readMessage(&canMsgIn) == MCP2515::ERROR_OK;
-}
-
-inline int CANController::combineBytes(unsigned char DataH, unsigned char DataL)
-{
-  return int(word(DataH, DataL));
-}
-
-int CANController::calcPosition(long setPos, int motorID)
-{
-  return constrain(
-      POS_KP * (setPos - positions[motorID]) + 0 * sumDeltaPos[motorID],
-      -16384, 16384);
 }
 
 void CANController::speedHandlerPID() {
@@ -90,51 +73,33 @@ void CANController::speedHandlerPID() {
     setMotorCurrent();
 }
 
-void CANController::updateData(int motorID) {
+void CANController::updateMotorSpeeds() {
+    int motor1Angle = motor1Encoder.getAngle();
+    int motor2Angle = motor2Encoder.getAngle();
+    int motor3Angle = motor3Encoder.getAngle();
+    int motor4Angle = motor4Encoder.getAngle();
 
-    angles[motorID] = combineBytes(canMsgIn.data[0], canMsgIn.data[1]);
-    rawSpeed = combineBytes(canMsgIn.data[2], canMsgIn.data[3]);
+    long time = millis();
 
-    speeds[motorID] = rawSpeed;
+    long deltaTime = time - lastTime;
 
-    actualCurrents[motorID] = combineBytes(canMsgIn.data[4], canMsgIn.data[5]);
-    temps[motorID] = canMsgIn.data[6];
+    int motor1Speed = (motor1Angle - prevPositions[0]) / deltaTime;
+    int motor2Speed = (motor2Angle - prevPositions[1]) / deltaTime;
+    int motor3Speed = (motor3Angle - prevPositions[2]) / deltaTime;
+    int motor4Speed = (motor4Angle - prevPositions[3]) / deltaTime;
 
-    sumDeltaPos[motorID] += setPos[motorID] - positions[motorID];
+    speeds[0] = motor1Speed;
+    speeds[1] = motor2Speed;
+    speeds[2] = motor3Speed;
+    speeds[3] = motor4Speed;
 
-    deltaPos[motorID] = angles[motorID] - lastAngles[motorID];
-
-    if (abs(speeds[motorID]) < 1200) {
-
-        if (deltaPos[motorID] < -8000)
-        positions[motorID]++;
-        else if (deltaPos[motorID] > 8000)
-        positions[motorID]--;
-        else
-        positions[motorID] += deltaPos[motorID];
-    }
-    else if (abs(speeds[motorID]) < 6000) {
-        if (speeds[motorID] < 0 && deltaPos[motorID] > 4000) {
-        positions[motorID] -= 8192;
-
-        } else if (-deltaPos[motorID] > 4000 && speeds[motorID] > 0) {
-        positions[motorID] += 8192;
-
-        }
-    } else
-        positions[motorID] += (speeds[motorID] * i1) * 8192;
-
-    lastAngles[motorID] = angles[motorID];
-}
-
-void CANController::getCanData() {
-    if (canMsgIncoming())
-    {
-        int motorID = canMsgIn.can_id - 0x201;
-        if (motorID >= 0 && motorID < 4) {
-            updateData(motorID);
-        }
-    }
+    // Update all last timestep values
+    lastTime = time;
+    prevPositions[0] = motor1Angle;
+    prevPositions[1] = motor2Angle;
+    prevPositions[2] = motor3Angle;
+    prevPositions[3] = motor4Angle;
+    
 }
 
 void CANController::setSpeed(int sp0, int sp1, int sp2, int sp3) {
@@ -144,10 +109,6 @@ void CANController::setSpeed(int sp0, int sp1, int sp2, int sp3) {
     setSpeeds[3] = sp3;
 
     speedHandlerPID();
-}
-
-int CANController::getSpeed(int motorID) {
-    return speeds[motorID];
 }
 
 void CANController::cutCurrent() {
