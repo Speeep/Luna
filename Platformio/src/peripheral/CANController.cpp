@@ -9,14 +9,17 @@ void CANController::init() {
     mcp2515.setNormalMode();
 
     long lastTime = 0;
-    prevPositions[4] = {0};
-    errors[4] = {0};
-    prevErrors[4] = {0};
-    setSpeeds[4] = {0};
-    speeds[4] = {0};
-    sums[4] = {0};
-    setCurrents[4] = {0};
-    speedSetpoints[4] = {0};
+
+    for (int i = 0; i < 4; i++) {
+        prevPositions[i] = 0;
+        errors[i] = 0;
+        prevErrors[i] = 0;
+        setSpeeds[i] = 0;
+        speeds[i] = 0;
+        sums[i] = 0;
+        setCurrents[i] = 0;
+        speedSetpoints[i] = 0;
+    }
 
     motor1Encoder.init();
     motor2Encoder.init();
@@ -112,6 +115,9 @@ void CANController::setSpeed(int sp0, int sp1, int sp2, int sp3) {
 }
 
 void CANController::cutCurrent() {
-    setCurrents[4] = {0};
+    setCurrents[0] = 0;
+    setCurrents[1] = 0;
+    setCurrents[2] = 0;
+    setCurrents[3] = 0;
     setMotorCurrent();
 }
