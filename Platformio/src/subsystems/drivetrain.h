@@ -25,7 +25,7 @@ class Drivetrain {
 
   void setWheelSpeeds(int, int, int, int);
 
-  int getSpeed(int);
+  float getSpeed(int);
 
   float getLeftWheelpodAngle();
 

@@ -20,22 +20,24 @@ public:
 
     void setSpeed(int, int, int, int);
 
+    float getSpeed(int);
+
     void cutCurrent();
 
 private:
     struct can_frame canMsgOut;
+    Encoder motor0Encoder;
     Encoder motor1Encoder;
     Encoder motor2Encoder;
     Encoder motor3Encoder;
-    Encoder motor4Encoder;
     MCP2515 mcp2515;
     long lastTime;
-    int prevPositions[4];
-    int errors[4];
-    int prevErrors[4];
-    int setSpeeds[4];
-    int speeds[4];
-    int sums[4];
+    float prevAngles[4];
+    float errors[4];
+    float prevErrors[4];
+    float setSpeeds[4];
+    float speeds[4];
+    float sums[4];
     int setCurrents[4];
-    int speedSetpoints[4];
+    float speedSetpoints[4];
 };

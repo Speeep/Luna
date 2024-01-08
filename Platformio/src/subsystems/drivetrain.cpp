@@ -62,7 +62,7 @@ void Drivetrain::setWheelSpeeds(int sp0, int sp1, int sp2, int sp3) {
     can_controller.setSpeed(-sp0, -sp1, sp2, sp3);
 }
 
-int Drivetrain::getSpeed(int motorId) {
+float Drivetrain::getSpeed(int motorId) {
     return can_controller.getSpeed(motorId);
 }
 

@@ -11,39 +11,39 @@ void CANController::init() {
     long lastTime = 0;
 
     for (int i = 0; i < 4; i++) {
-        prevPositions[i] = 0;
-        errors[i] = 0;
-        prevErrors[i] = 0;
-        setSpeeds[i] = 0;
-        speeds[i] = 0;
-        sums[i] = 0;
+        prevAngles[i] = 0.0;
+        errors[i] = 0.0;
+        prevErrors[i] = 0.0;
+        setSpeeds[i] = 0.0;
+        speeds[i] = 0.0;
+        sums[i] = 0.0;
         setCurrents[i] = 0;
-        speedSetpoints[i] = 0;
+        speedSetpoints[i] = 0.0;
     }
 
-    motor1Encoder.init();
-    motor2Encoder.init();
-    motor3Encoder.init();
-    motor4Encoder.init();
+    motor0Encoder.init(3, 0.0);
+    motor1Encoder.init(4, 0.0);
+    motor2Encoder.init(5, 0.0);
+    motor3Encoder.init(6, 0.0);
 }
 
 void CANController::setMotorCurrent() {
     canMsgOut.can_id = 0x200;
     canMsgOut.can_dlc = 8;
 
-    int motorCurrent1 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
-    int motorCurrent2 = constrain(setCurrents[1], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
-    int motorCurrent3 = constrain(setCurrents[2], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
-    int motorCurrent4 = constrain(setCurrents[3], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    int motorCurrent0 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    int motorCurrent1 = constrain(setCurrents[1], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    int motorCurrent2 = constrain(setCurrents[2], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    int motorCurrent3 = constrain(setCurrents[3], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
 
-    canMsgOut.data[0] = (char)(motorCurrent1 / 256);
-    canMsgOut.data[1] = (char)(motorCurrent1 % 256);
-    canMsgOut.data[2] = (char)(motorCurrent2 / 256);
-    canMsgOut.data[3] = (char)(motorCurrent2 % 256);
-    canMsgOut.data[4] = (char)(motorCurrent3 / 256);
-    canMsgOut.data[5] = (char)(motorCurrent3 % 256);
-    canMsgOut.data[6] = (char)(motorCurrent4 / 256);
-    canMsgOut.data[7] = (char)(motorCurrent4 % 256);
+    canMsgOut.data[0] = (char)(motorCurrent0 / 256);
+    canMsgOut.data[1] = (char)(motorCurrent0 % 256);
+    canMsgOut.data[2] = (char)(motorCurrent1 / 256);
+    canMsgOut.data[3] = (char)(motorCurrent1 % 256);
+    canMsgOut.data[4] = (char)(motorCurrent2 / 256);
+    canMsgOut.data[5] = (char)(motorCurrent2 % 256);
+    canMsgOut.data[6] = (char)(motorCurrent3 / 256);
+    canMsgOut.data[7] = (char)(motorCurrent3 % 256);
 
     mcp2515.sendMessage(&canMsgOut);
 }
@@ -77,31 +77,31 @@ void CANController::speedHandlerPID() {
 }
 
 void CANController::updateMotorSpeeds() {
-    int motor1Angle = motor1Encoder.getAngle();
-    int motor2Angle = motor2Encoder.getAngle();
-    int motor3Angle = motor3Encoder.getAngle();
-    int motor4Angle = motor4Encoder.getAngle();
+    float motor0Angle = motor0Encoder.getAngle();
+    // float motor1Angle = motor1Encoder.getAngle();
+    // float motor2Angle = motor2Encoder.getAngle();
+    // float motor3Angle = motor3Encoder.getAngle();
 
     long time = millis();
 
     long deltaTime = time - lastTime;
 
-    int motor1Speed = (motor1Angle - prevPositions[0]) / deltaTime;
-    int motor2Speed = (motor2Angle - prevPositions[1]) / deltaTime;
-    int motor3Speed = (motor3Angle - prevPositions[2]) / deltaTime;
-    int motor4Speed = (motor4Angle - prevPositions[3]) / deltaTime;
+    float motor0Speed = (motor0Angle - prevAngles[0]) / deltaTime;
+    // float motor1Speed = (motor1Angle - prevAngles[1]) / deltaTime;
+    // float motor2Speed = (motor2Angle - prevAngles[2]) / deltaTime;
+    // float motor3Speed = (motor3Angle - prevAngles[3]) / deltaTime;
 
-    speeds[0] = motor1Speed;
-    speeds[1] = motor2Speed;
-    speeds[2] = motor3Speed;
-    speeds[3] = motor4Speed;
+    speeds[0] = motor0Speed;
+    // speeds[1] = motor1Speed;
+    // speeds[2] = motor2Speed;
+    // speeds[3] = motor3Speed;
 
     // Update all last timestep values
     lastTime = time;
-    prevPositions[0] = motor1Angle;
-    prevPositions[1] = motor2Angle;
-    prevPositions[2] = motor3Angle;
-    prevPositions[3] = motor4Angle;
+    prevAngles[0] = motor0Angle;
+    // prevAngles[1] = motor1Angle;
+    // prevAngles[2] = motor2Angle;
+    // prevAngles[3] = motor3Angle;
     
 }
 
@@ -112,6 +112,10 @@ void CANController::setSpeed(int sp0, int sp1, int sp2, int sp3) {
     setSpeeds[3] = sp3;
 
     speedHandlerPID();
+}
+
+float CANController::getSpeed(int motorId) {
+    return speeds[motorId];
 }
 
 void CANController::cutCurrent() {
