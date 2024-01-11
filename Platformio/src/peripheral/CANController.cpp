@@ -77,7 +77,7 @@ void CANController::speedHandlerPID() {
 }
 
 void CANController::updateMotorSpeeds() {
-    float motor0Angle = motor0Encoder.getAngle();
+    float motor0Angle = motor0Encoder.getRawAngle();
     // float motor1Angle = motor1Encoder.getAngle();
     // float motor2Angle = motor2Encoder.getAngle();
     // float motor3Angle = motor3Encoder.getAngle();

@@ -31,6 +31,10 @@ int driveSpeed = 0;
 bool drivetrainEnable = false;
 bool drivetrainAngle = false;
 
+static unsigned long previousMillis = 0;
+const unsigned long interval = 5;
+unsigned long currentMillis = millis();
+
 void drivetrainSpeedCallback(const std_msgs::Int32 &driveSpeedMsg) {
   drivetrain.setDriveSpeed(driveSpeedMsg.data);
 }
@@ -79,24 +83,32 @@ void loop()
 {
   nh.spinOnce();
 
-  // int motor4speed = drivetrain.getSpeed(0);
-  // motorSpeed.data = motor4speed;
-  // motorSpeedPub.publish(&motorSpeed);
+  currentMillis = millis();
 
-  // float left_wheelpod_angle = drivetrain.getSpeed(0);
-  // left_wheelpod_angle_msg.data = left_wheelpod_angle;
-  // left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
+  // Drivetrain gets looped every 2 milliseconds
+  if (currentMillis - previousMillis >= interval) {
 
-  // bool drivetrainIsEnabled = drivetrain.isEnabled();
-  // enabbledMsg.data = drivetrainIsEnabled;
-  // drivetrainIsEnabledPub.publish(&enabbledMsg);
+    // int motor4speed = drivetrain.getSpeed(0);
+    // motorSpeed.data = motor4speed;
+    // motorSpeedPub.publish(&motorSpeed);
 
-  drivetrain.loop();
+    // float left_wheelpod_angle = drivetrain.getSpeed(0);
+    // left_wheelpod_angle_msg.data = left_wheelpod_angle;
+    // left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
 
-  String drivetrainWheel0Speed = String(drivetrain.getSpeed(0));
-  String ianOutputString = "Motor 0: " + drivetrainWheel0Speed;
-  ianOutputMsg.data = ianOutputString.c_str();
-  ianOutputPub.publish(&ianOutputMsg);
+    // bool drivetrainIsEnabled = drivetrain.isEnabled();
+    // enabbledMsg.data = drivetrainIsEnabled;
+    // drivetrainIsEnabledPub.publish(&enabbledMsg);
 
-  // drivetrain.setWheelSpeeds(0, 0, 0, 0);
+    drivetrain.loop();
+
+    String drivetrainWheel0Speed = String(drivetrain.getSpeed(0));
+    String ianOutputString = "Motor 0: " + drivetrainWheel0Speed;
+    ianOutputMsg.data = ianOutputString.c_str();
+    ianOutputPub.publish(&ianOutputMsg);
+
+    // drivetrain.setWheelSpeeds(0, 0, 0, 0);
+
+    previousMillis = currentMillis;
+  }
 }
