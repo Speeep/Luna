@@ -20,7 +20,7 @@ void Drivetrain::init() {
     leftWheelpodAngle = 0;
     rightWheelpodAngle = 0;
     turnMotorEffort = 0;
-    driveSpeed = 0;
+    driveSpeed = 0.0;
 }
 
 void Drivetrain::enable() {
@@ -52,13 +52,14 @@ void Drivetrain::loop() {
     if (enabled) {
         // left_turn_motor.setEffort(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
         // right_turn_motor.setEffort(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
-        setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
+        // setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
+        setWheelSpeeds(1.4, 1.4, 1.4, 1.4);
     } else {
         can_controller.cutCurrent();
     }
 }
 
-void Drivetrain::setWheelSpeeds(int sp0, int sp1, int sp2, int sp3) {
+void Drivetrain::setWheelSpeeds(float sp0, float sp1, float sp2, float sp3) {
     can_controller.setSpeed(-sp0, -sp1, sp2, sp3);
 }
 
@@ -98,6 +99,10 @@ bool Drivetrain::isEnabled() {
     return enabled;
 }
 
-void Drivetrain::setDriveSpeed(int speed) {
+void Drivetrain::setDriveSpeed(float speed) {
     driveSpeed = speed;
+}
+
+float Drivetrain::getDriveSpeed() {
+    return driveSpeed;
 }

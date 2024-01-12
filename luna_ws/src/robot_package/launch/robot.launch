@@ -1,16 +1,4 @@
 <launch>
-  <!-- <node
-    pkg="robot_package"
-    type="robot.py"
-    name="robot" 
-    output="screen"
-  /> -->
-  <!-- <node
-    pkg="robot_package"
-    type="drivetrain.py"
-    name="drivetrain" 
-    output="screen"
-  /> -->
   <node
     pkg="robot_package"
     type="listener.py"

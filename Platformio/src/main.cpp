@@ -35,19 +35,19 @@ static unsigned long previousMillis = 0;
 const unsigned long interval = 5;
 unsigned long currentMillis = millis();
 
-void drivetrainSpeedCallback(const std_msgs::Int32 &driveSpeedMsg) {
+void drivetrainSpeedCallback(const std_msgs::Float32 &driveSpeedMsg) {
   drivetrain.setDriveSpeed(driveSpeedMsg.data);
 }
 
-// void drivetrainEnableCallback(const std_msgs::Bool &driveEnableMsg) {
-//   drivetrainEnable = driveEnableMsg.data;
+void drivetrainEnableCallback(const std_msgs::Bool &driveEnableMsg) {
+  drivetrainEnable = driveEnableMsg.data;
 
-//   if (drivetrainEnable == true) {
-//     drivetrain.enable();
-//   } else {
-//     drivetrain.disable();
-//   }
-// }
+  if (drivetrainEnable == true) {
+    drivetrain.enable();
+  } else {
+    drivetrain.disable();
+  }
+}
 
 void drivetrainAngleCallback(const std_msgs::Bool &driveAngleMsg) {
   drivetrainAngle = driveAngleMsg.data;
@@ -56,8 +56,8 @@ void drivetrainAngleCallback(const std_msgs::Bool &driveAngleMsg) {
 
 }
 
-ros::Subscriber<std_msgs::Int32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
-// ros::Subscriber<std_msgs::Bool> driveEnableSub("/drivetrain/enable", &drivetrainEnableCallback);
+ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
+ros::Subscriber<std_msgs::Bool> driveEnableSub("/drivetrain/enable", &drivetrainEnableCallback);
 ros::Subscriber<std_msgs::Bool> driveAngleSub("/drivetrain/angle", &drivetrainAngleCallback);
 
 void setup()
@@ -76,7 +76,7 @@ void setup()
   nh.advertise(ianOutputPub);
   nh.advertise(motorSpeedPub);
   nh.subscribe(driveSpeedSub);
-  // nh.subscribe(driveEnableSub);
+  nh.subscribe(driveEnableSub);
   nh.subscribe(driveAngleSub);
 }
 void loop()
@@ -102,10 +102,12 @@ void loop()
 
     drivetrain.loop();
 
-    String drivetrainWheel0Speed = String(drivetrain.getSpeed(0));
-    String ianOutputString = "Motor 0: " + drivetrainWheel0Speed;
-    ianOutputMsg.data = ianOutputString.c_str();
-    ianOutputPub.publish(&ianOutputMsg);
+    if (drivetrain.isEnabled()) {
+      String drivetrainWheel0Speed = String(drivetrain.getDriveSpeed());
+      String ianOutputString = "Motor 0: " + drivetrainWheel0Speed;
+      ianOutputMsg.data = ianOutputString.c_str();
+      ianOutputPub.publish(&ianOutputMsg);
+    }
 
     // drivetrain.setWheelSpeeds(0, 0, 0, 0);
 

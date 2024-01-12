@@ -52,21 +52,42 @@ void CANController::speedHandlerPID() {
 
     // Define Errors for this loop
     errors[0] = setSpeeds[0] - speeds[0];
-    errors[1] = setSpeeds[1] - speeds[1];
-    errors[2] = setSpeeds[2] - speeds[2];
-    errors[3] = setSpeeds[3] - speeds[3];
-
-    // Integrate the error over time
-    sums[0] = constrain(sums[0] + errors[0], -SPEED_SUMCAP, SPEED_SUMCAP);
-    sums[1] = constrain(sums[1] + errors[1], -SPEED_SUMCAP, SPEED_SUMCAP);
-    sums[2] = constrain(sums[2] + errors[2], -SPEED_SUMCAP, SPEED_SUMCAP);
-    sums[3] = constrain(sums[3] + errors[3], -SPEED_SUMCAP, SPEED_SUMCAP);
+    // errors[1] = setSpeeds[1] - speeds[1];
+    // errors[2] = setSpeeds[2] - speeds[2];
+    // errors[3] = setSpeeds[3] - speeds[3];
 
     // PID Here
-    setCurrents[0] = SPEED_KP * errors[0] + SPEED_KI * sums[0] + SPEED_KD * (errors[0] - prevErrors[0]);
-    setCurrents[1] = SPEED_KP * errors[1] + SPEED_KI * sums[1] + SPEED_KD * (errors[1] - prevErrors[1]);
-    setCurrents[2] = SPEED_KP * errors[2] + SPEED_KI * sums[2] + SPEED_KD * (errors[2] - prevErrors[2]);
-    setCurrents[3] = SPEED_KP * errors[3] + SPEED_KI * sums[3] + SPEED_KD * (errors[3] - prevErrors[3]);
+    if (setSpeeds[0] == 0) {
+        setCurrents[0] = 0;
+    } else if (setSpeeds[0] > 0) {
+        setCurrents[0] = BASE_CURRENT + SPEED_KP * errors[0] + SPEED_KD * (errors[0] - prevErrors[0]);
+    } else {
+        setCurrents[0] = -BASE_CURRENT + SPEED_KP * errors[0] + SPEED_KD * (errors[0] - prevErrors[0]);
+    }
+
+    if (setSpeeds[1] == 0) {
+        setCurrents[1] = 0;
+    } else if (setSpeeds[1] > 0) {
+        setCurrents[1] = BASE_CURRENT + SPEED_KP * errors[1] + SPEED_KD * (errors[1] - prevErrors[1]);
+    } else {
+        setCurrents[1] = -BASE_CURRENT + SPEED_KP * errors[1] + SPEED_KD * (errors[1] - prevErrors[1]);
+    }
+
+    if (setSpeeds[2] == 0) {
+        setCurrents[2] = 0;
+    } else if (setSpeeds[2] > 0) {
+        setCurrents[2] = BASE_CURRENT + SPEED_KP * errors[2] + SPEED_KD * (errors[2] - prevErrors[2]);
+    } else {
+        setCurrents[2] = -BASE_CURRENT + SPEED_KP * errors[2] + SPEED_KD * (errors[2] - prevErrors[2]);
+    }
+
+    if (setSpeeds[3] == 0) {
+        setCurrents[3] = 0;
+    } else if (setSpeeds[3] > 0) {
+        setCurrents[3] = 500 + SPEED_KP * errors[3]; // + SPEED_KD * (errors[3] - prevErrors[3]);
+    } else {
+        setCurrents[3] = -500 + SPEED_KP * errors[3]; // + SPEED_KD * (errors[3] - prevErrors[3]);
+    }
 
     prevErrors[0] = errors[0];
     prevErrors[1] = errors[1];
@@ -105,7 +126,7 @@ void CANController::updateMotorSpeeds() {
     
 }
 
-void CANController::setSpeed(int sp0, int sp1, int sp2, int sp3) {
+void CANController::setSpeed(float sp0, float sp1, float sp2, float sp3) {
     setSpeeds[0] = sp0;
     setSpeeds[1] = sp1;
     setSpeeds[2] = sp2;

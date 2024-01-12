@@ -18,7 +18,7 @@ public:
 
     void updateMotorSpeeds();
 
-    void setSpeed(int, int, int, int);
+    void setSpeed(float, float, float, float);
 
     float getSpeed(int);
 
