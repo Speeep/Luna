@@ -21,10 +21,10 @@ void CANController::init() {
         speedSetpoints[i] = 0.0;
     }
 
-    motor0Encoder.init(3, 0.0);
-    motor1Encoder.init(4, 0.0);
+    // motor0Encoder.init(3, 0.0);
+    // motor1Encoder.init(4, 0.0);
     motor2Encoder.init(5, 0.0);
-    motor3Encoder.init(6, 0.0);
+    // motor3Encoder.init(6, 0.0);
 }
 
 void CANController::setMotorCurrent() {
@@ -52,42 +52,50 @@ void CANController::speedHandlerPID() {
 
     // Define Errors for this loop
     errors[0] = setSpeeds[0] - speeds[0];
-    // errors[1] = setSpeeds[1] - speeds[1];
-    // errors[2] = setSpeeds[2] - speeds[2];
-    // errors[3] = setSpeeds[3] - speeds[3];
+    errors[1] = setSpeeds[1] - speeds[1];
+    errors[2] = setSpeeds[2] - speeds[2];
+    errors[3] = setSpeeds[3] - speeds[3];
+
+    // Integrate the error over time
+    sums[0] = constrain(sums[0] + errors[0], -SPEED_SUMCAP, SPEED_SUMCAP);
+    sums[1] = constrain(sums[1] + errors[1], -SPEED_SUMCAP, SPEED_SUMCAP);
+    sums[2] = constrain(sums[2] + errors[2], -SPEED_SUMCAP, SPEED_SUMCAP);
+    sums[3] = constrain(sums[3] + errors[3], -SPEED_SUMCAP, SPEED_SUMCAP);
 
     // PID Here
-    if (setSpeeds[0] == 0) {
-        setCurrents[0] = 0;
-    } else if (setSpeeds[0] > 0) {
-        setCurrents[0] = BASE_CURRENT + SPEED_KP * errors[0] + SPEED_KD * (errors[0] - prevErrors[0]);
-    } else {
-        setCurrents[0] = -BASE_CURRENT + SPEED_KP * errors[0] + SPEED_KD * (errors[0] - prevErrors[0]);
-    }
+    // if (setSpeeds[0] == 0) {
+    //     setCurrents[0] = 0;
+    //     sums[0] = 0;
+    // } else if (setSpeeds[0] > 0) {
+    //     setCurrents[0] = BASE_CURRENT + SPEED_KP * errors[0] + SPEED_KI * sums[0];
+    // } else {
+    //     setCurrents[0] = -BASE_CURRENT + SPEED_KP * errors[0] + SPEED_KI * sums[0];
+    // }
 
-    if (setSpeeds[1] == 0) {
-        setCurrents[1] = 0;
-    } else if (setSpeeds[1] > 0) {
-        setCurrents[1] = BASE_CURRENT + SPEED_KP * errors[1] + SPEED_KD * (errors[1] - prevErrors[1]);
-    } else {
-        setCurrents[1] = -BASE_CURRENT + SPEED_KP * errors[1] + SPEED_KD * (errors[1] - prevErrors[1]);
-    }
+    // if (setSpeeds[1] == 0) {
+    //     setCurrents[1] = 0;
+    // } else if (setSpeeds[1] > 0) {
+    //     setCurrents[1] = BASE_CURRENT + SPEED_KP * errors[1];
+    // } else {
+    //     setCurrents[1] = -BASE_CURRENT + SPEED_KP * errors[1];
+    // }
 
     if (setSpeeds[2] == 0) {
         setCurrents[2] = 0;
+        sums[2] = 0;
     } else if (setSpeeds[2] > 0) {
-        setCurrents[2] = BASE_CURRENT + SPEED_KP * errors[2] + SPEED_KD * (errors[2] - prevErrors[2]);
+        setCurrents[2] = BASE_CURRENT + SPEED_KP * errors[2] + SPEED_KI * sums[2];
     } else {
-        setCurrents[2] = -BASE_CURRENT + SPEED_KP * errors[2] + SPEED_KD * (errors[2] - prevErrors[2]);
+        setCurrents[2] = -BASE_CURRENT + SPEED_KP * errors[2] + SPEED_KI * sums[2];
     }
 
-    if (setSpeeds[3] == 0) {
-        setCurrents[3] = 0;
-    } else if (setSpeeds[3] > 0) {
-        setCurrents[3] = 500 + SPEED_KP * errors[3]; // + SPEED_KD * (errors[3] - prevErrors[3]);
-    } else {
-        setCurrents[3] = -500 + SPEED_KP * errors[3]; // + SPEED_KD * (errors[3] - prevErrors[3]);
-    }
+    // if (setSpeeds[3] == 0) {
+    //     setCurrents[3] = 0;
+    // } else if (setSpeeds[3] > 0) {
+    //     setCurrents[3] = 500 + SPEED_KP * errors[3];
+    // } else {
+    //     setCurrents[3] = -500 + SPEED_KP * errors[3];
+    // }
 
     prevErrors[0] = errors[0];
     prevErrors[1] = errors[1];
@@ -98,30 +106,38 @@ void CANController::speedHandlerPID() {
 }
 
 void CANController::updateMotorSpeeds() {
-    float motor0Angle = motor0Encoder.getRawAngle();
-    // float motor1Angle = motor1Encoder.getAngle();
-    // float motor2Angle = motor2Encoder.getAngle();
-    // float motor3Angle = motor3Encoder.getAngle();
+    // float motor0Angle = motor0Encoder.getRawAngle();
+    // float motor1Angle = motor1Encoder.getRawAngle();
+    float motor2Angle = motor2Encoder.getRawAngle();
+    // float motor3Angle = motor3Encoder.getRawAngle();
 
     long time = millis();
 
     long deltaTime = time - lastTime;
 
-    float motor0Speed = (motor0Angle - prevAngles[0]) / deltaTime;
+    float motor2deltaAngle = motor2Angle - prevAngles[2];
+
+    if (motor2deltaAngle > 2048) {
+        motor2deltaAngle -= 4096;
+    } else if (motor2deltaAngle < -2048) {
+        motor2deltaAngle += 4096;
+    }
+
+    // float motor0Speed = (motor0Angle - prevAngles[0]) / deltaTime;
     // float motor1Speed = (motor1Angle - prevAngles[1]) / deltaTime;
-    // float motor2Speed = (motor2Angle - prevAngles[2]) / deltaTime;
+    float motor2Speed = motor2deltaAngle / deltaTime;
     // float motor3Speed = (motor3Angle - prevAngles[3]) / deltaTime;
 
-    speeds[0] = motor0Speed;
+    // speeds[0] = motor0Speed;
     // speeds[1] = motor1Speed;
-    // speeds[2] = motor2Speed;
+    speeds[2] = motor2Speed;
     // speeds[3] = motor3Speed;
 
     // Update all last timestep values
     lastTime = time;
-    prevAngles[0] = motor0Angle;
+    // prevAngles[0] = motor0Angle;
     // prevAngles[1] = motor1Angle;
-    // prevAngles[2] = motor2Angle;
+    prevAngles[2] = motor2Angle;
     // prevAngles[3] = motor3Angle;
     
 }
@@ -145,4 +161,8 @@ void CANController::cutCurrent() {
     setCurrents[2] = 0;
     setCurrents[3] = 0;
     setMotorCurrent();
+}
+
+float CANController::getSum() {
+    return setCurrents[2];
 }

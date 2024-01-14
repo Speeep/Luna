@@ -32,7 +32,6 @@ bool drivetrainEnable = false;
 bool drivetrainAngle = false;
 
 static unsigned long previousMillis = 0;
-const unsigned long interval = 5;
 unsigned long currentMillis = millis();
 
 void drivetrainSpeedCallback(const std_msgs::Float32 &driveSpeedMsg) {
@@ -86,7 +85,7 @@ void loop()
   currentMillis = millis();
 
   // Drivetrain gets looped every 2 milliseconds
-  if (currentMillis - previousMillis >= interval) {
+  if (currentMillis - previousMillis >= DRIVETRAIN_INTERVAL) {
 
     // int motor4speed = drivetrain.getSpeed(0);
     // motorSpeed.data = motor4speed;
@@ -103,7 +102,7 @@ void loop()
     drivetrain.loop();
 
     if (drivetrain.isEnabled()) {
-      String drivetrainWheel0Speed = String(drivetrain.getDriveSpeed());
+      String drivetrainWheel0Speed = String(drivetrain.getSum());
       String ianOutputString = "Motor 0: " + drivetrainWheel0Speed;
       ianOutputMsg.data = ianOutputString.c_str();
       ianOutputPub.publish(&ianOutputMsg);

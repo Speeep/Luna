@@ -52,8 +52,7 @@ void Drivetrain::loop() {
     if (enabled) {
         // left_turn_motor.setEffort(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
         // right_turn_motor.setEffort(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
-        // setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
-        setWheelSpeeds(1.4, 1.4, 1.4, 1.4);
+        setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
     } else {
         can_controller.cutCurrent();
     }
@@ -105,4 +104,8 @@ void Drivetrain::setDriveSpeed(float speed) {
 
 float Drivetrain::getDriveSpeed() {
     return driveSpeed;
+}
+
+float Drivetrain::getSum() {
+    return can_controller.getSum();
 }

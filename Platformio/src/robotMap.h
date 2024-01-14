@@ -14,15 +14,16 @@
 #define MCP_SO 50 // Green Wire
 #define MCP_SCK 52 // Orange Wire
 
+#define DRIVETRAIN_INTERVAL 10
 #define INTERVAL 5000
 
 // Velocity loop PID parameters
 // Increase Ki based on load, fine-tune Kp
-#define BASE_CURRENT 1000
+#define BASE_CURRENT 1100
 #define SPEED_KP 500
-#define SPEED_KI 0
+#define SPEED_KI 1
 #define SPEED_KD 10
-#define SPEED_SUMCAP 0
+#define SPEED_SUMCAP 2000
 
 #define POS_KP 0.05
 

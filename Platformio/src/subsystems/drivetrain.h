@@ -47,6 +47,8 @@ class Drivetrain {
 
   float getDriveSpeed();
 
+  float getSum();
+
  private:
     Snowblower left_turn_motor;
     Snowblower right_turn_motor;

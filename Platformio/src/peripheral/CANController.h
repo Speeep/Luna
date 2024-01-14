@@ -24,6 +24,8 @@ public:
 
     void cutCurrent();
 
+    float getSum();
+
 private:
     struct can_frame canMsgOut;
     Encoder motor0Encoder;
