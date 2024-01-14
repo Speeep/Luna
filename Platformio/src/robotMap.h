@@ -20,7 +20,7 @@
 // Velocity loop PID parameters
 // Increase Ki based on load, fine-tune Kp
 #define BASE_CURRENT 1100
-#define SPEED_KP 500
+#define SPEED_KP 250
 #define SPEED_KI 1
 #define SPEED_KD 10
 #define SPEED_SUMCAP 2000
@@ -41,7 +41,7 @@
 #define FRONT_RIGHT_DRIVE_ENCODER_ID 5
 #define BACK_RIGHT_DRIVE_ENCODER_ID 6
 
-#define MAX_MOTOR_CURRENT 4000
+#define MAX_MOTOR_CURRENT 6000
 
 #define LEFT_TURN_MOTOR_KP 20
 #define RIGHT_TURN_MOTOR_KP 20

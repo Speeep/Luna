@@ -164,5 +164,5 @@ void CANController::cutCurrent() {
 }
 
 float CANController::getSum() {
-    return setCurrents[2];
+    return sums[2];
 }
