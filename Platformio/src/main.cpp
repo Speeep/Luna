@@ -55,9 +55,14 @@ void drivetrainAngleCallback(const std_msgs::Bool &driveAngleMsg) {
 
 }
 
+void drivetrainRotateCallback(const std_msgs::Float32 &driveRotateMsg) {
+  drivetrain.setRotateSpeed(driveRotateMsg.data);
+}
+
 ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Bool> driveEnableSub("/drivetrain/enable", &drivetrainEnableCallback);
 ros::Subscriber<std_msgs::Bool> driveAngleSub("/drivetrain/angle", &drivetrainAngleCallback);
+ros::Subscriber<std_msgs::Float32> driveRotateSub("/drivetrain/rotate", &drivetrainRotateCallback);
 
 void setup()
 {
@@ -94,10 +99,6 @@ void loop()
     // float left_wheelpod_angle = drivetrain.getSpeed(0);
     // left_wheelpod_angle_msg.data = left_wheelpod_angle;
     // left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
-
-    // bool drivetrainIsEnabled = drivetrain.isEnabled();
-    // enabbledMsg.data = drivetrainIsEnabled;
-    // drivetrainIsEnabledPub.publish(&enabbledMsg);
 
     drivetrain.loop();
 

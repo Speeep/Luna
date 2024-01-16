@@ -37,22 +37,32 @@ void Drivetrain::loop() {
 
     // Always Get Data
     can_controller.updateMotorSpeeds();
-    // leftWheelpodAngle = left_wheelpod_encoder.getAngle();
-    // rightWheelpodAngle = right_wheelpod_encoder.getAngle();
+    leftWheelpodAngle = left_wheelpod_encoder.getAngle();
+    rightWheelpodAngle = right_wheelpod_encoder.getAngle();
 
-    // if (isAngled) {
-    //     setLeftWheelpodAngleSetpoint(0.7853);
-    //     setRightWheelpodAngleSetpoint(-0.7853);
-    // } else {
-    //     setLeftWheelpodAngleSetpoint(0.0);
-    //     setRightWheelpodAngleSetpoint(0.0);
-    // }
+    if (isAngled) {
+        setLeftWheelpodAngleSetpoint(0.7853);
+        setRightWheelpodAngleSetpoint(-0.7853);
+    } else {
+        setLeftWheelpodAngleSetpoint(0.0);
+        setRightWheelpodAngleSetpoint(0.0);
+    }
 
     // If enabled, control the motors, else cut current to the motors
     if (enabled) {
-        // left_turn_motor.setEffort(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
-        // right_turn_motor.setEffort(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
-        setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
+        left_turn_motor.setEffort(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
+        right_turn_motor.setEffort(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
+
+        // Only control the drivebase if it's wheelpods are pointed the correct direction. 
+        if ((abs(leftWheelpodAngle - leftWheelpodAngleSetpoint) < WHEELPOD_ANGLE_TOLERANCE) && (abs(rightWheelpodAngle - rightWheelpodAngleSetpoint) < WHEELPOD_ANGLE_TOLERANCE)) {
+
+            if (isAngled) {
+                setWheelSpeeds(-driveSpeed, -driveSpeed, driveSpeed, driveSpeed);
+            } else {
+                setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
+            }
+        }
+
     } else {
         can_controller.cutCurrent();
     }
@@ -99,6 +109,10 @@ bool Drivetrain::isEnabled() {
 }
 
 void Drivetrain::setDriveSpeed(float speed) {
+    driveSpeed = speed;
+}
+
+void Drivetrain::setRotateSpeed(float speed) {
     driveSpeed = speed;
 }
 

@@ -45,6 +45,8 @@ class Drivetrain {
 
   void setDriveSpeed(float);
 
+  void setRotateSpeed(float);
+
   float getDriveSpeed();
 
   float getSum();

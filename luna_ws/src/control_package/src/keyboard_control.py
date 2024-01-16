@@ -7,7 +7,7 @@ class KeyControlNode:
         rospy.init_node('keyboard_control', anonymous=True)
 
         # Define publishers for different key presses
-        self.drivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
+        self.cddrivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
         self.drivetrain_angle_pub = rospy.Publisher('/drivetrain/angle', Bool, queue_size=10)
         self.drivetrain_rotate_pub = rospy.Publisher('/drivetrain/rotate', Float32, queue_size=10)
         self.drivetrain_enable_pub = rospy.Publisher('/drivetrain/enable', Bool, queue_size=10)
