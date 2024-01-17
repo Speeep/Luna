@@ -15,12 +15,12 @@ void Drivetrain::init() {
     right_wheelpod_encoder.init(RIGHT_WHEELPOD_ENCODER_ID, RIGHT_WHEELPOD_ENCODER_START_ANGLE);
     can_controller.init();
     enabled = false;
-    leftWheelpodAngleSetpoint = 0.1;
+    leftWheelpodAngleSetpoint = 0.0;
     rightWheelpodAngleSetpoint = 0.0;
     leftWheelpodAngle = 0;
     rightWheelpodAngle = 0;
     turnMotorEffort = 0;
-    driveSpeed = 0;
+    driveSpeed = 0.0;
 }
 
 void Drivetrain::enable() {
@@ -36,7 +36,7 @@ void Drivetrain::disable() {
 void Drivetrain::loop() {
 
     // Always Get Data
-    can_controller.getCanData();
+    can_controller.updateMotorSpeeds();
     leftWheelpodAngle = left_wheelpod_encoder.getAngle();
     rightWheelpodAngle = right_wheelpod_encoder.getAngle();
 
@@ -52,17 +52,27 @@ void Drivetrain::loop() {
     if (enabled) {
         left_turn_motor.setEffort(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
         right_turn_motor.setEffort(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
-        setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
+
+        // Only control the drivebase if it's wheelpods are pointed the correct direction. 
+        if ((abs(leftWheelpodAngle - leftWheelpodAngleSetpoint) < WHEELPOD_ANGLE_TOLERANCE) && (abs(rightWheelpodAngle - rightWheelpodAngleSetpoint) < WHEELPOD_ANGLE_TOLERANCE)) {
+
+            if (isAngled) {
+                setWheelSpeeds(-driveSpeed, -driveSpeed, driveSpeed, driveSpeed);
+            } else {
+                setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
+            }
+        }
+
     } else {
         can_controller.cutCurrent();
     }
 }
 
-void Drivetrain::setWheelSpeeds(int sp0, int sp1, int sp2, int sp3) {
+void Drivetrain::setWheelSpeeds(float sp0, float sp1, float sp2, float sp3) {
     can_controller.setSpeed(-sp0, -sp1, sp2, sp3);
 }
 
-int Drivetrain::getSpeed(int motorId) {
+float Drivetrain::getSpeed(int motorId) {
     return can_controller.getSpeed(motorId);
 }
 
@@ -98,6 +108,18 @@ bool Drivetrain::isEnabled() {
     return enabled;
 }
 
-void Drivetrain::setDriveSpeed(int speed) {
+void Drivetrain::setDriveSpeed(float speed) {
     driveSpeed = speed;
+}
+
+void Drivetrain::setRotateSpeed(float speed) {
+    driveSpeed = speed;
+}
+
+float Drivetrain::getDriveSpeed() {
+    return driveSpeed;
+}
+
+float Drivetrain::getSum() {
+    return can_controller.getSum();
 }

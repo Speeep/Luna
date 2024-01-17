@@ -12,6 +12,8 @@ class Encoder {
 
   float getAngle();
 
+  float getRawAngle();
+
  private:
     float startAngle;
     float radAngle;

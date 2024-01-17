@@ -3,8 +3,8 @@
 #include "Arduino.h"
 #include <mcp2515.h>
 #include <SPI.h>
+#include "encoder.h"
 #include "../robotMap.h"
-#include <Kalman.h>
 
 class CANController {
 public:
@@ -12,46 +12,34 @@ public:
 
     void init();
 
-    void setMotorSpeed(int);
-
     void setMotorCurrent();
-
-    inline bool canMsgIncoming();
-
-    inline int combineBytes(unsigned char, unsigned char);
-
-    void getCanData();
-
-    void updateData(int);
-
-    int calcPosition(long, int);
 
     void speedHandlerPID();
 
-    void setSpeed(int, int, int, int);
+    void updateMotorSpeeds();
 
-    int getSpeed(int);
+    void setSpeed(float, float, float, float);
+
+    float getSpeed(int);
 
     void cutCurrent();
 
+    float getSum();
+
 private:
     struct can_frame canMsgOut;
-    struct can_frame canMsgIn;
+    Encoder motor0Encoder;
+    Encoder motor1Encoder;
+    Encoder motor2Encoder;
+    Encoder motor3Encoder;
     MCP2515 mcp2515;
-    int rawSpeed;
-    int angles[4];
-    int lastAngles[4];
-    int speeds[4];
-    long positions[4];
-    int actualCurrents[4];
+    long lastTime;
+    float prevAngles[4];
+    float errors[4];
+    float prevErrors[4];
+    float setSpeeds[4];
+    float speeds[4];
+    float sums[4];
     int setCurrents[4];
-    int deltaPos[4];
-    long sumDeltaPos[4];
-    long setPos[4];
-    int setSpeeds[4];
-    int temps[4];
-    int errors[4];
-    int prevErrors[4];
-    int sums[4];
-    float i1;
+    float speedSetpoints[4];
 };

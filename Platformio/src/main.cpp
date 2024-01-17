@@ -31,7 +31,10 @@ int driveSpeed = 0;
 bool drivetrainEnable = false;
 bool drivetrainAngle = false;
 
-void drivetrainSpeedCallback(const std_msgs::Int32 &driveSpeedMsg) {
+static unsigned long previousMillis = 0;
+unsigned long currentMillis = millis();
+
+void drivetrainSpeedCallback(const std_msgs::Float32 &driveSpeedMsg) {
   drivetrain.setDriveSpeed(driveSpeedMsg.data);
 }
 
@@ -52,9 +55,14 @@ void drivetrainAngleCallback(const std_msgs::Bool &driveAngleMsg) {
 
 }
 
-ros::Subscriber<std_msgs::Int32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
+void drivetrainRotateCallback(const std_msgs::Float32 &driveRotateMsg) {
+  drivetrain.setRotateSpeed(driveRotateMsg.data);
+}
+
+ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Bool> driveEnableSub("/drivetrain/enable", &drivetrainEnableCallback);
 ros::Subscriber<std_msgs::Bool> driveAngleSub("/drivetrain/angle", &drivetrainAngleCallback);
+ros::Subscriber<std_msgs::Float32> driveRotateSub("/drivetrain/rotate", &drivetrainRotateCallback);
 
 void setup()
 {
@@ -79,28 +87,30 @@ void loop()
 {
   nh.spinOnce();
 
-  // int motor4speed = drivetrain.getSpeed(0);
-  // motorSpeed.data = motor4speed;
-  // motorSpeedPub.publish(&motorSpeed);
+  currentMillis = millis();
 
-  float left_wheelpod_angle = drivetrain.getSpeed(0);
-  left_wheelpod_angle_msg.data = left_wheelpod_angle;
-  left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
+  // Drivetrain gets looped every 2 milliseconds
+  if (currentMillis - previousMillis >= DRIVETRAIN_INTERVAL) {
 
-  bool drivetrainIsEnabled = drivetrain.isEnabled();
-  enabbledMsg.data = drivetrainIsEnabled;
-  drivetrainIsEnabledPub.publish(&enabbledMsg);
+    // int motor4speed = drivetrain.getSpeed(0);
+    // motorSpeed.data = motor4speed;
+    // motorSpeedPub.publish(&motorSpeed);
 
-  String drivetrainWeel1Speed = String(drivetrain.getSpeed(0));
-  String drivetrainWeel2Speed = String(drivetrain.getSpeed(1));
-  String drivetrainWeel3Speed = String(drivetrain.getSpeed(2));
-  String drivetrainWeel4Speed = String(drivetrain.getSpeed(3));
+    // float left_wheelpod_angle = drivetrain.getSpeed(0);
+    // left_wheelpod_angle_msg.data = left_wheelpod_angle;
+    // left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
 
-  String ianOutputString = "1: " + drivetrainWeel1Speed + "     2: " + drivetrainWeel2Speed + "     2: " + drivetrainWeel3Speed + "     4: " + drivetrainWeel4Speed;
-  ianOutputMsg.data = ianOutputString.c_str();
-  ianOutputPub.publish(&ianOutputMsg);
+    drivetrain.loop();
 
-  drivetrain.loop();
+    if (drivetrain.isEnabled()) {
+      String drivetrainWheel0Speed = String(drivetrain.getSum());
+      String ianOutputString = "Motor 0: " + drivetrainWheel0Speed;
+      ianOutputMsg.data = ianOutputString.c_str();
+      ianOutputPub.publish(&ianOutputMsg);
+    }
 
-  // drivetrain.setWheelSpeeds(0, 0, 0, 0);
+    // drivetrain.setWheelSpeeds(0, 0, 0, 0);
+
+    previousMillis = currentMillis;
+  }
 }

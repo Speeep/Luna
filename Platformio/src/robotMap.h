@@ -14,14 +14,16 @@
 #define MCP_SO 50 // Green Wire
 #define MCP_SCK 52 // Orange Wire
 
+#define DRIVETRAIN_INTERVAL 10
 #define INTERVAL 5000
 
 // Velocity loop PID parameters
 // Increase Ki based on load, fine-tune Kp
-#define SPEED_KP 20
-#define SPEED_KI 0
+#define BASE_CURRENT 1100
+#define SPEED_KP 250
+#define SPEED_KI 1
 #define SPEED_KD 10
-#define SPEED_SUMCAP 0
+#define SPEED_SUMCAP 2000
 
 #define POS_KP 0.05
 
@@ -33,7 +35,15 @@
 
 #define RIGHT_WHEELPOD_ENCODER_ID 2
 #define RIGHT_WHEELPOD_ENCODER_START_ANGLE 2.60
-#define MAX_MOTOR_CURRENT 4000
+
+#define WHEELPOD_ANGLE_TOLERANCE 0.05
+
+#define FRONT_LEFT_DRIVE_ENCODER_ID 3
+#define BACK_LEFT_DRIVE_ENCODER_ID 4
+#define FRONT_RIGHT_DRIVE_ENCODER_ID 5
+#define BACK_RIGHT_DRIVE_ENCODER_ID 6
+
+#define MAX_MOTOR_CURRENT 6000
 
 #define LEFT_TURN_MOTOR_KP 20
 #define RIGHT_TURN_MOTOR_KP 20

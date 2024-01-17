@@ -23,9 +23,9 @@ class Drivetrain {
 
   void setRightWheelpodAngle(int);
 
-  void setWheelSpeeds(int, int, int, int);
+  void setWheelSpeeds(float, float, float, float);
 
-  int getSpeed(int);
+  float getSpeed(int);
 
   float getLeftWheelpodAngle();
 
@@ -43,7 +43,13 @@ class Drivetrain {
 
   bool isEnabled();
 
-  void setDriveSpeed(int);
+  void setDriveSpeed(float);
+
+  void setRotateSpeed(float);
+
+  float getDriveSpeed();
+
+  float getSum();
 
  private:
     Snowblower left_turn_motor;
@@ -58,5 +64,5 @@ class Drivetrain {
     float rightWheelpodAngle;
     int turnMotorEffort;
     bool isAngled;
-    int driveSpeed;
+    float driveSpeed;
 };
