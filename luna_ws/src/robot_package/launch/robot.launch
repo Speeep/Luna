@@ -1,16 +1,4 @@
 <launch>
-  <node
-    pkg="robot_package"
-    type="listener.py"
-    name="listener" 
-    output="screen"
-  />
-  <node
-    pkg="control_package"
-    type="keyboard_control.py"
-    name="keyboard_control" 
-    output="screen"
-  />
   <arg name="port" default="/dev/ttyACM0" />
   <arg name="baud" default="57600" />
   
