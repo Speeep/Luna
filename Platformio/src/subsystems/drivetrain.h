@@ -49,7 +49,7 @@ class Drivetrain {
 
   float getDriveSpeed();
 
-  float getSum();
+  String getSums();
 
  private:
     Snowblower left_turn_motor;

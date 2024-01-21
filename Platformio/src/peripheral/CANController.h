@@ -3,7 +3,7 @@
 #include "Arduino.h"
 #include <mcp2515.h>
 #include <SPI.h>
-#include "encoder.h"
+#include "rawEncoder.h"
 #include "../robotMap.h"
 
 class CANController {
@@ -24,14 +24,14 @@ public:
 
     void cutCurrent();
 
-    float getSum();
+    String getSums();
 
 private:
     struct can_frame canMsgOut;
-    Encoder motor0Encoder;
-    Encoder motor1Encoder;
-    Encoder motor2Encoder;
-    Encoder motor3Encoder;
+    RawEncoder motor0Encoder;
+    RawEncoder motor1Encoder;
+    RawEncoder motor2Encoder;
+    RawEncoder motor3Encoder;
     MCP2515 mcp2515;
     long lastTime;
     float prevAngles[4];

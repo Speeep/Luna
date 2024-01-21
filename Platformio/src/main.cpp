@@ -71,8 +71,6 @@ void setup()
   Wire.begin();
   Wire.setClock(800000L);
 
-  drivetrain.init();
-
   nh.initNode();
   nh.advertise(left_wheelpod_angle_pub);
   nh.advertise(left_wheelpod_angle_setpoint_pub);
@@ -82,6 +80,8 @@ void setup()
   nh.subscribe(driveSpeedSub);
   nh.subscribe(driveEnableSub);
   nh.subscribe(driveAngleSub);
+
+  drivetrain.init();
 }
 void loop()
 {
@@ -92,24 +92,14 @@ void loop()
   // Drivetrain gets looped every 2 milliseconds
   if (currentMillis - previousMillis >= DRIVETRAIN_INTERVAL) {
 
-    // int motor4speed = drivetrain.getSpeed(0);
-    // motorSpeed.data = motor4speed;
-    // motorSpeedPub.publish(&motorSpeed);
-
-    // float left_wheelpod_angle = drivetrain.getSpeed(0);
-    // left_wheelpod_angle_msg.data = left_wheelpod_angle;
-    // left_wheelpod_angle_pub.publish(&left_wheelpod_angle_msg);
-
     drivetrain.loop();
 
     if (drivetrain.isEnabled()) {
-      String drivetrainWheel0Speed = String(drivetrain.getSum());
+      String drivetrainWheel0Speed = String(drivetrain.getSums());
       String ianOutputString = "Motor 0: " + drivetrainWheel0Speed;
       ianOutputMsg.data = ianOutputString.c_str();
       ianOutputPub.publish(&ianOutputMsg);
     }
-
-    // drivetrain.setWheelSpeeds(0, 0, 0, 0);
 
     previousMillis = currentMillis;
   }

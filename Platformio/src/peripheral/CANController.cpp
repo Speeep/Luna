@@ -21,10 +21,10 @@ void CANController::init() {
         speedSetpoints[i] = 0.0;
     }
 
-    motor0Encoder.init(3, 0.0);
-    motor1Encoder.init(4, 0.0);
-    motor2Encoder.init(5, 0.0);
-    motor3Encoder.init(6, 0.0);
+    motor0Encoder.init(3);
+    motor1Encoder.init(4);
+    motor2Encoder.init(5);
+    motor3Encoder.init(6);
 }
 
 void CANController::setMotorCurrent() {
@@ -113,55 +113,55 @@ void CANController::updateMotorSpeeds() {
     float motor2Angle = motor2Encoder.getRawAngle();
     float motor3Angle = motor3Encoder.getRawAngle();
 
-    long time = millis();
+    // long time = millis();
 
-    long deltaTime = time - lastTime;
+    // long deltaTime = time - lastTime;
 
-    float motor0deltaAngle = motor0Angle - prevAngles[0];
-    float motor1deltaAngle = motor1Angle - prevAngles[1];
-    float motor2deltaAngle = motor2Angle - prevAngles[2];
-    float motor3deltaAngle = motor3Angle - prevAngles[3];
+    // float motor0deltaAngle = motor0Angle - prevAngles[0];
+    // float motor1deltaAngle = motor1Angle - prevAngles[1];
+    // float motor2deltaAngle = motor2Angle - prevAngles[2];
+    // float motor3deltaAngle = motor3Angle - prevAngles[3];
 
-    if (motor0deltaAngle > 2048) {
-        motor0deltaAngle -= 4096;
-    } else if (motor0deltaAngle < -2048) {
-        motor0deltaAngle += 4096;
-    }
+    // if (motor0deltaAngle > 2048) {
+    //     motor0deltaAngle -= 4096;
+    // } else if (motor0deltaAngle < -2048) {
+    //     motor0deltaAngle += 4096;
+    // }
 
-    if (motor1deltaAngle > 2048) {
-        motor1deltaAngle -= 4096;
-    } else if (motor1deltaAngle < -2048) {
-        motor1deltaAngle += 4096;
-    }
+    // if (motor1deltaAngle > 2048) {
+    //     motor1deltaAngle -= 4096;
+    // } else if (motor1deltaAngle < -2048) {
+    //     motor1deltaAngle += 4096;
+    // }
 
-    if (motor2deltaAngle > 2048) {
-        motor2deltaAngle -= 4096;
-    } else if (motor2deltaAngle < -2048) {
-        motor2deltaAngle += 4096;
-    }
+    // if (motor2deltaAngle > 2048) {
+    //     motor2deltaAngle -= 4096;
+    // } else if (motor2deltaAngle < -2048) {
+    //     motor2deltaAngle += 4096;
+    // }
 
-    if (motor3deltaAngle > 2048) {
-        motor3deltaAngle -= 4096;
-    } else if (motor3deltaAngle < -2048) {
-        motor3deltaAngle += 4096;
-    }
+    // if (motor3deltaAngle > 2048) {
+    //     motor3deltaAngle -= 4096;
+    // } else if (motor3deltaAngle < -2048) {
+    //     motor3deltaAngle += 4096;
+    // }
 
-    float motor0Speed = motor0deltaAngle / deltaTime;
-    float motor1Speed = motor1deltaAngle / deltaTime;
-    float motor2Speed = motor2deltaAngle / deltaTime;
-    float motor3Speed = motor3deltaAngle / deltaTime;
+    // float motor0Speed = motor0deltaAngle / deltaTime;
+    // float motor1Speed = motor1deltaAngle / deltaTime;
+    // float motor2Speed = motor2deltaAngle / deltaTime;
+    // float motor3Speed = motor3deltaAngle / deltaTime;
 
-    speeds[0] = motor0Speed;
-    speeds[1] = motor1Speed;
-    speeds[2] = motor2Speed;
-    speeds[3] = motor3Speed;
+    // speeds[0] = motor0Speed;
+    // speeds[1] = motor1Speed;
+    // speeds[2] = motor2Speed;
+    // speeds[3] = motor3Speed;
 
-    // Update all last timestep values
-    lastTime = time;
-    prevAngles[0] = motor0Angle;
-    prevAngles[1] = motor1Angle;
-    prevAngles[2] = motor2Angle;
-    prevAngles[3] = motor3Angle;
+    // // Update all last timestep values
+    // lastTime = time;
+    // prevAngles[0] = motor0Angle;
+    // prevAngles[1] = motor1Angle;
+    // prevAngles[2] = motor2Angle;
+    // prevAngles[3] = motor3Angle;
     
 }
 
@@ -186,6 +186,6 @@ void CANController::cutCurrent() {
     setMotorCurrent();
 }
 
-float CANController::getSum() {
-    return sums[2];
+String CANController::getSums() {
+    return String(sums[0]) + "  " + String(sums[1]) + "  " + String(sums[2]) + "  " + String(sums[3]);
 }

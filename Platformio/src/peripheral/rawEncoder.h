@@ -3,19 +3,17 @@
 #include "Arduino.h"
 #include "../robotMap.h"
 
-class Encoder {
+class RawEncoder {
  public:
 
-  Encoder();
+  RawEncoder();
 
-  void init(int id, float start);
+  void init(int id);
 
-  float getAngle();
+  int getRawAngle();
 
  private:
-    float startAngle;
-    float radAngle;
-    float rawAngle;
+    int lastRawAngle;
     int lowbyte;   // raw angle 7:0
     word highbyte; // raw angle 7:0 and 11:8
     int encoderNumber;

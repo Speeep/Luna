@@ -5,19 +5,17 @@
  *      Author: Speeep
  */
 
-#include "encoder.h"
+#include "rawEncoder.h"
 #include <Wire.h>
 
-Encoder::Encoder(){}
+RawEncoder::RawEncoder(){}
 
-void Encoder::init(int id, float start) {
+void RawEncoder::init(int id) {
     encoderNumber = id;
-    startAngle = start;
-    rawAngle = 0;
-    radAngle = 0.0;
+    lastRawAngle = 0;
 }
 
-float Encoder::getAngle()
+int RawEncoder::getRawAngle()
 {
   // Multiplexer things
   Wire.beginTransmission(0x70);
@@ -26,7 +24,7 @@ float Encoder::getAngle()
   {
     // Handle I2C communication error
     Serial.println("Error setting multiplexer channel");
-    return radAngle;  // Return the last known valid value
+    return lastRawAngle;  // Return the last known valid value
   }
 
   // Encoder things
@@ -36,14 +34,14 @@ float Encoder::getAngle()
   if (Wire.endTransmission() != 0)
   {
     Serial.println("Error starting transmission to the sensor");
-    return radAngle;
+    return lastRawAngle;
   }
 
   Wire.requestFrom(0x36, 1);
   if (Wire.available() == 0)
   {
     Serial.println("Error receiving data from the sensor");
-    return radAngle;
+    return lastRawAngle;
   }
   lowbyte = Wire.read();
 
@@ -53,35 +51,24 @@ float Encoder::getAngle()
   if (Wire.endTransmission() != 0)
   {
     Serial.println("Error starting transmission to the sensor");
-    return radAngle;
+    return lastRawAngle;
   }
 
   Wire.requestFrom(0x36, 1);
   if (Wire.available() == 0)
   {
     Serial.println("Error receiving data from the sensor");
-    return radAngle;
+    return lastRawAngle;
   }
   highbyte = Wire.read();
   highbyte = highbyte << 8;
 
-  int rawAngle = (highbyte | lowbyte) & 0x0fff;
-
-  if ((static_cast<float>(rawAngle) * 0.001533981 - startAngle) == 0.0) {
-    return radAngle;
+  if (((highbyte | lowbyte) & 0x0fff) == 0) {
+    return lastRawAngle;
   } else {
-    radAngle = static_cast<float>(rawAngle) * 0.001533981 - startAngle;
-    return radAngle;
+    int rawAngle = (highbyte | lowbyte) & 0x0fff;
+    lastRawAngle = rawAngle;
+    return rawAngle;
   }
 
-  if (radAngle < 0.0)
-  {
-    radAngle += 6.28319;
-  }
-  if (radAngle > 3.14159)
-  {
-    radAngle -= 6.28319;
-  }
-
-  return radAngle;
 }

@@ -53,15 +53,20 @@ void Drivetrain::loop() {
         left_turn_motor.setEffort(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
         right_turn_motor.setEffort(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
 
-        // Only control the drivebase if it's wheelpods are pointed the correct direction. 
-        if ((abs(leftWheelpodAngle - leftWheelpodAngleSetpoint) < WHEELPOD_ANGLE_TOLERANCE) && (abs(rightWheelpodAngle - rightWheelpodAngleSetpoint) < WHEELPOD_ANGLE_TOLERANCE)) {
-
-            if (isAngled) {
-                setWheelSpeeds(-driveSpeed, -driveSpeed, driveSpeed, driveSpeed);
-            } else {
-                setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
-            }
+        if (isAngled) {
+            setWheelSpeeds(-driveSpeed, -driveSpeed, driveSpeed, driveSpeed);
+        } else {
+            setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
         }
+        // Only control the drivebase if it's wheelpods are pointed the correct direction. 
+        // if ((abs(leftWheelpodAngle - leftWheelpodAngleSetpoint) < WHEELPOD_ANGLE_TOLERANCE) && (abs(rightWheelpodAngle - rightWheelpodAngleSetpoint) < WHEELPOD_ANGLE_TOLERANCE)) {
+
+        //     if (isAngled) {
+        //         setWheelSpeeds(-driveSpeed, -driveSpeed, driveSpeed, driveSpeed);
+        //     } else {
+        //         setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
+        //     }
+        // }
 
     } else {
         can_controller.cutCurrent();
@@ -120,6 +125,6 @@ float Drivetrain::getDriveSpeed() {
     return driveSpeed;
 }
 
-float Drivetrain::getSum() {
-    return can_controller.getSum();
+String Drivetrain::getSums() {
+    return can_controller.getSums();
 }
