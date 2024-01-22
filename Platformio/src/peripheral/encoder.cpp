@@ -10,8 +10,9 @@
 
 Encoder::Encoder(){}
 
-void Encoder::init(int id, float start) {
+void Encoder::init(int id, int multiplexerId, float start) {
     encoderNumber = id;
+    multiplexerNumber = multiplexerId;
     startAngle = start;
     rawAngle = 0;
     radAngle = 0.0;
@@ -20,13 +21,21 @@ void Encoder::init(int id, float start) {
 float Encoder::getAngle()
 {
   // Multiplexer things
-  Wire.beginTransmission(0x70);
-  Wire.write(1 << encoderNumber);
-  if (Wire.endTransmission() != 0)
-  {
-    // Handle I2C communication error
-    Serial.println("Error setting multiplexer channel");
-    return radAngle;  // Return the last known valid value
+  if(multiplexerNumber == 0){
+    Wire.beginTransmission(0x70);
+    Wire.write(1 << encoderNumber);
+    Wire.endTransmission();
+    Wire.beginTransmission(0x71);
+    Wire.write(1 << 7);
+    Wire.endTransmission();
+  }
+  else{
+    Wire.beginTransmission(0x71);
+    Wire.write(1 << encoderNumber);
+    Wire.endTransmission();
+    Wire.beginTransmission(0x70);
+    Wire.write(1 << 7);
+    Wire.endTransmission();
   }
 
   // Encoder things
@@ -71,17 +80,17 @@ float Encoder::getAngle()
     return radAngle;
   } else {
     radAngle = static_cast<float>(rawAngle) * 0.001533981 - startAngle;
-    return radAngle;
-  }
 
-  if (radAngle < 0.0)
-  {
-    radAngle += 6.28319;
-  }
-  if (radAngle > 3.14159)
-  {
-    radAngle -= 6.28319;
-  }
+    if (radAngle < 0.0)
+    {
+      radAngle += 6.28319;
+    }
+    
+    if (radAngle > 3.14159)
+    {
+      radAngle -= 6.28319;
+    }
 
   return radAngle;
+  }
 }

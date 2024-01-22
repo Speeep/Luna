@@ -21,10 +21,10 @@ void CANController::init() {
         speedSetpoints[i] = 0.0;
     }
 
-    motor0Encoder.init(3);
-    motor1Encoder.init(4);
-    motor2Encoder.init(5);
-    motor3Encoder.init(6);
+    motor0Encoder.init(FRONT_LEFT_DRIVE_ENCODER_ID, MULTIPLEXER_0_ID);
+    motor1Encoder.init(BACK_LEFT_DRIVE_ENCODER_ID, MULTIPLEXER_0_ID);
+    motor2Encoder.init(BACK_RIGHT_DRIVE_ENCODER_ID, MULTIPLEXER_0_ID);
+    motor3Encoder.init(FRONT_RIGHT_DRIVE_ENCODER_ID, MULTIPLEXER_0_ID);
 }
 
 void CANController::setMotorCurrent() {

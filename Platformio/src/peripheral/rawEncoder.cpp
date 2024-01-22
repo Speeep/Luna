@@ -10,21 +10,30 @@
 
 RawEncoder::RawEncoder(){}
 
-void RawEncoder::init(int id) {
+void RawEncoder::init(int id, int multiplexerId) {
     encoderNumber = id;
+    multiplexerNumber = multiplexerId;
     lastRawAngle = 0;
 }
 
 int RawEncoder::getRawAngle()
 {
   // Multiplexer things
-  Wire.beginTransmission(0x70);
-  Wire.write(1 << encoderNumber);
-  if (Wire.endTransmission() != 0)
-  {
-    // Handle I2C communication error
-    Serial.println("Error setting multiplexer channel");
-    return lastRawAngle;  // Return the last known valid value
+  if(multiplexerNumber == 0){
+    Wire.beginTransmission(0x70);
+    Wire.write(1 << encoderNumber);
+    Wire.endTransmission();
+    Wire.beginTransmission(0x71);
+    Wire.write(1 << 7);
+    Wire.endTransmission();
+  }
+  else{
+    Wire.beginTransmission(0x71);
+    Wire.write(1 << encoderNumber);
+    Wire.endTransmission();
+    Wire.beginTransmission(0x70);
+    Wire.write(1 << 7);
+    Wire.endTransmission();
   }
 
   // Encoder things

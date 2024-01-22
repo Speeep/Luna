@@ -8,7 +8,7 @@ class Encoder {
 
   Encoder();
 
-  void init(int id, float start);
+  void init(int id, int multiplexerId, float start);
 
   float getAngle();
 
@@ -19,4 +19,5 @@ class Encoder {
     int lowbyte;   // raw angle 7:0
     word highbyte; // raw angle 7:0 and 11:8
     int encoderNumber;
+    int multiplexerNumber;
 };

@@ -102,7 +102,7 @@ class KeyControlNode:
             self.drivetrain_enable_pub.publish(self.robot_enable)
         else:
             disable = Bool()
-            disable.data = False
+            disable.data = self.robot_enable
             self.drivetrain_enable_pub.publish(self.robot_enable)
 
 if __name__ == '__main__':

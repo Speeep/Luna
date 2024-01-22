@@ -11,8 +11,8 @@ Drivetrain::Drivetrain(){}
 void Drivetrain::init() {
     left_turn_motor.init(true);
     right_turn_motor.init(false);
-    left_wheelpod_encoder.init(LEFT_WHEELPOD_ENCODER_ID, LEFT_WHEELPOD_ENCODER_START_ANGLE);
-    right_wheelpod_encoder.init(RIGHT_WHEELPOD_ENCODER_ID, RIGHT_WHEELPOD_ENCODER_START_ANGLE);
+    left_wheelpod_encoder.init(LEFT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, LEFT_WHEELPOD_ENCODER_START_ANGLE);
+    right_wheelpod_encoder.init(RIGHT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, RIGHT_WHEELPOD_ENCODER_START_ANGLE);
     can_controller.init();
     enabled = false;
     leftWheelpodAngleSetpoint = 0.0;
