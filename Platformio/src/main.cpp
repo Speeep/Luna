@@ -96,8 +96,8 @@ void loop()
     drivetrain.loop();
 
     if (drivetrain.isEnabled()) {
-      String drivetrainWheel0Speed = String(drivetrain.getRightWheelpodAngle());
-      String ianOutputString = "Motor 0: " + drivetrainWheel0Speed;
+      String drivetrainWheel0Speed = String(drivetrain.getSums());
+      String ianOutputString = drivetrainWheel0Speed;
       ianOutputMsg.data = ianOutputString.c_str();
       ianOutputPub.publish(&ianOutputMsg);
     }
