@@ -1,3 +1,4 @@
 {
-    "C_Cpp.default.compilerPath": "/home/speeep/.platformio/packages/toolchain-atmelavr/bin/avr-gcc"
+    "C_Cpp.default.compilerPath": "/home/speeep/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
+    "C_Cpp.errorSquiggles": "disabled"
 }

@@ -52,3 +52,8 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+Platformio/.vscode/c_cpp_properties.json
+Platformio/.pio/build/project.checksum
+Platformio/.vscode/launch.json
+Platformio/.vscode/extensions.json
+Platformio/.vscode/launch.json
