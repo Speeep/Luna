@@ -5,12 +5,12 @@
  *      Author: Speeep
  */
 
-#include "snowblower.h"
+#include "HBridge.h"
 #include <Wire.h>
 
-Snowblower::Snowblower() {}
+HBridge::HBridge() {}
 
-void Snowblower::init(bool isLeft)
+void HBridge::init(bool isLeft)
 {
     leftSide = isLeft;
 
@@ -27,7 +27,7 @@ void Snowblower::init(bool isLeft)
     }
 }
 
-void Snowblower::setEffort(int effort)
+void HBridge::setEffort(int effort)
 {
     if (effort > 100) {
         effort = 100;

@@ -7,6 +7,7 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 #include "./subsystems/drivetrain.h"
+#include "./subsystems/localizer.h"
 
 ros::NodeHandle nh;
 

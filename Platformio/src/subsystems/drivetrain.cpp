@@ -58,15 +58,6 @@ void Drivetrain::loop() {
         } else {
             setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
         }
-        // Only control the drivebase if it's wheelpods are pointed the correct direction. 
-        // if ((abs(leftWheelpodAngle - leftWheelpodAngleSetpoint) < WHEELPOD_ANGLE_TOLERANCE) && (abs(rightWheelpodAngle - rightWheelpodAngleSetpoint) < WHEELPOD_ANGLE_TOLERANCE)) {
-
-        //     if (isAngled) {
-        //         setWheelSpeeds(-driveSpeed, -driveSpeed, driveSpeed, driveSpeed);
-        //     } else {
-        //         setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
-        //     }
-        // }
 
     } else {
         can_controller.cutCurrent();

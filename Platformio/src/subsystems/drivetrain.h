@@ -2,9 +2,10 @@
 
 #include "Arduino.h"
 #include "../robotMap.h"
-#include "./peripheral/snowblower.h"
+#include "./peripheral/HBridge.h"
 #include "./peripheral/encoder.h"
 #include "./peripheral/CANController.h"
+#include "geometry_msgs/Pose.h"
 
 class Drivetrain {
  public:
@@ -52,8 +53,8 @@ class Drivetrain {
   String getSums();
 
  private:
-    Snowblower left_turn_motor;
-    Snowblower right_turn_motor;
+    HBridge left_turn_motor;
+    HBridge right_turn_motor;
     Encoder left_wheelpod_encoder;
     Encoder right_wheelpod_encoder;
     CANController can_controller;

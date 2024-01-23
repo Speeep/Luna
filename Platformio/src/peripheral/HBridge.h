@@ -3,10 +3,10 @@
 #include "Arduino.h"
 #include "../robotMap.h"
 
-class Snowblower {
+class HBridge {
  public:
 
-  Snowblower();
+  HBridge();
 
   void init(bool);
 
