@@ -8,7 +8,7 @@ class HBridge {
 
   HBridge();
 
-  void init(bool);
+  void init(int, int);
 
   void setEffort(int effort);
 

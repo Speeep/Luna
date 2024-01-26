@@ -27,10 +27,12 @@ std_msgs::Int32 motorSpeed;
 ros::Publisher motorSpeedPub("/listener/motorspeed", &motorSpeed);
 
 Drivetrain drivetrain;
+Localizer localizer;
 
 int driveSpeed = 0;
 bool drivetrainEnable = false;
 bool drivetrainAngle = false;
+bool localizerEnable = false;
 
 static unsigned long previousMillis = 0;
 unsigned long currentMillis = millis();
@@ -60,10 +62,27 @@ void drivetrainRotateCallback(const std_msgs::Float32 &driveRotateMsg) {
   drivetrain.setRotateSpeed(driveRotateMsg.data);
 }
 
+void localizerAngleCallback(const std_msgs::Float32 &localizerAngleMsg) {
+  localizer.setAngleSetpoint(localizerAngleMsg.data);
+}
+
+void localizerEnableCallback(const std_msgs::Bool &localizerEnableMsg) {
+  localizerEnable = localizerEnableMsg.data;
+
+  if (localizerEnable == true) {
+    drivetrain.enable();
+  } else {
+    drivetrain.disable();
+  }
+}
+
 ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Bool> driveEnableSub("/drivetrain/enable", &drivetrainEnableCallback);
 ros::Subscriber<std_msgs::Bool> driveAngleSub("/drivetrain/angle", &drivetrainAngleCallback);
 ros::Subscriber<std_msgs::Float32> driveRotateSub("/drivetrain/rotate", &drivetrainRotateCallback);
+ros::Subscriber<std_msgs::Float32> localizerAngleSub("localizer/angle", &localizerAngleCallback);
+ros::Subscriber<std_msgs::Float32> localizerEnableSub("localizer/enable", &localizerEnableCallback);
+
 
 void setup()
 {
@@ -81,9 +100,11 @@ void setup()
   nh.subscribe(driveSpeedSub);
   nh.subscribe(driveEnableSub);
   nh.subscribe(driveAngleSub);
+  nh.subscribe(localizerAngleSub);
 
   drivetrain.init();
 }
+
 void loop()
 {
   nh.spinOnce();
@@ -95,8 +116,10 @@ void loop()
 
     drivetrain.loop();
 
+    localizer.loop();
+
     if (drivetrain.isEnabled()) {
-      String drivetrainWheel0Speed = String(drivetrain.getSums());
+      String drivetrainWheel0Speed = String(localizer.getAngle());
       String ianOutputString = drivetrainWheel0Speed;
       ianOutputMsg.data = ianOutputString.c_str();
       ianOutputPub.publish(&ianOutputMsg);

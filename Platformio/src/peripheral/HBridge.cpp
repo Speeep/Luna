@@ -10,21 +10,12 @@
 
 HBridge::HBridge() {}
 
-void HBridge::init(bool isLeft)
+void HBridge::init(int RPWM, int LPWM)
 {
-    leftSide = isLeft;
-
-    if (leftSide) {
-        pinMode(LEFT_R_PWM, OUTPUT);
-        pinMode(LEFT_L_PWM, OUTPUT);
-        R_PWM = LEFT_R_PWM;
-        L_PWM = LEFT_L_PWM;
-    } else {
-        pinMode(RIGHT_R_PWM, OUTPUT);
-        pinMode(RIGHT_L_PWM, OUTPUT);
-        R_PWM = RIGHT_R_PWM;
-        L_PWM = RIGHT_L_PWM;
-    }
+        pinMode(RPWM, OUTPUT);
+        pinMode(LPWM, OUTPUT);
+        R_PWM = RPWM;
+        L_PWM = LPWM;
 }
 
 void HBridge::setEffort(int effort)

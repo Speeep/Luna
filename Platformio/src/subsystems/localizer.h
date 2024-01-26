@@ -16,12 +16,18 @@ class Localizer {
 
         void disable();
 
-        float loop();
+        void setAngleSetpoint(float);
+
+        float getAngle();
+
+        void loop();
 
     private:
 
         HBridge turnMotor;
         Encoder encoder;
         bool enabled;
+        float angle;
+        float angleSetpoint;
 
 };

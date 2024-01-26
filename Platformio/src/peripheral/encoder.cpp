@@ -76,10 +76,10 @@ float Encoder::getAngle()
 
   int rawAngle = (highbyte | lowbyte) & 0x0fff;
 
-  if ((static_cast<float>(rawAngle) * 0.001533981 - startAngle) == 0.0) {
+  if ((static_cast<float>(rawAngle) * BYTES_2_RAD - startAngle) == 0.0) {
     return radAngle;
   } else {
-    radAngle = static_cast<float>(rawAngle) * 0.001533981 - startAngle;
+    radAngle = static_cast<float>(rawAngle) * BYTES_2_RAD - startAngle;
 
     if (radAngle < 0.0)
     {
