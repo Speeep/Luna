@@ -11,6 +11,8 @@ class KeyControlNode:
         self.drivetrain_angle_pub = rospy.Publisher('/drivetrain/angle', Bool, queue_size=10)
         self.drivetrain_rotate_pub = rospy.Publisher('/drivetrain/rotate', Float32, queue_size=10)
         self.drivetrain_enable_pub = rospy.Publisher('/drivetrain/enable', Bool, queue_size=10)
+        self.localizer_angle_pub = rospy.Publisher('localizer/angle', Float32, queue_size=10)
+        self.localizer_enable_pub = rospy.Publisher('/localizer/enable', Bool, queue_size=10)
 
         # Create a listener for keyboard events
         self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
@@ -25,7 +27,9 @@ class KeyControlNode:
             'a': False,
             'd': False,
             'o': False,
-            'p': False
+            'p': False,
+            'n': False,
+            'm': False
         }
 
         # Create a timer to check key presses periodically
@@ -33,6 +37,9 @@ class KeyControlNode:
 
         # Robot enable
         self.robot_enable = False
+
+        # Localizer Angle Setpoint
+        self.locaizer_angle_setpoint = 0.0
 
     def on_press(self, key):
         try:
@@ -95,15 +102,25 @@ class KeyControlNode:
             self.robot_enable = False
             disable.data = self.robot_enable
             self.drivetrain_enable_pub.publish(self.robot_enable)
+            self.localizer_enable_pub.publish(self.robot_enable)
         elif self.key_states['o']:
             enable = Bool()
             self.robot_enable = True
             enable.data = self.robot_enable
             self.drivetrain_enable_pub.publish(self.robot_enable)
+            self.localizer_enable_pub.publish(self.robot_enable)
         else:
             disable = Bool()
             disable.data = self.robot_enable
             self.drivetrain_enable_pub.publish(self.robot_enable)
+            self.localizer_enable_pub.publish(self.robot_enable)
+
+        if self.key_states['n']:
+            self.locaizer_angle_setpoint += 0.10472
+            self.localizer_angle_pub.publish(self.locaizer_angle_setpoint)
+        elif self.key_states['m']:
+            self.locaizer_angle_setpoint -= 0.10472
+            self.localizer_angle_pub.publish(self.locaizer_angle_setpoint)
 
 if __name__ == '__main__':
     try:
