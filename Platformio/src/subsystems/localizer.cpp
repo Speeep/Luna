@@ -47,10 +47,6 @@ float Localizer::getAngle() {
     return angle;
 }
 
-bool Localizer::getHysteresis() {
-    return hysteresis;
-}
-
 void Localizer::loop() {
 
     // Always get Data

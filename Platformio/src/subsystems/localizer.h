@@ -24,8 +24,6 @@ class Localizer {
 
         float getAngle();
 
-        bool getHysteresis();
-
         void loop();
 
     private:
