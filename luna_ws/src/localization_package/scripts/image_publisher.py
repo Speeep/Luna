@@ -7,7 +7,7 @@ import numpy as np
 from math import sin, cos
 import cv2.aruco as aruco
 from geometry_msgs.msg import Pose
-from std_msgs.msg import Int32, Float32MultiArray
+from std_msgs.msg import Float32, Float32MultiArray
 import pickle
 from scipy.spatial.transform import Rotation as R
 
@@ -59,13 +59,13 @@ def main():
     rospy.init_node('image_publisher')
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
     pose_publisher = rospy.Publisher('aruco_pose', Pose, queue_size=10)
-    servo_error_publisher = rospy.Publisher('servo_error', Int32, queue_size=10)
+    servo_error_publisher = rospy.Publisher('/localizer/error', Float32, queue_size=10)
     aruco_data_publisher = rospy.Publisher('aruco_data', Float32MultiArray, queue_size=10)
 
     bridge = CvBridge()
 
     # Define Camera to Use
-    cam = cv.VideoCapture(8)
+    cam = cv.VideoCapture(0)
 
     # Define green color
     GREEN = (0, 255, 0)

@@ -6,4 +6,11 @@
     <param name="port" value="$(arg port)" />
     <param name="baud" value="$(arg baud)" />
   </node>
+
+  <node
+    pkg="localization_package"
+    type="image_publisher.py"
+    name="image_publisher" 
+    output="screen"
+  />
 </launch> 
