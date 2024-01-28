@@ -16,9 +16,15 @@ class Localizer {
 
         void disable();
 
-        void setAngleSetpoint(float);
+        bool isEnabled();
+
+        void setError(float);
+
+        float getError();
 
         float getAngle();
+
+        bool getHysteresis();
 
         void loop();
 
@@ -28,6 +34,12 @@ class Localizer {
         Encoder encoder;
         bool enabled;
         float angle;
+        float lastAngle;
         float angleSetpoint;
+        float error;
+        bool hysteresis;
+        bool turnAround;
+        bool turnClockwise;
+        bool turning;
 
 };

@@ -11,7 +11,7 @@ class KeyControlNode:
         self.drivetrain_angle_pub = rospy.Publisher('/drivetrain/angle', Bool, queue_size=10)
         self.drivetrain_rotate_pub = rospy.Publisher('/drivetrain/rotate', Float32, queue_size=10)
         self.drivetrain_enable_pub = rospy.Publisher('/drivetrain/enable', Bool, queue_size=10)
-        self.localizer_angle_pub = rospy.Publisher('localizer/angle', Float32, queue_size=10)
+        self.localizer_error_pub = rospy.Publisher('localizer/error', Float32, queue_size=10)
         self.localizer_enable_pub = rospy.Publisher('/localizer/enable', Bool, queue_size=10)
 
         # Create a listener for keyboard events
@@ -39,7 +39,7 @@ class KeyControlNode:
         self.robot_enable = False
 
         # Localizer Angle Setpoint
-        self.locaizer_angle_setpoint = 0.0
+        self.localizer_error = 0.0
 
     def on_press(self, key):
         try:
@@ -116,11 +116,14 @@ class KeyControlNode:
             self.localizer_enable_pub.publish(self.robot_enable)
 
         if self.key_states['n']:
-            self.locaizer_angle_setpoint += 0.10472
-            self.localizer_angle_pub.publish(self.locaizer_angle_setpoint)
+            self.localizer_error = 1.0
+            self.localizer_error_pub.publish(self.localizer_error)
         elif self.key_states['m']:
-            self.locaizer_angle_setpoint -= 0.10472
-            self.localizer_angle_pub.publish(self.locaizer_angle_setpoint)
+            self.localizer_error = -1.0
+            self.localizer_error_pub.publish(self.localizer_error)
+        else:
+            self.localizer_error = 0.0
+            self.localizer_error_pub.publish(self.localizer_error)
 
 if __name__ == '__main__':
     try:

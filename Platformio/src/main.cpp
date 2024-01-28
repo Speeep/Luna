@@ -26,6 +26,9 @@ ros::Publisher ianOutputPub("/listener/ian_output", &ianOutputMsg);
 std_msgs::Int32 motorSpeed;
 ros::Publisher motorSpeedPub("/listener/motorspeed", &motorSpeed);
 
+std_msgs::Float32 localizerAngle;
+ros::Publisher localizerAnglePub("/jetson/localizer_angle", &localizerAngle);
+
 Drivetrain drivetrain;
 Localizer localizer;
 
@@ -62,17 +65,17 @@ void drivetrainRotateCallback(const std_msgs::Float32 &driveRotateMsg) {
   drivetrain.setRotateSpeed(driveRotateMsg.data);
 }
 
-void localizerAngleCallback(const std_msgs::Float32 &localizerAngleMsg) {
-  localizer.setAngleSetpoint(localizerAngleMsg.data);
+void localizerErrorCallback(const std_msgs::Float32 &localizerErrorMsg) {
+  localizer.setError(localizerErrorMsg.data);
 }
 
 void localizerEnableCallback(const std_msgs::Bool &localizerEnableMsg) {
   localizerEnable = localizerEnableMsg.data;
 
   if (localizerEnable == true) {
-    drivetrain.enable();
+    localizer.enable();
   } else {
-    drivetrain.disable();
+    localizer.disable();
   }
 }
 
@@ -80,8 +83,8 @@ ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrai
 ros::Subscriber<std_msgs::Bool> driveEnableSub("/drivetrain/enable", &drivetrainEnableCallback);
 ros::Subscriber<std_msgs::Bool> driveAngleSub("/drivetrain/angle", &drivetrainAngleCallback);
 ros::Subscriber<std_msgs::Float32> driveRotateSub("/drivetrain/rotate", &drivetrainRotateCallback);
-ros::Subscriber<std_msgs::Float32> localizerAngleSub("localizer/angle", &localizerAngleCallback);
-ros::Subscriber<std_msgs::Float32> localizerEnableSub("localizer/enable", &localizerEnableCallback);
+ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
+ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
 
 
 void setup()
@@ -97,12 +100,15 @@ void setup()
   nh.advertise(drivetrainIsEnabledPub);
   nh.advertise(ianOutputPub);
   nh.advertise(motorSpeedPub);
+  nh.advertise(localizerAnglePub);
   nh.subscribe(driveSpeedSub);
   nh.subscribe(driveEnableSub);
   nh.subscribe(driveAngleSub);
-  nh.subscribe(localizerAngleSub);
+  nh.subscribe(localizerErrorSub);
+  nh.subscribe(localizerEnableSub);
 
   drivetrain.init();
+  localizer.init();
 }
 
 void loop()
@@ -119,10 +125,15 @@ void loop()
     localizer.loop();
 
     if (drivetrain.isEnabled()) {
-      String drivetrainWheel0Speed = String(localizer.getAngle());
+      String drivetrainWheel0Speed = String(localizer.getHysteresis());
       String ianOutputString = drivetrainWheel0Speed;
       ianOutputMsg.data = ianOutputString.c_str();
       ianOutputPub.publish(&ianOutputMsg);
+    }
+
+    if (localizer.isEnabled()) {
+      localizerAngle.data = localizer.getAngle();
+      localizerAnglePub.publish(&localizerAngle);
     }
 
     previousMillis = currentMillis;
