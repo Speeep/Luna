@@ -29,7 +29,8 @@ class KeyControlNode:
             'o': False,
             'p': False,
             'n': False,
-            'm': False
+            'm': False,
+            'b': False
         }
 
         # Create a timer to check key presses periodically
@@ -115,15 +116,15 @@ class KeyControlNode:
             self.drivetrain_enable_pub.publish(self.robot_enable)
             self.localizer_enable_pub.publish(self.robot_enable)
 
-        # if self.key_states['n']:
-        #     self.localizer_error = 1.0
-        #     self.localizer_error_pub.publish(self.localizer_error)
-        # elif self.key_states['m']:
-        #     self.localizer_error = -1.0
-        #     self.localizer_error_pub.publish(self.localizer_error)
-        # else:
-        #     self.localizer_error = 0.0
-        #     self.localizer_error_pub.publish(self.localizer_error)
+        if self.key_states['b']:
+            self.localizer_error = 100.0
+            self.localizer_error_pub.publish(self.localizer_error)
+        elif self.key_states['m']:
+            self.localizer_error = -100.0
+            self.localizer_error_pub.publish(self.localizer_error)
+        elif self.key_states['n']:
+            self.localizer_error = 0.0
+            self.localizer_error_pub.publish(self.localizer_error)
 
 if __name__ == '__main__':
     try:
