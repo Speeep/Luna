@@ -13,4 +13,10 @@
     name="image_publisher" 
     output="screen"
   />
+  <node
+    pkg="localization_package"
+    type="image_subscriber.py"
+    name="image_subscriber" 
+    output="screen"
+  />
 </launch> 
