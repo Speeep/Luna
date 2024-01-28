@@ -12,8 +12,8 @@ import pickle
 from scipy.spatial.transform import Rotation as R
 
 # Load the pickles
-matrix_path = '/home/speeep/Development/Luna/luna_ws/src/localization_package/scripts/pkls027/cameraMatrix.pkl'
-dist_path = '/home/speeep/Development/Luna/luna_ws/src/localization_package/scripts/pkls027/dist.pkl'
+matrix_path = '/home/jetson/Development/Luna/luna_ws/src/localization_package/scripts/pkls027/cameraMatrix.pkl'
+dist_path = '/home/jetson/Development/Luna/luna_ws/src/localization_package/scripts/pkls027/dist.pkl'
 
 with open(matrix_path, 'rb') as file:
     camera_matrix = pickle.load(file)
