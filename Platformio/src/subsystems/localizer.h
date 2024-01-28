@@ -35,6 +35,7 @@ class Localizer {
         float lastAngle;
         float angleSetpoint;
         float error;
+        float errors;
         bool hysteresis;
         bool turnAround;
         bool turnClockwise;

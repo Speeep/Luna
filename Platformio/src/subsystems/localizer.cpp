@@ -16,6 +16,7 @@ void Localizer::init() {
     lastAngle = 0.0;
     angleSetpoint = 0.0;
     error = 0.0;
+    errors = 0.0;
     hysteresis = false;
     turnAround = false;
     turnClockwise = false;
@@ -51,6 +52,10 @@ void Localizer::loop() {
 
     // Always get Data
     angle = encoder.getAngle();
+
+    // Accumulate error and constrain
+    errors += error;
+    errors = constrain(errors, -MAX_LOCALIZER_ERRORS, MAX_LOCALIZER_ERRORS);
 
     // If enabled, control the motors, else cut current to the motors
     if (enabled) {
@@ -95,7 +100,7 @@ void Localizer::loop() {
             }
 
         } else {
-            turnMotor.setEffort(int((error) * LOCALIZER_MOTOR_KP));
+            turnMotor.setEffort(int((error * LOCALIZER_MOTOR_KP) + (errors * LOCALIZER_MOTOR_KI)));
         }
 
     } else {
