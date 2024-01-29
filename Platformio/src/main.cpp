@@ -107,6 +107,7 @@ void setup()
   nh.advertise(ianOutputPub);
   nh.advertise(motorSpeedPub);
   nh.advertise(localizerAnglePub);
+  nh.advertise(poseStepPub);
   nh.subscribe(driveSpeedSub);
   nh.subscribe(driveEnableSub);
   nh.subscribe(driveAngleSub);
@@ -150,7 +151,7 @@ void loop()
   if(currentMillis - lastOdomTime >= ODOM_INTERVAL){
     float step[3] = {0,0,0};
     drivetrain.stepOdom(step);
-    
+
     poseStep.data = step;
     poseStepPub.publish(&poseStep);
   }
