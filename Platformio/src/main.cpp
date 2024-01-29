@@ -41,8 +41,7 @@ bool drivetrainEnable = false;
 bool drivetrainAngle = false;
 bool localizerEnable = false;
 
-long lastOdomTime = 0;
-
+static unsigned long lastOdomTime = 0;
 static unsigned long previousMillis = 0;
 unsigned long currentMillis = millis();
 
@@ -129,6 +128,8 @@ void loop()
   // Drivetrain gets looped every 2 milliseconds
   if (currentMillis - previousMillis >= DRIVETRAIN_INTERVAL) {
 
+    previousMillis = currentMillis;
+
     drivetrain.loop();
 
     localizer.loop();
@@ -144,11 +145,12 @@ void loop()
       localizerAngle.data = localizer.getAngle();
       localizerAnglePub.publish(&localizerAngle);
     }
-
-
-    previousMillis = currentMillis;
   }
+
   if(currentMillis - lastOdomTime >= ODOM_INTERVAL){
+
+    lastOdomTime = currentMillis;
+
     float step[3] = {0,0,0};
     drivetrain.stepOdom(step);
 
