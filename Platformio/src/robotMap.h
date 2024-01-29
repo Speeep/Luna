@@ -64,3 +64,7 @@
 
 #define ROBOT_WIDTH_CM 53.34
 #define ROBOT_LENGTH_CM 50.80
+
+#define ODOM_INTERVAL 10
+
+#define CM_PER_TICK 0.015585

@@ -5,7 +5,6 @@
 #include "./peripheral/HBridge.h"
 #include "./peripheral/encoder.h"
 #include "./peripheral/CANController.h"
-#include "geometry_msgs/Pose.h"
 
 class Drivetrain {
  public:
@@ -52,6 +51,8 @@ class Drivetrain {
 
   String getSums();
 
+  void stepOdom(float (&output)[3]);
+
  private:
     HBridge left_turn_motor;
     HBridge right_turn_motor;
@@ -66,4 +67,5 @@ class Drivetrain {
     int turnMotorEffort;
     bool isAngled;
     float driveSpeed;
+    long previousOdomReadTime;
 };

@@ -8,6 +8,7 @@
 #include <std_msgs/String.h>
 #include "./subsystems/drivetrain.h"
 #include "./subsystems/localizer.h"
+#include <std_msgs/Float32MultiArray.h>
 
 ros::NodeHandle nh;
 
@@ -29,6 +30,9 @@ ros::Publisher motorSpeedPub("/listener/motorspeed", &motorSpeed);
 std_msgs::Float32 localizerAngle;
 ros::Publisher localizerAnglePub("/jetson/localizer_angle", &localizerAngle);
 
+std_msgs::Float32MultiArray poseStep;
+ros::Publisher poseStepPub("/jetson/pose_step", &poseStep);
+
 Drivetrain drivetrain;
 Localizer localizer;
 
@@ -36,6 +40,8 @@ int driveSpeed = 0;
 bool drivetrainEnable = false;
 bool drivetrainAngle = false;
 bool localizerEnable = false;
+
+long lastOdomTime = 0;
 
 static unsigned long previousMillis = 0;
 unsigned long currentMillis = millis();
@@ -109,6 +115,8 @@ void setup()
 
   drivetrain.init();
   localizer.init();
+
+  lastOdomTime = millis();
 }
 
 void loop()
@@ -136,6 +144,14 @@ void loop()
       localizerAnglePub.publish(&localizerAngle);
     }
 
+
     previousMillis = currentMillis;
+  }
+  if(currentMillis - lastOdomTime >= ODOM_INTERVAL){
+    float step[3] = {0,0,0};
+    drivetrain.stepOdom(step);
+    
+    poseStep.data = step;
+    poseStepPub.publish(&poseStep);
   }
 }
