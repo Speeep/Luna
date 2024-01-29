@@ -84,10 +84,10 @@ void Drivetrain::stepOdom(float (&output)[3]){
     float sinThetaR = sin(getRightWheelpodAngle());
 
     //Calculate estimated new wheel positions using the wheel angles and the displacements
-    float newPostion0[2] = {+ ROBOT_LENGTH_CM / 2 + cosThetaL * wheelDisplacement[0], + ROBOT_WIDTH_CM / 2 - sinThetaL * wheelDisplacement[0]};
-    float newPostion1[2] = {- ROBOT_LENGTH_CM / 2 + cosThetaL * wheelDisplacement[1], + ROBOT_WIDTH_CM / 2 + sinThetaL * wheelDisplacement[1]};
-    float newPostion2[2] = {- ROBOT_LENGTH_CM / 2 + cosThetaL * wheelDisplacement[2], - ROBOT_WIDTH_CM / 2 + sinThetaL * wheelDisplacement[2]};
-    float newPostion3[2] = {+ ROBOT_LENGTH_CM / 2 + cosThetaL * wheelDisplacement[3], - ROBOT_WIDTH_CM / 2 - sinThetaL * wheelDisplacement[3]};
+    float newPostion0[2] = {  ROBOT_LENGTH_CM / 2 + cosThetaL * wheelDisplacement[0],   ROBOT_WIDTH_CM / 2 - sinThetaL * wheelDisplacement[0]};
+    float newPostion1[2] = { -ROBOT_LENGTH_CM / 2 + cosThetaL * wheelDisplacement[1],   ROBOT_WIDTH_CM / 2 + sinThetaL * wheelDisplacement[1]};
+    float newPostion2[2] = { -ROBOT_LENGTH_CM / 2 + cosThetaL * wheelDisplacement[2],  -ROBOT_WIDTH_CM / 2 + sinThetaL * wheelDisplacement[2]};
+    float newPostion3[2] = {  ROBOT_LENGTH_CM / 2 + cosThetaL * wheelDisplacement[3],  -ROBOT_WIDTH_CM / 2 - sinThetaL * wheelDisplacement[3]};
 
 
     //Calculate the average position of the new wheel positions
