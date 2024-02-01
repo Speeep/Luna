@@ -5,6 +5,7 @@
 #include "./peripheral/HBridge.h"
 #include "./peripheral/encoder.h"
 #include "./peripheral/CANController.h"
+#include <std_msgs/Float32MultiArray.h>
 
 class Drivetrain {
  public:
@@ -51,7 +52,7 @@ class Drivetrain {
 
   String getSums();
 
-  void stepOdom(float (&output)[3]);
+  std_msgs::Float32MultiArray stepOdom();
 
  private:
     HBridge left_turn_motor;

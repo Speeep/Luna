@@ -20,7 +20,7 @@ void Localizer::init() {
     hysteresis = false;
     turnAround = false;
     turnClockwise = false;
-    turning = true;
+    turning = false;
 }
 
 void Localizer::enable() {

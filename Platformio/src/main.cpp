@@ -115,8 +115,6 @@ void setup()
 
   drivetrain.init();
   localizer.init();
-
-  lastOdomTime = millis();
 }
 
 void loop()
@@ -151,10 +149,8 @@ void loop()
 
     lastOdomTime = currentMillis;
 
-    float step[3] = {0,0,0};
-    drivetrain.stepOdom(step);
+    std_msgs::Float32MultiArray stepMsg = drivetrain.stepOdom();
 
-    poseStep.data = step;
-    poseStepPub.publish(&poseStep);
+    poseStepPub.publish(&stepMsg);
   }
 }
