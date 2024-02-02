@@ -1,5 +1,5 @@
 import rospy
-from geometry_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float32MultiArray
 
 pose_step = [0.0, 0.0, 0.0]
 
