@@ -19,4 +19,10 @@
     name="image_subscriber" 
     output="screen"
   />
+  <node
+    pkg="localization_package"
+    type="localization_filter.py"
+    name="localization_filter" 
+    output="screen"
+  />
 </launch> 
