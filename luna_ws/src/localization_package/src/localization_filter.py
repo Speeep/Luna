@@ -29,6 +29,8 @@ def update_localization_estimate_cb(localization_estimate_msg):
     last_localization_time = rospy.Time.now()
 
 def filter():
+    
+    global pose
 
     rospy.init_node('localization_filter', anonymous=True)
 
@@ -37,7 +39,9 @@ def filter():
     rospy.Subscriber('jetson/localization_estimate', Float32MultiArray, update_localization_estimate_cb)
 
     rate = rospy.Rate(10)
+
     while not rospy.is_shutdown():
+
         current_time = rospy.Time.now()
 
         # If there isn't a base pose yet, use 100% localization estimate from webcam
