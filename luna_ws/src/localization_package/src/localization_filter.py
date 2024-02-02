@@ -55,6 +55,8 @@ def filter():
             # If localization_estimate is also (0.0, 0.0, 0.0) this will result in an infinite loop until timeout.
             pose = localization_estimate
 
+        print(current_time.to_sec())
+        print(last_odom_time.to_sec())
         print(current_time - last_odom_time)
         print((current_time - last_odom_time).to_sec())
         print((current_time - last_odom_time).to_sec() > odom_timeout)
