@@ -2,14 +2,18 @@ import rospy
 from std_msgs.msg import Float32MultiArray
 
 # Constants for filter tuning
-alpha = 0.2  # Weight for localization estimates
-beta = 0.8   # Weight for pose steps
+# alpha = 0.2  # Weight for localization estimates # TODO Un comment this line after testing
+# beta = 0.8   # Weight for pose steps # TODO Un comment this line after testing
+
+alpha = 0.0  # Weight for localization estimates # TODO Delete this line after testing
+beta = 1.0   # Weight for pose steps # TODO Delete this line after testing
 
 pose = (0.0, 0.0, 0.0)
 pose_step = (0.0, 0.0, 0.0)
 localization_estimate = (0.0, 0.0, 0.0)
 odom_timeout = 1.0
-localizer_timeout = 10.0
+localizer_timeout = 10000.0 # TODO Delete this line after testing
+# localizer_timeout = 10.0 # TODO Un comment this line after testing
 last_odom_time = rospy.Time(0)
 last_localization_time = rospy.Time(0)
 
@@ -46,7 +50,7 @@ def filter():
         if (current_time - last_odom_time).to_sec() > odom_timeout or (current_time - last_localization_time).to_sec() > localizer_timeout:
             rospy.logerr("Timeout occurred!")
             pose = (0.0, 0.0, 0.0)
-            
+
         else:
 
             # Complementary Filter Here
@@ -58,6 +62,8 @@ def filter():
 
             # Update the pose
             pose = fused_pose
+
+            print(pose)
         
         rate.sleep()  
 
