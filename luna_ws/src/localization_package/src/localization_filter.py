@@ -38,6 +38,8 @@ def filter():
 
     rospy.Subscriber('jetson/localization_estimate', Float32MultiArray, update_localization_estimate_cb)
 
+    filtered_pose_pub = rospy.Publisher('jetson/filtered_pose', Float32MultiArray, queue_size=10)
+    
     rate = rospy.Rate(10)
 
     while not rospy.is_shutdown():
@@ -67,6 +69,9 @@ def filter():
             # Update the pose
             pose = fused_pose
 
+            filtered_pose_msg = Float32MultiArray(data=fused_pose)
+            filtered_pose_pub.publish(filtered_pose_msg)
+            
             print(pose)
         
         rate.sleep()  
