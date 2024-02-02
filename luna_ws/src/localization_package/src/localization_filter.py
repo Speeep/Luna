@@ -55,12 +55,6 @@ def filter():
             # If localization_estimate is also (0.0, 0.0, 0.0) this will result in an infinite loop until timeout.
             pose = localization_estimate
 
-        print(current_time.to_sec())
-        print(last_odom_time.to_sec())
-        print(current_time - last_odom_time)
-        print((current_time - last_odom_time).to_sec())
-        print((current_time - last_odom_time).to_sec() > odom_timeout)
-
         # Check for timeouts
         if (current_time - last_odom_time).to_sec() > odom_timeout or (current_time - last_localization_time).to_sec() > localizer_timeout:
             rospy.logerr("Timeout occurred!")
@@ -80,8 +74,6 @@ def filter():
 
             filtered_pose_msg = Float32MultiArray(data=fused_pose)
             filtered_pose_pub.publish(filtered_pose_msg)
-            
-            print(pose)
         
         rate.sleep()  
 
