@@ -81,6 +81,11 @@ std_msgs::Float32MultiArray Drivetrain::stepOdom(){
         getSpeed(1) * deltaTime * CM_PER_TICK, 
         getSpeed(2) * deltaTime * CM_PER_TICK, 
         getSpeed(3) * deltaTime * CM_PER_TICK};
+    // float wheelDisplacement[4] = {
+    //     0 * deltaTime * CM_PER_TICK, 
+    //     0 * deltaTime * CM_PER_TICK, 
+    //     0 * deltaTime * CM_PER_TICK, 
+    //     0 * deltaTime * CM_PER_TICK};
     // Note: conversion from steps to cm - 4096 ticks per rotation, 63.8372 per rotation, therefore  0.015585cm/tick
 
     // Pre calculate trig of wheel angles
@@ -97,8 +102,8 @@ std_msgs::Float32MultiArray Drivetrain::stepOdom(){
 
 
     // Calculate the average position of the new wheel positions (rounded to 4 places)
-    output.data[0] = round((newPostion0[0] + newPostion1[0] + newPostion2[0] + newPostion3[0]) / 4 * 10000) / 10000.0; 
-    output.data[1] = round((newPostion0[1] + newPostion1[1] + newPostion2[1] + newPostion3[1]) / 4 * 10000) / 10000.0;
+    output.data[0] = (newPostion0[0] + newPostion1[0] + newPostion2[0] + newPostion3[0]) / 4; 
+    output.data[1] = (newPostion0[1] + newPostion1[1] + newPostion2[1] + newPostion3[1]) / 4;
 
 
     // Calculate the new angle using the new wheel positions
@@ -109,7 +114,7 @@ std_msgs::Float32MultiArray Drivetrain::stepOdom(){
     float rightAngle = atan2(newPostion3[1] - newPostion2[1], newPostion3[0] - newPostion2[0]);
 
     // Add average angle to output (rounded to 4 places)
-    output.data[2] = round((leftAngle + rightAngle) / 2 * 10000) / 10000.0;
+    output.data[2] = (leftAngle + rightAngle) / 2;
 
     previousOdomReadTime = currentTime;
 

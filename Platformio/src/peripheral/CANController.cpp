@@ -175,6 +175,9 @@ void CANController::setSpeed(float sp0, float sp1, float sp2, float sp3) {
 }
 
 float CANController::getSpeed(int motorId) {
+    if (motorId == 0 || motorId == 1) {
+        return -speeds[motorId];
+    }
     return speeds[motorId];
 }
 

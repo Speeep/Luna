@@ -133,7 +133,7 @@ void loop()
     localizer.loop();
 
     if (drivetrain.isEnabled()) {
-      String drivetrainWheel0Speed = String(localizer.getAngle());
+      String drivetrainWheel0Speed = String(drivetrain.getSpeed(0));
       String ianOutputString = drivetrainWheel0Speed;
       ianOutputMsg.data = ianOutputString.c_str();
       ianOutputPub.publish(&ianOutputMsg);
