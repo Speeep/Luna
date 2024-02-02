@@ -11,11 +11,11 @@ beta = 1.0   # Weight for pose steps # TODO Delete this line after testing
 pose = (0.0, 0.0, 0.0)
 pose_step = (0.0, 0.0, 0.0)
 localization_estimate = (0.0, 0.0, 0.0)
-odom_timeout = 1.0
+odom_timeout = 3.0
 localizer_timeout = 10000.0 # TODO Delete this line after testing
 # localizer_timeout = 10.0 # TODO Un comment this line after testing
-last_odom_time = rospy.Time(0)
-last_localization_time = rospy.Time(0)
+last_odom_time = rospy.Time.now()
+last_localization_time = rospy.Time.now()
 
 
 def update_odom_data_cb(odom_msg):
