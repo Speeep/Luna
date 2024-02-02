@@ -14,8 +14,8 @@ localization_estimate = (0.0, 0.0, 0.0)
 odom_timeout = 3.0
 localizer_timeout = 10000.0 # TODO Delete this line after testing
 # localizer_timeout = 10.0 # TODO Un comment this line after testing
-last_odom_time = rospy.Time.now()
-last_localization_time = rospy.Time.now()
+last_odom_time = rospy.Time(0)
+last_localization_time = rospy.Time(0)
 
 
 def update_odom_data_cb(odom_msg):
@@ -34,6 +34,9 @@ def filter():
 
     rospy.init_node('localization_filter', anonymous=True)
 
+    last_odom_time = rospy.Time.now()
+    last_localization_time = rospy.Time.now()
+
     rospy.Subscriber('/jetson/pose_step', Float32MultiArray, update_odom_data_cb)
 
     rospy.Subscriber('jetson/localization_estimate', Float32MultiArray, update_localization_estimate_cb)
@@ -51,6 +54,10 @@ def filter():
 
             # If localization_estimate is also (0.0, 0.0, 0.0) this will result in an infinite loop until timeout.
             pose = localization_estimate
+
+        print(current_time - last_odom_time)
+        print((current_time - last_odom_time).to_sec())
+        print((current_time - last_odom_time).to_sec() > odom_timeout)
 
         # Check for timeouts
         if (current_time - last_odom_time).to_sec() > odom_timeout or (current_time - last_localization_time).to_sec() > localizer_timeout:
