@@ -1,5 +1,6 @@
 import rospy
 from std_msgs.msg import Float32MultiArray
+import math
 
 # Constants for filter tuning
 # alpha = 0.2  # Weight for localization estimates # TODO Un comment this line after testing
@@ -64,8 +65,8 @@ def filter():
 
             # Complementary Filter Here
             fused_pose = (
-                alpha * localization_estimate[0] + beta * (pose[0] + pose_step[0]),
-                alpha * localization_estimate[1] + beta * (pose[1] + pose_step[1]),
+                alpha * localization_estimate[0] + beta * (pose[0] + pose_step[0]*math.cos(pose[2]) - pose_step[1]*math.sin(pose[2])),
+                alpha * localization_estimate[1] + beta * (pose[1] + pose_step[0]*math.sin(pose[2]) + pose_step[1]*math.cos(pose[2])),
                 alpha * localization_estimate[2] + beta * (pose[2] + pose_step[2])
             )
 
