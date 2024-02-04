@@ -5,20 +5,24 @@ from visualization_msgs.msg import Marker
 from std_msgs.msg import Float32MultiArray
 import tf.transformations
 
+x = 0.0
+y = 0.0
+theta = 0.0
+
 def filtered_pose_callback(msg):
     global x, y, theta
-    x = msg.data[0]
-    y = msg.data[1]
+    # convert from cm to meters for x and y, theta is already in rad
+    x = msg.data[0] / 100
+    y = msg.data[1] / 100
     theta = msg.data[2]
 
 def main():
     rospy.init_node("rviz_bot")
     marker_pub = rospy.Publisher("rviz_bot_marker", Marker, queue_size=1)
     rospy.Subscriber("jetson/filtered_pose", Float32MultiArray, filtered_pose_callback)
-    rate = rospy.Rate(1)
-    x = 0.0
-    y = 0.0
-    theta = 0.0
+    rate = rospy.Rate(10)
+
+    global x, y, theta
 
     # Set our initial shape type to be a cube
     shape = Marker.ARROW
@@ -45,6 +49,10 @@ def main():
         marker.pose.position.y = y
         yaw = theta
 
+        print("x: " + str(x))
+        print("y: " + str(y))
+        print("yaw: " + str(yaw))
+
         # Convert Euler angles to quaternion
         quaternion = tf.transformations.quaternion_from_euler(0.0, 0.0, yaw)
         marker.pose.orientation.x = quaternion[0]
@@ -54,8 +62,8 @@ def main():
         marker.pose.position.z = 0.05
 
         # Set the scale of the marker -- 1x1x1 here means 1m on a side
-        marker.scale.x = 1.0
-        marker.scale.y = 0.2
+        marker.scale.x = 0.3
+        marker.scale.y = 0.15
         marker.scale.z = 0.05
 
         # Set the color -- be sure to set alpha to something non-zero!

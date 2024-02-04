@@ -23,6 +23,8 @@ public:
 
     float getSpeed(int);
 
+    float getRealSpeed(int);
+
     void cutCurrent();
 
     String getSums();
@@ -44,6 +46,7 @@ private:
     float prevErrors[4];
     float setSpeeds[4];
     float speeds[4];
+    float realSpeeds[4];
     int filterPosition;
     float sums[4];
     int setCurrents[4];
