@@ -8,6 +8,7 @@
 #include <std_msgs/String.h>
 #include "./subsystems/drivetrain.h"
 #include "./subsystems/localizer.h"
+#include <std_msgs/Float32MultiArray.h>
 
 ros::NodeHandle nh;
 
@@ -29,6 +30,9 @@ ros::Publisher motorSpeedPub("/listener/motorspeed", &motorSpeed);
 std_msgs::Float32 localizerAngle;
 ros::Publisher localizerAnglePub("/jetson/localizer_angle", &localizerAngle);
 
+std_msgs::Float32MultiArray poseStep;
+ros::Publisher poseStepPub("/jetson/pose_step", &poseStep);
+
 Drivetrain drivetrain;
 Localizer localizer;
 
@@ -37,6 +41,7 @@ bool drivetrainEnable = false;
 bool drivetrainAngle = false;
 bool localizerEnable = false;
 
+static unsigned long lastOdomTime = 0;
 static unsigned long previousMillis = 0;
 unsigned long currentMillis = millis();
 
@@ -101,6 +106,7 @@ void setup()
   nh.advertise(ianOutputPub);
   nh.advertise(motorSpeedPub);
   nh.advertise(localizerAnglePub);
+  nh.advertise(poseStepPub);
   nh.subscribe(driveSpeedSub);
   nh.subscribe(driveEnableSub);
   nh.subscribe(driveAngleSub);
@@ -120,12 +126,14 @@ void loop()
   // Drivetrain gets looped every 2 milliseconds
   if (currentMillis - previousMillis >= DRIVETRAIN_INTERVAL) {
 
+    previousMillis = currentMillis;
+
     drivetrain.loop();
 
     localizer.loop();
 
     if (drivetrain.isEnabled()) {
-      String drivetrainWheel0Speed = String(localizer.getAngle());
+      String drivetrainWheel0Speed = String(drivetrain.getSpeed(0));
       String ianOutputString = drivetrainWheel0Speed;
       ianOutputMsg.data = ianOutputString.c_str();
       ianOutputPub.publish(&ianOutputMsg);
@@ -135,7 +143,14 @@ void loop()
       localizerAngle.data = localizer.getAngle();
       localizerAnglePub.publish(&localizerAngle);
     }
+  }
 
-    previousMillis = currentMillis;
+  if(currentMillis - lastOdomTime >= ODOM_INTERVAL){
+
+    lastOdomTime = currentMillis;
+
+    std_msgs::Float32MultiArray stepMsg = drivetrain.stepOdom();
+
+    poseStepPub.publish(&stepMsg);
   }
 }
