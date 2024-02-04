@@ -151,10 +151,10 @@ void CANController::updateMotorSpeeds() {
     float motor2Speed = motor2deltaAngle / deltaTime;
     float motor3Speed = motor3deltaAngle / deltaTime;
 
-    speeds[0] = motor0Speed;
-    speeds[1] = motor1Speed;
-    speeds[2] = motor2Speed;
-    speeds[3] = motor3Speed;
+    speeds[0] = mf0.filter(motor0Speed);
+    speeds[1] = mf1.filter(motor1Speed);
+    speeds[2] = mf2.filter(motor2Speed);
+    speeds[3] = mf3.filter(motor3Speed);
 
     // Update all last timestep values
     lastTime = time;
