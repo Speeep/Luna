@@ -162,8 +162,6 @@ def main():
                     servo_error = int((width//2) - centroid[0])
                     servo_error_publisher.publish(servo_error)
 
-                    print(localizer_angle)
-
             else: 
                 servo_error_publisher.publish(0)
 
