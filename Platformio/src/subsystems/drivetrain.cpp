@@ -107,14 +107,14 @@ std_msgs::Float32MultiArray Drivetrain::stepOdom(){
 
 
     // Calculate the new angle using the new wheel positions
-    // Left side
-    float leftAngle  = atan2(newPostion0[1] - newPostion1[1], newPostion0[0] - newPostion1[0]);
-
-    // Right side
-    float rightAngle = atan2(newPostion3[1] - newPostion2[1], newPostion3[0] - newPostion2[0]);
+    //Wheel 0
+    float angleFromWheel0 = atan2(newPostion0[1] - output.data[1], newPostion0[0] - output.data[0]) - ANGLE_TO_WHEEL_0;
+    float angleFromWheel1 = atan2(newPostion1[1] - output.data[1], newPostion1[0] - output.data[0]) - ANGLE_TO_WHEEL_0 - PI / 2;
+    float angleFromWheel2 = atan2(newPostion2[1] - output.data[1], newPostion2[0] - output.data[0]) + ANGLE_TO_WHEEL_0 + PI / 2;
+    float angleFromWheel3 = atan2(newPostion3[1] - output.data[1], newPostion3[0] - output.data[0]) + ANGLE_TO_WHEEL_0;
 
     // Add average angle to output (rounded to 4 places)
-    output.data[2] = (leftAngle + rightAngle) / 2;
+    output.data[2] = (angleFromWheel0 + angleFromWheel1 + angleFromWheel2 + angleFromWheel3) / 4
 
     previousOdomReadTime = currentTime;
 

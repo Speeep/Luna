@@ -68,3 +68,5 @@
 #define ODOM_INTERVAL 15
 
 #define CM_PER_TICK 0.015585
+
+#define ANGLE_TO_WHEEL_0 0.809784
