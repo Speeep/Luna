@@ -40,9 +40,9 @@ def filter():
 
     rospy.Subscriber('/jetson/pose_step', Float32MultiArray, update_odom_data_cb)
 
-    rospy.Subscriber('jetson/localization_estimate', Float32MultiArray, update_localization_estimate_cb)
+    rospy.Subscriber('/jetson/localization_estimate', Float32MultiArray, update_localization_estimate_cb)
 
-    filtered_pose_pub = rospy.Publisher('jetson/filtered_pose', Float32MultiArray, queue_size=10)
+    filtered_pose_pub = rospy.Publisher('/jetson/filtered_pose', Float32MultiArray, queue_size=10)
     
     rate = rospy.Rate(10)
 

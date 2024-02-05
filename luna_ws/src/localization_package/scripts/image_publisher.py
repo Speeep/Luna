@@ -6,7 +6,6 @@ import cv2 as cv
 import numpy as np
 from math import sin, cos
 import cv2.aruco as aruco
-from geometry_msgs.msg import Pose
 from std_msgs.msg import Float32, Float32MultiArray
 import pickle
 from scipy.spatial.transform import Rotation as R
@@ -30,6 +29,8 @@ dictionary = aruco.getPredefinedDictionary(cv.aruco.DICT_5X5_1000)
 xws = []
 yws = []
 
+# Angle of the localizer turret, used in the transformation matrix to go from webcam to robot pose
+localizer_angle = 0.0
 
 # Function to clean corners
 def clean_corners(corners):
@@ -55,12 +56,18 @@ def calculate_centroid(points):
     
     return (centroid_x, centroid_y)
 
+def update_localizer_angle_cb(localizer_angle_msg):
+    global localizer_angle
+    localizer_angle = localizer_angle_msg.data
+
 def main():
     rospy.init_node('image_publisher')
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
-    pose_publisher = rospy.Publisher('aruco_pose', Pose, queue_size=10)
     servo_error_publisher = rospy.Publisher('/localizer/error', Float32, queue_size=10)
-    aruco_data_publisher = rospy.Publisher('aruco_data', Float32MultiArray, queue_size=10)
+    aruco_data_publisher = rospy.Publisher('/jetson/localization_estimate', Float32MultiArray, queue_size=10)
+    rospy.Subscriber('/jetson/localizer_angle', Float32, update_localizer_angle_cb)
+
+    global localizer_angle
 
     bridge = CvBridge()
 
@@ -68,7 +75,7 @@ def main():
     cam = cv.VideoCapture(0)
 
     # Define green color
-    GREEN = (0, 255, 0)
+    YELLOW = (0, 255, 255)
 
     rate = rospy.Rate(10)  # Publish at 10 Hz
 
@@ -141,7 +148,7 @@ def main():
                     aruco_data_publisher.publish(aruco_data_msg)
 
                     cv.polylines(
-                        frame, [marker_corners[i].astype(np.int32)], True, (0, 255, 255), 4, cv.LINE_AA
+                        frame, [marker_corners[i].astype(np.int32)], True, YELLOW, 4, cv.LINE_AA
                     )
 
                     corners = marker_corners[i].reshape(4, 2)
