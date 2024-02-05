@@ -143,6 +143,8 @@ def main():
                     # Publish as a transformStamped msg
                     static_transformStamped = geometry_msgs.msg.TransformStamped()
                     static_transformStamped.header.stamp = rospy.Time.now()
+                    static_transformStamped.header.frame_id = "aruco"
+                    static_transformStamped.child_frame_id = "webcam"
                     static_transformStamped.transform.translation.x = float(avg_xw)
                     static_transformStamped.transform.translation.y = float(avg_yw)
                     static_transformStamped.transform.translation.z = float(0.0)
