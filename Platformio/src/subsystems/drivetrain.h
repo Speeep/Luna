@@ -26,6 +26,10 @@ class Drivetrain {
 
   void setWheelSpeeds(float, float, float, float);
 
+  void setWheelSpeeds(float, float);
+  
+  void turnICC(float, float);
+
   float getSpeed(int);
 
   float getRealSpeed(int);
@@ -61,6 +65,7 @@ class Drivetrain {
   float getPoseStepY();
 
   float getPoseStepTheta();
+
 
  private:
     HBridge left_turn_motor;
