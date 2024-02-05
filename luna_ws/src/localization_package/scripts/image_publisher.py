@@ -95,6 +95,8 @@ def main():
             threshold_value = 80
             thresh_ret, gray_frame = cv.threshold(gray_frame, threshold_value, 255, cv.THRESH_BINARY)
 
+            frame = cv.cvtColor(gray_frame, cv.COLOR_GRAY2BGR)
+
             # cv.imshow('gray', gray_frame)
             # cv.waitKey(0)
 
