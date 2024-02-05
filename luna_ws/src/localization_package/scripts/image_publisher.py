@@ -9,6 +9,8 @@ import cv2.aruco as aruco
 from std_msgs.msg import Float32, Float32MultiArray
 import pickle
 from scipy.spatial.transform import Rotation as R
+import tf.transformations, tf2_ros, geometry_msgs.msg
+import math
 
 # Load the pickles
 matrix_path = '/home/jetson/Development/Luna/luna_ws/src/localization_package/scripts/pkls027/cameraMatrix.pkl'
@@ -64,8 +66,9 @@ def main():
     rospy.init_node('image_publisher')
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
     servo_error_publisher = rospy.Publisher('/localizer/error', Float32, queue_size=10)
-    aruco_data_publisher = rospy.Publisher('/jetson/localization_estimate', Float32MultiArray, queue_size=10)
+    # aruco_data_publisher = rospy.Publisher('/jetson/localization_estimate', Float32MultiArray, queue_size=10)
     rospy.Subscriber('/jetson/localizer_angle', Float32, update_localizer_angle_cb)
+    aruco_broadcaster = tf2_ros.StaticTransformBroadcaster()
 
     global localizer_angle
 
@@ -137,10 +140,24 @@ def main():
                     avg_xw = round(sum(xws) / len(xws), 1)
                     avg_yw = round(sum(yws) / len(yws), 1)
 
+                    # Publish as a transformStamped msg
+                    static_transformStamped = geometry_msgs.msg.TransformStamped()
+                    static_transformStamped.header.stamp = rospy.Time.now()
+                    static_transformStamped.transform.translation.x = float(avg_xw)
+                    static_transformStamped.transform.translation.y = float(avg_yw)
+                    static_transformStamped.transform.translation.z = float(0.0)
+                    quat = tf.transformations.quaternion_from_euler(float(0.0),float(0.0),float(3.1415 + theta))
+                    static_transformStamped.transform.rotation.x = quat[0]
+                    static_transformStamped.transform.rotation.y = quat[1]
+                    static_transformStamped.transform.rotation.z = quat[2]
+                    static_transformStamped.transform.rotation.w = quat[3]
+
+                    aruco_broadcaster.sendTransform(static_transformStamped)
+
                     # Publish Theta to 'aruco_theta'
-                    aruco_data_msg = Float32MultiArray()
-                    aruco_data_msg.data = [avg_xw, avg_yw, theta]
-                    aruco_data_publisher.publish(aruco_data_msg)
+                    # aruco_data_msg = Float32MultiArray()
+                    # aruco_data_msg.data = [avg_xw, avg_yw, theta]
+                    # aruco_data_publisher.publish(aruco_data_msg)
 
                     cv.polylines(
                         frame, [marker_corners[i].astype(np.int32)], True, YELLOW, 4, cv.LINE_AA
