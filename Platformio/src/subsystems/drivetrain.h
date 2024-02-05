@@ -26,6 +26,10 @@ class Drivetrain {
 
   void setWheelSpeeds(float, float, float, float);
 
+  void setWheelSpeeds(float, float);
+  
+  void turnICC(float, float);
+
   float getSpeed(int);
 
   float getLeftWheelpodAngle();
@@ -53,6 +57,7 @@ class Drivetrain {
   String getSums();
 
   std_msgs::Float32MultiArray stepOdom();
+
 
  private:
     HBridge left_turn_motor;

@@ -125,6 +125,66 @@ void Drivetrain::setWheelSpeeds(float sp0, float sp1, float sp2, float sp3) {
     can_controller.setSpeed(-sp0, -sp1, sp2, sp3);
 }
 
+woid Drivetrain::setWheelSpeeds(float speedL, float speedR){
+    //allows for setting left and right wheel speeds
+    setWheelSpeeds(speedL, speedL, speedR, speedR);
+}
+
+void Drivetrain::turnICC(float yICC, float topSpeed){
+    // Calculate angles
+    
+    // float thetaR = atan2((ROBOT_LENGTH_CM/2), (- yICC - (ROBOT_WIDTH_CM/2)));
+    // float thetaL = atan2((ROBOT_LENGTH_CM/2), (- yICC + (ROBOT_WIDTH_CM/2)));
+    float thetaR = -atan2((ROBOT_WIDTH_CM / 2) + yICC,   ROBOT_LENGTH_CM / 2);
+    //note: right angle is inverted from our calculations, this math assumes turning the front wheels inwards is positive theta for L and R. If confused, ask Ian
+    float thetaL = atan2((ROBOT_WIDTH_CM / 2) - yICC,   ROBOT_LENGTH_CM / 2);
+
+    //limit angles to be from -pi/2 to pi/2
+    if (thetaR > HALF_PI){
+        thetaR -= PI;
+    }
+
+    else if(thetaR < -HALF_PI){
+        thetaR += PI;
+    }
+
+    if (thetaL > HALF_PI){
+        thetaL -= PI;
+    }
+
+    else if(thetaL < HALF_PI){
+        thetaL += PI;
+    }
+
+    float radiusR = sqrt(pow((double)ROBOT_LENGTH_CM / 2, 2) + pow(((double)ROBOT_WIDTH_CM/2) + yICC, 2));
+    
+    float radiusL = sqrt(pow((double)ROBOT_LENGTH_CM / 2, 2) + pow(((double)ROBOT_WIDTH_CM/2) - yICC, 2));
+
+    float speedL = topSpeed;
+    float speedR = topSpeed;
+
+    //Adjust speeds to match differential wheel speeds
+    if(radiusL > radiusR){
+        speedR *= radiusR / radiusL;
+    }
+    if(radiusR > radiusL){
+        speedL *= radiusL / radiusR;
+    }
+
+    //correct speeds in case icc is between wheels
+    if(0 <= yICC && yICC < ROBOT_WIDTH_CM / 2){
+        speedL *= -1;
+    }
+    if(0 > yICC && yICC > ROBOT_WIDTH_CM / -2){
+        speedR *= -1;
+    }
+
+    setLeftWheelpodAngleSetpoint(thetaL);
+    setRightWheelpodAngleSetpoint(thetaR);
+    setWheelSpeeds(speedL, speedR);
+    
+}
+
 float Drivetrain::getSpeed(int motorId) {
     return can_controller.getSpeed(motorId);
 }
@@ -176,3 +236,4 @@ float Drivetrain::getDriveSpeed() {
 String Drivetrain::getSums() {
     return can_controller.getSums();
 }
+
