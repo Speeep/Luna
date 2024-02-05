@@ -92,13 +92,10 @@ def main():
             gray_frame = cv.blur(gray_frame, (5,5))
 
             # Threshold image to get better ArUco detection
-            threshold_value = 80
-            thresh_ret, gray_frame = cv.threshold(gray_frame, threshold_value, 255, cv.THRESH_BINARY)
+            # threshold_value = 80
+            # thresh_ret, gray_frame = cv.threshold(gray_frame, threshold_value, 255, cv.THRESH_BINARY)
 
             frame = cv.cvtColor(gray_frame, cv.COLOR_GRAY2BGR)
-
-            # cv.imshow('gray', gray_frame)
-            # cv.waitKey(0)
 
             # Detect ArUco markers in the frame.
             marker_corners, ids, _ = aruco.detectMarkers(gray_frame, dictionary)
