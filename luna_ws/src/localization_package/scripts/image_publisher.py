@@ -91,10 +91,6 @@ def main():
             # Blur to remove noise
             gray_frame = cv.blur(gray_frame, (5,5))
 
-            # Threshold image to get better ArUco detection
-            # threshold_value = 80
-            # thresh_ret, gray_frame = cv.threshold(gray_frame, threshold_value, 255, cv.THRESH_BINARY)
-
             frame = cv.cvtColor(gray_frame, cv.COLOR_GRAY2BGR)
 
             # Detect ArUco markers in the frame.
