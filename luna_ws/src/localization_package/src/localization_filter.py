@@ -1,13 +1,15 @@
 import rospy
 from std_msgs.msg import Float32MultiArray
+from geometry_msgs.msg import PoseStamped, Pose, Point
+import tf.transformations
 import math
 
 # Constants for filter tuning
 # alpha = 0.2  # Weight for localization estimates # TODO Un comment this line after testing
 # beta = 0.8   # Weight for pose steps # TODO Un comment this line after testing
 
-alpha = 0.0  # Weight for localization estimates # TODO Delete this line after testing
-beta = 1.0   # Weight for pose steps # TODO Delete this line after testing
+alpha = 0.01  # Weight for localization estimates # TODO Delete this line after testing
+beta = 0.99   # Weight for pose steps # TODO Delete this line after testing
 
 pose = (0.0, 0.0, 0.0)
 pose_step = (0.0, 0.0, 0.0)
@@ -26,7 +28,17 @@ def update_odom_data_cb(odom_msg):
 
 def update_localization_estimate_cb(localization_estimate_msg):
     global localization_estimate, last_localization_time
-    localization_estimate = localization_estimate_msg.data
+    x = localization_estimate_msg.Pose.Point.x
+    y = localization_estimate_msg.Pose.Point.y
+    quat = (
+        localization_estimate_msg.pose.orientation.x,
+        localization_estimate_msg.pose.orientation.y,
+        localization_estimate_msg.pose.orientation.z,
+        localization_estimate_msg.pose.orientation.w
+    )
+    euler = tf.transformations.euler_from_quaternion(quat)
+    theta = euler[2]
+    localization_estimate = [x, y, theta]
     last_localization_time = rospy.Time.now()
 
 def filter():
@@ -40,7 +52,7 @@ def filter():
 
     rospy.Subscriber('/jetson/pose_step', Float32MultiArray, update_odom_data_cb)
 
-    rospy.Subscriber('/jetson/localization_estimate', Float32MultiArray, update_localization_estimate_cb)
+    rospy.Subscriber('/jetson/localizer_robot_pose', PoseStamped, update_localization_estimate_cb)
 
     filtered_pose_pub = rospy.Publisher('/jetson/filtered_pose', Float32MultiArray, queue_size=10)
     

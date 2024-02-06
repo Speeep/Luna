@@ -54,6 +54,8 @@ if __name__ == '__main__':
     robot_pose.pose.orientation = Quaternion(0.0, 0.0, 0.0, 1.0)
 
     pose_pub = rospy.Publisher('/jetson/localizer_robot_pose', PoseStamped, queue_size=10)
+    aruco_pose_pub = rospy.Publisher('/rviz/aruco_marker_pose', PoseStamped, queue_size=10)
+
 
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
@@ -81,16 +83,18 @@ if __name__ == '__main__':
         # Sequentially apply the transforms to robot_pose in the following order
 
         # 1. world_2_aruco
-        tf1 = tf2_geometry_msgs.do_transform_pose(robot_pose, world_2_aruco)
+        aruco_marker_pose = tf2_geometry_msgs.do_transform_pose(robot_pose, world_2_aruco)
+
+        aruco_pose_pub.publish(aruco_marker_pose)
 
         # 2. aruco_2_webcam_turned
-        tf2 = tf2_geometry_msgs.do_transform_pose(tf1, aruco_2_webcam_turned)
+        webcam_turned_pose = tf2_geometry_msgs.do_transform_pose(aruco_marker_pose, aruco_2_webcam_turned)
 
         # 3. webcam_turned_2_webcam
-        tf3 = tf2_geometry_msgs.do_transform_pose(tf2, webcam_turned_2_webcam)
+        webcam_pose = tf2_geometry_msgs.do_transform_pose(webcam_turned_pose, webcam_turned_2_webcam)
 
         # 4. webcam_2_robot
-        robot_pose_final = tf2_geometry_msgs.do_transform_pose(tf3, webcam_2_robot)
+        robot_pose_final = tf2_geometry_msgs.do_transform_pose(webcam_pose, webcam_2_robot)
 
         # Publish the final Robot Pose
         pose_pub.publish(robot_pose_final)
