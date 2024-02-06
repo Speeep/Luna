@@ -5,6 +5,7 @@ from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, TransformSta
 from std_msgs.msg import Header
 from std_msgs.msg import Float32
 
+
 def update_localizer_angle_cb(localizer_angle_msg):
     global localizer_angle
     localizer_angle = localizer_angle_msg.data
@@ -13,7 +14,7 @@ if __name__ == '__main__':
     rospy.init_node('tf_solver')
     rospy.Subscriber('/jetson/localizer_angle', Float32, update_localizer_angle_cb)
 
-    global localizer_angle
+    localizer_angle = 0.0
 
     tfBuffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tfBuffer)
