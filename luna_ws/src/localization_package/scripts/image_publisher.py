@@ -130,8 +130,9 @@ def main():
                     xws.append(xw)
                     yws.append(yw)
 
-                    avg_xw = round(sum(xws) / len(xws), 1)
-                    avg_yw = round(sum(yws) / len(yws), 1)
+                    # Take the avg, round, and convert to meters
+                    avg_xw = round(sum(xws) / len(xws), 1) / 100
+                    avg_yw = round(sum(yws) / len(yws), 1) / 100
 
                     # Publish as a transformStamped msg
                     static_transformStamped = geometry_msgs.msg.TransformStamped()

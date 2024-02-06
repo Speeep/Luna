@@ -1,6 +1,7 @@
 import rospy
 from std_msgs.msg import Float32MultiArray
-from geometry_msgs.msg import PoseStamped, Pose, Point
+from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
+from std_msgs.msg import Header
 import tf.transformations
 import math
 
@@ -54,7 +55,7 @@ def filter():
 
     rospy.Subscriber('/jetson/localizer_robot_pose', PoseStamped, update_localization_estimate_cb)
 
-    filtered_pose_pub = rospy.Publisher('/jetson/filtered_pose', Float32MultiArray, queue_size=10)
+    filtered_pose_pub = rospy.Publisher('/jetson/filtered_pose', PoseStamped, queue_size=10)
     
     rate = rospy.Rate(10)
 
@@ -85,8 +86,15 @@ def filter():
             # Update the pose
             pose = fused_pose
 
-            filtered_pose_msg = Float32MultiArray(data=fused_pose)
-            filtered_pose_pub.publish(filtered_pose_msg)
+            # Define a basic point that we can apply all the tfs to
+            filtered_robot_pose = PoseStamped()
+            filtered_robot_pose.header = Header()
+            filtered_robot_pose.header.stamp = rospy.Time.now()
+            filtered_robot_pose.pose = Pose()
+            filtered_robot_pose.pose.position = Point(pose[0], pose[1], 0.0)
+            quat = tf.transformations.quaternion_from_euler(float(0.0),float(0.0),float(pose[2]))
+            filtered_robot_pose.pose.orientation = quat
+            filtered_pose_pub.publish(filtered_robot_pose)
         
         rate.sleep()  
 
