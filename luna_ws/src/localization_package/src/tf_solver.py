@@ -58,13 +58,11 @@ if __name__ == '__main__':
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         try:
-            trans = tfBuffer.lookup_transform("aruco", "webcamTurned", rospy.Time())
+            # Define tf between Aruco Marker and Webcam
+            aruco_2_webcam_turned = tfBuffer.lookup_transform("aruco", "webcamTurned", rospy.Time())
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             rate.sleep()
             continue
-
-        # Define tf between Aruco Marker and Webcam
-        aruco_2_webcam_turned = trans.transform
 
         # Define tf between WebcamTurned and Webcam
         webcam_turned_2_webcam = TransformStamped()
