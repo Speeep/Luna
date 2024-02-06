@@ -28,8 +28,8 @@ def update_odom_data_cb(odom_msg):
 
 def update_localization_estimate_cb(localization_estimate_msg):
     global localization_estimate, last_localization_time
-    x = localization_estimate_msg.Pose.Point.x
-    y = localization_estimate_msg.Pose.Point.y
+    x = localization_estimate_msg.pose.position.x
+    y = localization_estimate_msg.pose.position.y
     quat = (
         localization_estimate_msg.pose.orientation.x,
         localization_estimate_msg.pose.orientation.y,
