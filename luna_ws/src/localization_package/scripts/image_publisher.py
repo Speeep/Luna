@@ -58,19 +58,13 @@ def calculate_centroid(points):
     
     return (centroid_x, centroid_y)
 
-def update_localizer_angle_cb(localizer_angle_msg):
-    global localizer_angle
-    localizer_angle = localizer_angle_msg.data
 
 def main():
     rospy.init_node('image_publisher')
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
     servo_error_publisher = rospy.Publisher('/localizer/error', Float32, queue_size=10)
     # aruco_data_publisher = rospy.Publisher('/jetson/localization_estimate', Float32MultiArray, queue_size=10)
-    rospy.Subscriber('/jetson/localizer_angle', Float32, update_localizer_angle_cb)
     aruco_broadcaster = tf2_ros.StaticTransformBroadcaster()
-
-    global localizer_angle
 
     bridge = CvBridge()
 
@@ -144,7 +138,7 @@ def main():
                     static_transformStamped = geometry_msgs.msg.TransformStamped()
                     static_transformStamped.header.stamp = rospy.Time.now()
                     static_transformStamped.header.frame_id = "aruco"
-                    static_transformStamped.child_frame_id = "webcam"
+                    static_transformStamped.child_frame_id = "webcamTurned"
                     static_transformStamped.transform.translation.x = float(avg_xw)
                     static_transformStamped.transform.translation.y = float(avg_yw)
                     static_transformStamped.transform.translation.z = float(0.0)
