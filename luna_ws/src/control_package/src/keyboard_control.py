@@ -1,5 +1,5 @@
 import rospy
-from std_msgs.msg import Float32, Bool, Int32
+from std_msgs.msg import Float32, Bool
 from pynput import keyboard
 
 class KeyControlNode:

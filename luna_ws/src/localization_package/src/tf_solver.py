@@ -105,4 +105,17 @@ if __name__ == '__main__':
         aruco_broadcaster.sendTransform(webcam_turned_2_webcam)
         aruco_broadcaster.sendTransform(webcam_2_robot)
 
+        # # Define tf between WebcamTurned and Webcam
+        # world_2_robot = TransformStamped()
+        # world_2_robot.header.frame_id = "world"
+        # world_2_robot.child_frame_id = "robot"
+        # world_2_robot.header.stamp = rospy.Time.now()
+        # world_2_robot.transform.translation.x = robot_pose_final.pose.position.x
+        # world_2_robot.transform.translation.y = robot_pose_final.pose.position.y
+        # world_2_robot.transform.translation.z = 0.0
+        # world_2_robot.transform.rotation.x = robot_pose_final.pose.orientation.x
+        # world_2_robot.transform.rotation.y = robot_pose_final.pose.orientation.y
+        # world_2_robot.transform.rotation.z = robot_pose_final.pose.orientation.z
+        # world_2_robot.transform.rotation.w = robot_pose_final.pose.orientation.w
+
         rate.sleep()
