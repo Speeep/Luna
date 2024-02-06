@@ -11,10 +11,4 @@
     name="keyboard_control" 
     output="screen"
   />
-  <node
-    pkg="using_markers"
-    type="rviz_bot.py"
-    name="rviz_bot" 
-    output="screen"
-  />
 </launch> 
