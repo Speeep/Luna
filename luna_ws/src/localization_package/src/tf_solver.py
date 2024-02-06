@@ -13,6 +13,7 @@ def update_localizer_angle_cb(localizer_angle_msg):
 if __name__ == '__main__':
     rospy.init_node('tf_solver')
     rospy.Subscriber('/jetson/localizer_angle', Float32, update_localizer_angle_cb)
+    aruco_broadcaster = tf2_ros.StaticTransformBroadcaster()
 
     localizer_angle = 0.0
 
@@ -25,7 +26,7 @@ if __name__ == '__main__':
     world_2_aruco.child_frame_id = "aruco"
     world_2_aruco.header.stamp = rospy.Time.now()
     world_2_aruco.transform.translation.x = 0.0
-    world_2_aruco.transform.translation.y = 500.0
+    world_2_aruco.transform.translation.y = 5.0
     world_2_aruco.transform.translation.z = 0.0
     world_2_aruco.transform.rotation.x = 0.0
     world_2_aruco.transform.rotation.y = 0.0
@@ -37,8 +38,8 @@ if __name__ == '__main__':
     webcam_2_robot.header.frame_id = "webcam"
     webcam_2_robot.child_frame_id = "robot"
     webcam_2_robot.header.stamp = rospy.Time.now()
-    webcam_2_robot.transform.translation.x = -3.81
-    webcam_2_robot.transform.translation.y = -12.192
+    webcam_2_robot.transform.translation.x = -0.0381
+    webcam_2_robot.transform.translation.y = -0.12192
     webcam_2_robot.transform.translation.z = 0.0
     webcam_2_robot.transform.rotation.x = 0.0
     webcam_2_robot.transform.rotation.y = 0.0
@@ -98,5 +99,10 @@ if __name__ == '__main__':
 
         # Publish the final Robot Pose
         pose_pub.publish(robot_pose_final)
+
+        aruco_broadcaster.sendTransform(world_2_aruco)
+        aruco_broadcaster.sendTransform(aruco_2_webcam_turned)
+        aruco_broadcaster.sendTransform(webcam_turned_2_webcam)
+        aruco_broadcaster.sendTransform(webcam_2_robot)
 
         rate.sleep()

@@ -63,7 +63,6 @@ def main():
     rospy.init_node('image_publisher')
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
     servo_error_publisher = rospy.Publisher('/localizer/error', Float32, queue_size=10)
-    # aruco_data_publisher = rospy.Publisher('/jetson/localization_estimate', Float32MultiArray, queue_size=10)
     aruco_broadcaster = tf2_ros.StaticTransformBroadcaster()
 
     bridge = CvBridge()
@@ -149,11 +148,6 @@ def main():
                     static_transformStamped.transform.rotation.w = quat[3]
 
                     aruco_broadcaster.sendTransform(static_transformStamped)
-
-                    # Publish Theta to 'aruco_theta'
-                    # aruco_data_msg = Float32MultiArray()
-                    # aruco_data_msg.data = [avg_xw, avg_yw, theta]
-                    # aruco_data_publisher.publish(aruco_data_msg)
 
                     cv.polylines(
                         frame, [marker_corners[i].astype(np.int32)], True, YELLOW, 4, cv.LINE_AA
