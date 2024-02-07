@@ -117,6 +117,10 @@ def filter():
             robot_transform.transform.rotation.w = quat_vals[3]
 
             broadcaster.sendTransform(robot_transform)
+
+            print(pose[0])
+            print(pose[1])
+            print(pose[2])
         
         rate.sleep()  
 
