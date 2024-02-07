@@ -123,7 +123,7 @@ def main():
                     distance = round(np.sqrt(x**2 + y**2 + z**2), 1)
 
                     xw = round((z * cos(theta) - x * sin(theta)), 1)
-                    yw = round((x * cos(theta) - z * sin(theta)), 1)
+                    yw = round((x * cos(theta) - z * sin(theta)), 1) * -1
 
                     if len(xws) >= 100:
                         xws.pop(0)
