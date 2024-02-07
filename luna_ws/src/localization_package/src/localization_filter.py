@@ -115,8 +115,8 @@ def filter():
             # robot_transform.transform.translation.x = float(pose[0])
             # robot_transform.transform.translation.y = float(pose[1])
             # robot_transform.transform.translation.z = float(0.0)
-            robot_transform.transform.translation.x = float(localization_estimate[0])
-            robot_transform.transform.translation.y = float(localization_estimate[1])
+            robot_transform.transform.translation.x = float(-localization_estimate[0])
+            robot_transform.transform.translation.y = float(-localization_estimate[1])
             robot_transform.transform.translation.z = float(0.0)
             robot_transform.transform.rotation.x = quat_vals[0]
             robot_transform.transform.rotation.y = quat_vals[1]
