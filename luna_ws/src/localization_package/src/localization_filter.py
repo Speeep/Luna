@@ -80,6 +80,10 @@ def filter():
 
         else:
 
+            print("Localization estimate[0]: " + str(localization_estimate[0]))
+            print("Localization estimate[1]: " + str(localization_estimate[1]))
+            print("Localization estimate[2]: " + str(localization_estimate[2]))
+
             # Complementary Filter Here
             fused_pose = (
                 alpha * localization_estimate[0] + beta * (pose[0] + pose_step[0]*math.cos(pose[2]) - pose_step[1]*math.sin(pose[2])),
@@ -118,9 +122,9 @@ def filter():
 
             broadcaster.sendTransform(robot_transform)
 
-            print(pose[0])
-            print(pose[1])
-            print(pose[2])
+            print("pose[0]: " + str(pose[0]))
+            print("pose[1]: " + str(pose[1]))
+            print("pose[2]: " + str(pose[2]))
         
         rate.sleep()  
 
