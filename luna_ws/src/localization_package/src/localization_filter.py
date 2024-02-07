@@ -100,19 +100,19 @@ def filter():
             filtered_robot_pose.pose.orientation = quat
             filtered_pose_pub.publish(filtered_robot_pose)
 
-            # robot_transform = TransformStamped()
-            # robot_transform.header.frame_id = "robot_unfused"
-            # robot_transform.child_frame_id = "robot"
-            # robot_transform.header.stamp = rospy.Time.now()
-            # robot_transform.transform.translation.x = pose[0]
-            # robot_transform.transform.translation.y = pose[1]
-            # robot_transform.transform.translation.z = 0.0
-            # robot_transform.transform.rotation.x = quat[0]
-            # robot_transform.transform.rotation.y = quat[1]
-            # robot_transform.transform.rotation.z = quat[2]
-            # robot_transform.transform.rotation.w = quat[3]
+            robot_transform = TransformStamped()
+            robot_transform.header.frame_id = "robot_unfused"
+            robot_transform.child_frame_id = "robot"
+            robot_transform.header.stamp = rospy.Time.now()
+            robot_transform.transform.translation.x = pose[0]
+            robot_transform.transform.translation.y = pose[1]
+            robot_transform.transform.translation.z = 0.0
+            robot_transform.transform.rotation.x = quat[0]
+            robot_transform.transform.rotation.y = quat[1]
+            robot_transform.transform.rotation.z = quat[2]
+            robot_transform.transform.rotation.w = quat[3]
 
-            # broadcaster.sendTransform(robot_transform)
+            broadcaster.sendTransform(robot_transform)
         
         rate.sleep()  
 
