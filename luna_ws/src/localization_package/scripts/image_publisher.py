@@ -63,6 +63,7 @@ def main():
     rospy.init_node('image_publisher')
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
     servo_error_publisher = rospy.Publisher('/localizer/error', Float32, queue_size=10)
+    tvec_publisher = rospy.Publisher('/tvec', Float32MultiArray, queue_size=10)
     aruco_broadcaster = tf2_ros.StaticTransformBroadcaster()
 
     bridge = CvBridge()
@@ -115,6 +116,9 @@ def main():
 
                     # Extract x, y, and z from the translation vector
                     x, y, z = tVec[0][0][0], tVec[0][0][1], tVec[0][0][2]
+                    tvec_msg = Float32MultiArray()
+                    tvec_msg.data = [x, y, z]
+                    tvec_publisher.publish(tvec_msg)
 
                     distance = round(np.sqrt(x**2 + y**2 + z**2), 1)
 
