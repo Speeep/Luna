@@ -77,10 +77,10 @@ std_msgs::Float32MultiArray Drivetrain::stepOdom(){
 
     // Calculate distances travelled by each wheel in the previous timestep
     float wheelDisplacement[4] = {
-        getRealSpeed(0) * deltaTime * CM_PER_TICK * ODOM_CORRECTION_FACTOR, 
-        getRealSpeed(1) * deltaTime * CM_PER_TICK * ODOM_CORRECTION_FACTOR, 
-        getRealSpeed(2) * deltaTime * CM_PER_TICK * ODOM_CORRECTION_FACTOR, 
-        getRealSpeed(3) * deltaTime * CM_PER_TICK * ODOM_CORRECTION_FACTOR};
+        getRealSpeed(0) * deltaTime * M_PER_TICK * ODOM_CORRECTION_FACTOR, 
+        getRealSpeed(1) * deltaTime * M_PER_TICK * ODOM_CORRECTION_FACTOR, 
+        getRealSpeed(2) * deltaTime * M_PER_TICK * ODOM_CORRECTION_FACTOR, 
+        getRealSpeed(3) * deltaTime * M_PER_TICK * ODOM_CORRECTION_FACTOR};
 
     // Pre calculate trig of wheel angles
     float cosThetaL = cos(getLeftWheelpodAngle());
