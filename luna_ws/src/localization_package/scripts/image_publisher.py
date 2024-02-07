@@ -174,7 +174,8 @@ def main():
                 servo_error_publisher.publish(0)
 
             # Convert the OpenCV image to a ROS Image message
-            image_message = bridge.cv2_to_imgmsg(frame, "bgr8")
+            scaled_image = cv.resize(frame, (0, 0), fx=0.25, fy=0.25)
+            image_message = bridge.cv2_to_imgmsg(scaled_image, "bgr8")
             image_publisher.publish(image_message)
             
         rate.sleep()

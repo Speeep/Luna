@@ -62,11 +62,11 @@ class KeyControlNode:
         # Keys needed for driving forward and backward
         if self.key_states['w']:
             drive_speed = Float32()
-            drive_speed.data = 1.0
+            drive_speed.data = 0.6
             self.drivetrain_drive_pub.publish(drive_speed)
         elif self.key_states['s']:
             drive_speed = Float32()
-            drive_speed.data = -1.0
+            drive_speed.data = -0.6
             self.drivetrain_drive_pub.publish(drive_speed)
         else:
             drive_speed = Float32()
@@ -86,11 +86,11 @@ class KeyControlNode:
         # Keys needed for rotating the drivetrain about its center axis
         if self.key_states['a']:
             rotate_speed = Float32()
-            rotate_speed.data = 0.4
+            rotate_speed.data = 0.2
             self.drivetrain_rotate_pub.publish(rotate_speed)
         elif self.key_states['d']:
             rotate_speed = Float32()
-            rotate_speed.data = -0.4
+            rotate_speed.data = -0.2
             self.drivetrain_rotate_pub.publish(rotate_speed)
         else:
             rotate_speed = Float32()

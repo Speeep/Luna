@@ -9,8 +9,8 @@ import math
 # alpha = 0.2  # Weight for localization estimates # TODO Un comment this line after testing
 # beta = 0.8   # Weight for pose steps # TODO Un comment this line after testing
 
-alpha = 0.01  # Weight for localization estimates # TODO Delete this line after testing
-beta = 0.99   # Weight for pose steps # TODO Delete this line after testing
+alpha = 0.00  # Weight for localization estimates # TODO Delete this line after testing
+beta = 1.0   # Weight for pose steps # TODO Delete this line after testing
 
 pose = (0.0, 0.0, 0.0)
 pose_step = (0.0, 0.0, 0.0)
