@@ -111,10 +111,10 @@ def filter():
             robot_transform.transform.translation.x = float(pose[0])
             robot_transform.transform.translation.y = float(pose[1])
             robot_transform.transform.translation.z = float(0.0)
-            robot_transform.transform.rotation.x = quat[0]
-            robot_transform.transform.rotation.y = quat[1]
-            robot_transform.transform.rotation.z = quat[2]
-            robot_transform.transform.rotation.w = quat[3]
+            robot_transform.transform.rotation.x = quat_vals[0]
+            robot_transform.transform.rotation.y = quat_vals[1]
+            robot_transform.transform.rotation.z = quat_vals[2]
+            robot_transform.transform.rotation.w = quat_vals[3]
 
             broadcaster.sendTransform(robot_transform)
         
