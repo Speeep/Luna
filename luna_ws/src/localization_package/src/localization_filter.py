@@ -1,6 +1,8 @@
 import rospy
 from std_msgs.msg import Float32MultiArray
-from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
+import tf2_ros
+import tf.transformations
+from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, TransformStamped
 from std_msgs.msg import Header
 import tf.transformations
 import math
@@ -9,7 +11,7 @@ import math
 # alpha = 0.2  # Weight for localization estimates # TODO Un comment this line after testing
 # beta = 0.8   # Weight for pose steps # TODO Un comment this line after testing
 
-alpha = 0.00  # Weight for localization estimates # TODO Delete this line after testing
+alpha = 0.0  # Weight for localization estimates # TODO Delete this line after testing
 beta = 1.0   # Weight for pose steps # TODO Delete this line after testing
 
 pose = (0.0, 0.0, 0.0)
@@ -56,6 +58,8 @@ def filter():
     rospy.Subscriber('/jetson/localizer_robot_pose', PoseStamped, update_localization_estimate_cb)
 
     filtered_pose_pub = rospy.Publisher('/jetson/filtered_pose', PoseStamped, queue_size=10)
+
+    broadcaster = tf2_ros.StaticTransformBroadcaster()
     
     rate = rospy.Rate(10)
 
@@ -95,6 +99,20 @@ def filter():
             quat = tf.transformations.quaternion_from_euler(float(0.0),float(0.0),float(pose[2]))
             filtered_robot_pose.pose.orientation = quat
             filtered_pose_pub.publish(filtered_robot_pose)
+
+            # robot_transform = TransformStamped()
+            # robot_transform.header.frame_id = "robot_unfused"
+            # robot_transform.child_frame_id = "robot"
+            # robot_transform.header.stamp = rospy.Time.now()
+            # robot_transform.transform.translation.x = pose[0]
+            # robot_transform.transform.translation.y = pose[1]
+            # robot_transform.transform.translation.z = 0.0
+            # robot_transform.transform.rotation.x = quat[0]
+            # robot_transform.transform.rotation.y = quat[1]
+            # robot_transform.transform.rotation.z = quat[2]
+            # robot_transform.transform.rotation.w = quat[3]
+
+            # broadcaster.sendTransform(robot_transform)
         
         rate.sleep()  
 
