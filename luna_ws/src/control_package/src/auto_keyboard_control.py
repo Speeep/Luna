@@ -7,10 +7,8 @@ class KeyControlNode:
         rospy.init_node('keyboard_control', anonymous=True)
 
         # Define publishers for different key presses
-        self.drivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
-        self.drivetrain_angle_pub = rospy.Publisher('/drivetrain/angle', Bool, queue_size=10)
+
         self.drivetrain_enable_pub = rospy.Publisher('/drivetrain/enable', Bool, queue_size=10)
-        self.localizer_error_pub = rospy.Publisher('localizer/error', Float32, queue_size=10)
         self.localizer_enable_pub = rospy.Publisher('/localizer/enable', Bool, queue_size=10)
 
         # Create a listener for keyboard events
@@ -19,15 +17,8 @@ class KeyControlNode:
 
         # Initialize variables to track key states
         self.key_states = {
-            'w': False,
-            's': False,
-            'q': False,
-            'e': False,
             'o': False,
             'p': False,
-            'n': False,
-            'm': False,
-            'b': False
         }
 
         # Create a timer to check key presses periodically
@@ -35,9 +26,6 @@ class KeyControlNode:
 
         # Robot enable
         self.robot_enable = False
-
-        # Localizer Angle Setpoint
-        self.localizer_error = 0.0
 
     def on_press(self, key):
         try:
@@ -56,29 +44,6 @@ class KeyControlNode:
             pass
 
     def check_key_presses(self, event):
-        # Keys needed for driving forward and backward
-        if self.key_states['w']:
-            drive_speed = Float32()
-            drive_speed.data = 0.6
-            self.drivetrain_drive_pub.publish(drive_speed)
-        elif self.key_states['s']:
-            drive_speed = Float32()
-            drive_speed.data = -0.6
-            self.drivetrain_drive_pub.publish(drive_speed)
-        else:
-            drive_speed = Float32()
-            drive_speed.data = 0.0
-            self.drivetrain_drive_pub.publish(drive_speed)
-
-        # Keys needed for angling the wheel pods in and out
-        if self.key_states['q']:
-            angled = Bool()
-            angled.data = True
-            self.drivetrain_angle_pub.publish(angled)
-        elif self.key_states['e']:
-            angled = Bool()
-            angled.data = False
-            self.drivetrain_angle_pub.publish(angled)
 
         # Keys needed for enabling and disabling the robot
         if self.key_states['p']:
@@ -98,16 +63,6 @@ class KeyControlNode:
             disable.data = self.robot_enable
             self.drivetrain_enable_pub.publish(self.robot_enable)
             self.localizer_enable_pub.publish(self.robot_enable)
-
-        if self.key_states['b']:
-            self.localizer_error = 100.0
-            self.localizer_error_pub.publish(self.localizer_error)
-        elif self.key_states['m']:
-            self.localizer_error = -100.0
-            self.localizer_error_pub.publish(self.localizer_error)
-        elif self.key_states['n']:
-            self.localizer_error = 0.0
-            self.localizer_error_pub.publish(self.localizer_error)
 
 if __name__ == '__main__':
     try:
