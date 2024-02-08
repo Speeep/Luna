@@ -22,8 +22,7 @@ def multiply_transforms(trans1, trans2):
     result_matrix = tf.transformations.concatenate_matrices(trans1_matrix, trans2_matrix)
 
     # Normalize the quaternion
-    rotation_matrix = result_matrix[:3, :3]
-    quat = tf.transformations.quaternion_from_matrix(rotation_matrix)
+    quat = tf.transformations.quaternion_from_matrix(result_matrix)
     quat /= tf.transformations.vector_norm(quat)
 
     # Convert the resulting matrix back to a TransformStamped message
