@@ -97,9 +97,12 @@ if __name__ == '__main__':
         # 4. webcam_2_robot
         robot_pose_final = tf2_geometry_msgs.do_transform_pose(webcam_pose, webcam_2_robot)
 
-        print("robot pose final header: " + str(robot_pose_final.header))
-        print("tf solver final robot pose x: " + str(robot_pose_final.pose.position.x))
-        print("tf solver final robot pose y: " + str(robot_pose_final.pose.position.y))
+        world_2_robot = world_2_aruco * aruco_2_webcam_turned
+        world_2_robot = world_2_aruco * webcam_turned_2_webcam
+        world_2_robot = world_2_aruco * webcam_2_robot
+
+        print("tf solver final robot pose x: " + str(world_2_robot.transform.translation.x))
+        print("tf solver final robot pose y: " + str(world_2_robot.transform.translation.y))
 
         # Publish the final Robot Pose
         pose_pub.publish(robot_pose_final)
@@ -108,5 +111,6 @@ if __name__ == '__main__':
         broadcaster.sendTransform(aruco_2_webcam_turned)
         broadcaster.sendTransform(webcam_turned_2_webcam)
         broadcaster.sendTransform(webcam_2_robot)
+        broadcaster.sendTransform(world_2_robot)
 
         rate.sleep()
