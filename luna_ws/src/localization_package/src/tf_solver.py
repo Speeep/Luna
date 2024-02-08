@@ -21,6 +21,11 @@ def multiply_transforms(trans1, trans2):
     # Multiply the transformation matrices
     result_matrix = tf.transformations.concatenate_matrices(trans1_matrix, trans2_matrix)
 
+    # Normalize the quaternion
+    rotation_matrix = result_matrix[:3, :3]
+    quat = tf.transformations.quaternion_from_matrix(rotation_matrix)
+    quat /= tf.transformations.vector_norm(quat)
+
     # Convert the resulting matrix back to a TransformStamped message
     result_trans = TransformStamped()
     result_trans.header.frame_id = trans1.header.frame_id
@@ -28,11 +33,12 @@ def multiply_transforms(trans1, trans2):
     result_trans.transform.translation.x = result_matrix[0, 3]
     result_trans.transform.translation.y = result_matrix[1, 3]
     result_trans.transform.translation.z = result_matrix[2, 3]
-    quat = tf.transformations.quaternion_from_matrix(result_matrix)
     result_trans.transform.rotation.x = quat[0]
     result_trans.transform.rotation.y = quat[1]
     result_trans.transform.rotation.z = quat[2]
-    result_trans.transform.rotation.w = 1.0
+    result_trans.transform.rotation.w = quat[3]
+
+    result_trans
 
     return result_trans
 
