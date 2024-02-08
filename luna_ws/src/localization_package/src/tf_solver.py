@@ -22,7 +22,7 @@ def multiply_transforms(trans1, trans2):
     result_matrix = tf.transformations.concatenate_matrices(trans1_matrix, trans2_matrix)
 
     # Convert the resulting matrix back to a TransformStamped message
-    result_trans = tf2_geometry_msgs.msg.TransformStamped()
+    result_trans = TransformStamped()
     result_trans.header.frame_id = trans1.header.frame_id
     result_trans.child_frame_id = trans2.child_frame_id
     result_trans.transform.translation.x = result_matrix[0, 3]
