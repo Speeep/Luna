@@ -139,7 +139,8 @@ if __name__ == '__main__':
 
         world_2_webcam_turned = multiply_transforms(world_2_aruco, aruco_2_webcam_turned)
         world_2_webcam = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
-        world_2_robot = multiply_transforms(world_2_webcam, webcam_2_robot)
+        # world_2_robot = multiply_transforms(world_2_webcam, webcam_2_robot)
+        print(tf.transformations.euler_from_quaternion(world_2_webcam.transform.rotation))
 
         print("tf solver world_2_robot x: " + str(world_2_robot.transform.translation.x))
         print("tf solver world_2_robot y: " + str(world_2_robot.transform.translation.y))
