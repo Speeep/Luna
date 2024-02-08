@@ -79,7 +79,7 @@ if __name__ == '__main__':
     webcam_2_robot.child_frame_id = "robot_unfused"
     webcam_2_robot.header.stamp = rospy.Time.now()
     webcam_2_robot.transform.translation.x = -0.0381
-    webcam_2_robot.transform.translation.y = 0.12192
+    webcam_2_robot.transform.translation.y = -0.12192
     webcam_2_robot.transform.translation.z = 0.0
     webcam_2_robot.transform.rotation.x = 0.0
     webcam_2_robot.transform.rotation.y = 0.0
