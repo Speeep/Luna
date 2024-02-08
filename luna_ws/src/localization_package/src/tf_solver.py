@@ -112,8 +112,8 @@ if __name__ == '__main__':
         webcam_turned_2_webcam.header.frame_id = "webcamTurned"
         webcam_turned_2_webcam.child_frame_id = "webcam"
         webcam_turned_2_webcam.header.stamp = rospy.Time.now()
-        webcam_turned_2_webcam.transform.translation.x = 0.0
-        webcam_turned_2_webcam.transform.translation.y = 0.0
+        webcam_turned_2_webcam.transform.translation.x = -0.0381
+        webcam_turned_2_webcam.transform.translation.y = -0.12192
         webcam_turned_2_webcam.transform.translation.z = 0.0
         quat = tf.transformations.quaternion_from_euler(float(0.0),float(0.0),float(localizer_angle))
         webcam_turned_2_webcam.transform.rotation.x = quat[0]
@@ -138,9 +138,11 @@ if __name__ == '__main__':
         robot_pose_final = tf2_geometry_msgs.do_transform_pose(webcam_pose, webcam_2_robot)
 
         world_2_webcam_turned = multiply_transforms(world_2_aruco, aruco_2_webcam_turned)
-        world_2_webcam = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
-        world_2_robot = multiply_transforms(world_2_webcam, webcam_2_robot)
-        # world_2_robot = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
+        # world_2_webcam = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
+
+        world_2_robot = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
+
+        # world_2_robot = multiply_transforms(world_2_webcam, webcam_2_robot)
 
         print("tf solver world_2_robot x: " + str(world_2_robot.transform.translation.x))
         print("tf solver world_2_robot y: " + str(world_2_robot.transform.translation.y))
