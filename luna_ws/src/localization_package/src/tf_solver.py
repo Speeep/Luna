@@ -129,9 +129,11 @@ if __name__ == '__main__':
         robot_pose_final = tf2_geometry_msgs.do_transform_pose(webcam_pose, webcam_2_robot)
 
         world_2_webcam_turned = multiply_transforms(world_2_aruco, aruco_2_webcam_turned)
+        world_2_webcam = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
+        world_2_robot = multiply_transforms(world_2_webcam, webcam_2_robot)
 
-        print("tf solver world_2_webcam_turned x: " + str(world_2_webcam_turned.transform.translation.x))
-        print("tf solver world_2_webcam_turned y: " + str(world_2_webcam_turned.transform.translation.y))
+        print("tf solver world_2_robot x: " + str(world_2_robot.transform.translation.x))
+        print("tf solver world_2_robot y: " + str(world_2_robot.transform.translation.y))
 
         # Publish the final Robot Pose
         pose_pub.publish(robot_pose_final)
@@ -140,6 +142,6 @@ if __name__ == '__main__':
         broadcaster.sendTransform(aruco_2_webcam_turned)
         broadcaster.sendTransform(webcam_turned_2_webcam)
         broadcaster.sendTransform(webcam_2_robot)
-        broadcaster.sendTransform(world_2_webcam_turned)
+        broadcaster.sendTransform(world_2_robot)
 
         rate.sleep()
