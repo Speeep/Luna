@@ -4,6 +4,11 @@ import tf.transformations, tf2_geometry_msgs
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, TransformStamped
 from std_msgs.msg import Header
 from std_msgs.msg import Float32
+import math
+
+# Random Ian Variables
+l_magic = 0.127741
+theta_magic = -1.87367
 
 
 def update_localizer_angle_cb(localizer_angle_msg):
@@ -139,8 +144,33 @@ if __name__ == '__main__':
 
         world_2_webcam_turned = multiply_transforms(world_2_aruco, aruco_2_webcam_turned)
         world_2_webcam = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
-        # world_2_robot = multiply_transforms(world_2_webcam, webcam_2_robot)
-        print(tf.transformations.euler_from_quaternion(world_2_webcam.transform.rotation))
+        
+        rotation = [
+            world_2_webcam.transform.rotation.x,
+            world_2_webcam.transform.rotation.y,
+            world_2_webcam.transform.rotation.z,
+            world_2_webcam.transform.rotation.w
+        ]
+        eulers = tf.transformations.euler_from_quaternion(rotation)
+        z_rotation = eulers[2]
+
+        x_adj = l_magic * math.cos(z_rotation + theta_magic)
+        y_adj = l_magic * math.sin(z_rotation + theta_magic)
+
+        # Define tf between webcam and robot
+        webcam_2_robot = TransformStamped()
+        webcam_2_robot.header.frame_id = "webcam"
+        webcam_2_robot.child_frame_id = "robot_unfused"
+        webcam_2_robot.header.stamp = rospy.Time.now()
+        webcam_2_robot.transform.translation.x = x_adj
+        webcam_2_robot.transform.translation.y = y_adj
+        webcam_2_robot.transform.translation.z = 0.0
+        webcam_2_robot.transform.rotation.x = 0.0
+        webcam_2_robot.transform.rotation.y = 0.0
+        webcam_2_robot.transform.rotation.z = 0.0
+        webcam_2_robot.transform.rotation.w = 1.0
+
+        world_2_robot = multiply_transforms(world_2_webcam, webcam_2_robot)
 
         print("tf solver world_2_robot x: " + str(world_2_robot.transform.translation.x))
         print("tf solver world_2_robot y: " + str(world_2_robot.transform.translation.y))
