@@ -28,7 +28,11 @@ def multiply_transforms(trans1, trans2):
     result_trans.transform.translation.x = result_matrix[0, 3]
     result_trans.transform.translation.y = result_matrix[1, 3]
     result_trans.transform.translation.z = result_matrix[2, 3]
-    result_trans.transform.rotation = tf.transformations.quaternion_from_matrix(result_matrix)
+    quat = tf.transformations.quaternion_from_matrix(result_matrix)
+    result_trans.transform.rotation.x = quat[0]
+    result_trans.transform.rotation.y = quat[1]
+    result_trans.transform.rotation.z = quat[2]
+    result_trans.transform.rotation.w = quat[3]
 
     return result_trans
 
