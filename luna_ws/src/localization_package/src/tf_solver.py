@@ -12,26 +12,16 @@ def update_localizer_angle_cb(localizer_angle_msg):
 
 def multiply_transforms(trans1, trans2):
     # Convert TransformStamped messages to matrices
-    trans1_matrix = tf.transformations.translation_matrix((trans1.transform.translation.x, trans1.transform.translation.y, trans1.transform.translation.z))
-    trans1_matrix *= tf.transformations.quaternion_matrix((trans1.transform.rotation.x, trans1.transform.rotation.y, trans1.transform.rotation.z, trans1.transform.rotation.w))
-
-    trans2_matrix = tf.transformations.translation_matrix((trans2.transform.translation.x, trans2.transform.translation.y, trans2.transform.translation.z))
-    trans2_matrix *= tf.transformations.quaternion_matrix((trans2.transform.rotation.x, trans2.transform.rotation.y, trans2.transform.rotation.z, trans2.transform.rotation.w))
-
-    # Multiply the transformation matrices
-    result_matrix = tf.transformations.concatenate_matrices(trans1_matrix, trans2_matrix)
-
-    # Normalize the quaternion
-    quat = tf.transformations.quaternion_from_matrix(result_matrix)
-    quat /= tf.transformations.vector_norm(quat)
+    
 
     # Convert the resulting matrix back to a TransformStamped message
     result_trans = TransformStamped()
     result_trans.header.frame_id = trans1.header.frame_id
     result_trans.child_frame_id = trans2.child_frame_id
-    result_trans.transform.translation.x = result_matrix[0, 3]
-    result_trans.transform.translation.y = result_matrix[1, 3]
-    result_trans.transform.translation.z = result_matrix[2, 3]
+    result_trans.transform.translation.x = trans1.transform.translation.x + trans2.transform.translation.x
+    result_trans.transform.translation.y = trans1.transform.translation.y + trans2.transform.translation.y
+    result_trans.transform.translation.z = trans1.transform.translation.z + trans2.transform.translation.z
+    quat = tf.transformations.quaternion_from_euler(float(0.0), float(0.0), float(0.0))
     result_trans.transform.rotation.x = quat[0]
     result_trans.transform.rotation.y = quat[1]
     result_trans.transform.rotation.z = quat[2]
