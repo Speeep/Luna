@@ -97,6 +97,7 @@ if __name__ == '__main__':
         # 4. webcam_2_robot
         robot_pose_final = tf2_geometry_msgs.do_transform_pose(webcam_pose, webcam_2_robot)
 
+        print("robot pose final header: " + str(robot_pose_final.header))
         print("tf solver final robot pose x: " + str(robot_pose_final.pose.position.x))
         print("tf solver final robot pose y: " + str(robot_pose_final.pose.position.y))
 
