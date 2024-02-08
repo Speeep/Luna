@@ -46,7 +46,7 @@ def update_localization_estimate_cb(localization_estimate_msg):
 
 def filter():
     
-    global pose, last_odom_time, last_localization_time
+    global pose, last_odom_time, last_localization_time, localization_estimate
 
     rospy.init_node('localization_filter', anonymous=True)
 
