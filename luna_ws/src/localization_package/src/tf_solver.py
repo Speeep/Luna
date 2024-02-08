@@ -13,17 +13,17 @@ def update_localizer_angle_cb(localizer_angle_msg):
 
 def multiply_transforms(trans1, trans2):
     # Convert TransformStamped messages to matrices
-    trans1_mat = tf.transformations.translation_matrix(trans1.transform)
-    rot1_mat   = tf.transformations.quaternion_matrix(trans1.transform)
+    trans1_mat = tf.transformations.translation_matrix(trans1.transform.translation)
+    rot1_mat   = tf.transformations.quaternion_matrix(trans1.transform.rotation)
     mat1 = numpy.dot(trans1_mat, rot1_mat)
 
-    trans2_mat = tf.transformations.translation_matrix(trans2.transform)
-    rot2_mat    = tf.transformations.quaternion_matrix(trans2.transform)
+    trans2_mat = tf.transformations.translation_matrix(trans2.transform.translation)
+    rot2_mat    = tf.transformations.quaternion_matrix(trans2.transform.rotation)
     mat2 = numpy.dot(trans2_mat, rot2_mat)
 
     mat3 = numpy.dot(mat1, mat2)
-    trans3 = tf.transformations.translation_from_matrix(mat3.transform)
-    quat3 = tf.transformations.quaternion_from_matrix(mat3.transform)
+    trans3 = tf.transformations.translation_from_matrix(mat3.transform.translation)
+    quat3 = tf.transformations.quaternion_from_matrix(mat3.transform.rotation)
 
     # Convert the resulting matrix back to a TransformStamped message
     result_trans = TransformStamped()
