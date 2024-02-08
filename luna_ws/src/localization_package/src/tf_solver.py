@@ -137,9 +137,9 @@ if __name__ == '__main__':
         # 4. webcam_2_robot
         robot_pose_final = tf2_geometry_msgs.do_transform_pose(webcam_pose, webcam_2_robot)
 
-        world_2_robot = multiply_transforms(world_2_aruco, aruco_2_webcam_turned)
-        world_2_robot = multiply_transforms(world_2_robot, webcam_2_robot)
-        world_2_robot = multiply_transforms(world_2_robot, webcam_turned_2_webcam)
+        world_2_webcam_turned = multiply_transforms(world_2_aruco, aruco_2_webcam_turned)
+        world_2_webcam = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
+        world_2_robot = multiply_transforms(world_2_webcam, webcam_2_robot)
         # world_2_robot = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
 
         print("tf solver world_2_robot x: " + str(world_2_robot.transform.translation.x))
