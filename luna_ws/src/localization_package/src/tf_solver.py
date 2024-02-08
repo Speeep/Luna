@@ -32,7 +32,7 @@ def multiply_transforms(trans1, trans2):
     result_trans.transform.rotation.x = quat[0]
     result_trans.transform.rotation.y = quat[1]
     result_trans.transform.rotation.z = quat[2]
-    result_trans.transform.rotation.w = quat[3]
+    result_trans.transform.rotation.w = 1.0
 
     return result_trans
 
