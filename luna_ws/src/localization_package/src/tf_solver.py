@@ -10,26 +10,45 @@ def update_localizer_angle_cb(localizer_angle_msg):
     global localizer_angle
     localizer_angle = localizer_angle_msg.data
 
-def multiply_transforms(trans1, trans2):
-    # Convert TransformStamped messages to matrices
-    
+def multiply_transforms(transform1, transform2):
+    # Extract translation vectors
+    translation1 = [transform1.transform.translation.x,
+                    transform1.transform.translation.y,
+                    transform1.transform.translation.z]
+    translation2 = [transform2.transform.translation.x,
+                    transform2.transform.translation.y,
+                    transform2.transform.translation.z]
 
-    # Convert the resulting matrix back to a TransformStamped message
-    result_trans = TransformStamped()
-    result_trans.header.frame_id = trans1.header.frame_id
-    result_trans.child_frame_id = trans2.child_frame_id
-    result_trans.transform.translation.x = trans1.transform.translation.x + trans2.transform.translation.x
-    result_trans.transform.translation.y = trans1.transform.translation.y + trans2.transform.translation.y
-    result_trans.transform.translation.z = trans1.transform.translation.z + trans2.transform.translation.z
-    quat = tf.transformations.quaternion_from_euler(float(0.0), float(0.0), float(0.0))
-    result_trans.transform.rotation.x = quat[0]
-    result_trans.transform.rotation.y = quat[1]
-    result_trans.transform.rotation.z = quat[2]
-    result_trans.transform.rotation.w = quat[3]
+    # Extract rotation quaternions
+    rotation1 = [transform1.transform.rotation.x,
+                 transform1.transform.rotation.y,
+                 transform1.transform.rotation.z,
+                 transform1.transform.rotation.w]
+    rotation2 = [transform2.transform.rotation.x,
+                 transform2.transform.rotation.y,
+                 transform2.transform.rotation.z,
+                 transform2.transform.rotation.w]
 
-    result_trans
+    # Perform quaternion multiplication for rotation
+    rotation_result = tf.transformations.quaternion_multiply(rotation1, rotation2)
 
-    return result_trans
+    # Perform vector addition for translation
+    translation_result = [translation1[i] + translation2[i] for i in range(3)]
+
+    # Create a new TransformStamped message for the result
+    result_transform = TransformStamped()
+    result_transform.header.stamp = rospy.Time.now()
+    result_transform.header.frame_id = transform1.header.frame_id
+    result_transform.child_frame_id = transform2.child_frame_id
+    result_transform.transform.translation.x = translation_result[0]
+    result_transform.transform.translation.y = translation_result[1]
+    result_transform.transform.translation.z = translation_result[2]
+    result_transform.transform.rotation.x = rotation_result[0]
+    result_transform.transform.rotation.y = rotation_result[1]
+    result_transform.transform.rotation.z = rotation_result[2]
+    result_transform.transform.rotation.w = rotation_result[3]
+
+    return result_transform
 
 if __name__ == '__main__':
     rospy.init_node('tf_solver')
