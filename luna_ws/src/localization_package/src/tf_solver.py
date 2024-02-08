@@ -127,21 +127,6 @@ if __name__ == '__main__':
         webcam_turned_2_webcam.transform.rotation.w = quat[3]
 
         # Sequentially apply the transforms to robot_pose in the following order
-
-        # 1. world_2_aruco
-        aruco_marker_pose = tf2_geometry_msgs.do_transform_pose(robot_pose, world_2_aruco)
-
-        aruco_pose_pub.publish(aruco_marker_pose)
-
-        # 2. aruco_2_webcam_turned
-        webcam_turned_pose = tf2_geometry_msgs.do_transform_pose(aruco_marker_pose, aruco_2_webcam_turned)
-
-        # 3. webcam_turned_2_webcam
-        webcam_pose = tf2_geometry_msgs.do_transform_pose(webcam_turned_pose, webcam_turned_2_webcam)
-
-        # 4. webcam_2_robot
-        robot_pose_final = tf2_geometry_msgs.do_transform_pose(webcam_pose, webcam_2_robot)
-
         world_2_webcam_turned = multiply_transforms(world_2_aruco, aruco_2_webcam_turned)
         world_2_webcam = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
         
@@ -172,8 +157,7 @@ if __name__ == '__main__':
 
         world_2_robot = multiply_transforms(world_2_webcam, webcam_2_robot)
 
-        print("tf solver world_2_robot x: " + str(world_2_robot.transform.translation.x))
-        print("tf solver world_2_robot y: " + str(world_2_robot.transform.translation.y))
+        robot_pose_final = tf2_geometry_msgs.do_transform_pose(robot_pose, world_2_robot)
 
         # Publish the final Robot Pose
         pose_pub.publish(robot_pose_final)
