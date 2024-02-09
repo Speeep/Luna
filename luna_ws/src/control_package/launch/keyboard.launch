@@ -24,4 +24,10 @@
     name="image_subscriber" 
     output="screen"
   />
+  <node
+    pkg="control_package"
+    type="autonomous_control.py"
+    name="autonomous_control" 
+    output="screen"
+  />
 </launch> 

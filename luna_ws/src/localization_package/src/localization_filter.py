@@ -8,11 +8,8 @@ import tf.transformations
 import math
 
 # Constants for filter tuning
-# alpha = 0.2  # Weight for localization estimates # TODO Un comment this line after testing
-# beta = 0.8   # Weight for pose steps # TODO Un comment this line after testing
-
-alpha = 0.10  # Weight for localization estimates # TODO Delete this line after testing
-beta = 0.90   # Weight for pose steps # TODO Delete this line after testing
+alpha = 0.10  # Weight for localization estimates
+beta = 0.90   # Weight for pose steps
 
 pose = (0.0, 0.0, 0.0)
 pose_step = (0.0, 0.0, 0.0)

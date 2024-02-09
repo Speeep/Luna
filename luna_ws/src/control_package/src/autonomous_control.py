@@ -67,47 +67,47 @@ def main():
         else: 
             localizer_error_pub.publish(0.0)
 
-        # Only if the robot is enabled
-        if (drivetrain_enable):
+        # # Only if the robot is enabled
+        # if (drivetrain_enable):
 
-            print("robot is enabled!")
+        #     print("robot is enabled!")
 
-            # If localizer can see the ArUco marker
-            if (localizer_error != 0.0 and abs(localizer_error) < 150):
+        #     # If localizer can see the ArUco marker
+        #     if (localizer_error != 0.0 and abs(localizer_error) < 150):
 
-                print("localizer can see the ArUco marker!")
+        #         print("localizer can see the ArUco marker!")
 
-                # If robot is facing the left of the aruco marker
-                if (localizer_angle > 0.1):
+        #         # If robot is facing the left of the aruco marker
+        #         if (localizer_angle > 0.1):
 
-                    # If the drivetrain is not angled, set wheelpod angle setpoint to 45 degrees
-                    if (not drivetrain_angle):
-                        drivetrain_angle_pub.publish(True)
+        #             # If the drivetrain is not angled, set wheelpod angle setpoint to 45 degrees
+        #             if (not drivetrain_angle):
+        #                 drivetrain_angle_pub.publish(True)
 
-                    drivetrain_drive_pub.publish(-0.4)
+        #             drivetrain_drive_pub.publish(-0.4)
 
-                    print("turning right!")
+        #             print("turning right!")
 
-                # If robot is facing the right of the aruco marker
-                elif (localizer_angle < -0.1):
+        #         # If robot is facing the right of the aruco marker
+        #         elif (localizer_angle < -0.1):
 
-                    # If the drivetrain is not angled, set wheelpod angle setpoint to 45 degrees
-                    if (not drivetrain_angle):
-                        drivetrain_angle_pub.publish(True)
+        #             # If the drivetrain is not angled, set wheelpod angle setpoint to 45 degrees
+        #             if (not drivetrain_angle):
+        #                 drivetrain_angle_pub.publish(True)
 
-                    drivetrain_drive_pub.publish(0.4)
+        #             drivetrain_drive_pub.publish(0.4)
 
-                    print("turning left!")
+        #             print("turning left!")
 
-                else:
-                    # If the drivetrain is not angled, set wheelpod angle setpoint to 45 degrees
-                    if (drivetrain_angle):
-                        drivetrain_angle_pub.publish(False)
+        #         else:
+        #             # If the drivetrain is not angled, set wheelpod angle setpoint to 45 degrees
+        #             if (drivetrain_angle):
+        #                 drivetrain_angle_pub.publish(False)
 
-                    drivetrain_drive_pub.publish(0.4)
+        #             drivetrain_drive_pub.publish(0.4)
 
-        else: 
-            drivetrain_drive_pub.publish(0.0)
+        # else: 
+        #     drivetrain_drive_pub.publish(0.0)
 
                     
 
