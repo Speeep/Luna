@@ -147,6 +147,11 @@ void CANController::updateMotorSpeeds() {
         motor3deltaAngle += 4096;
     }
 
+    displacements[0] += motor0deltaAngle;
+    displacements[1] += motor1deltaAngle;
+    displacements[2] += motor2deltaAngle;
+    displacements[3] += motor3deltaAngle;
+
     float motor0Speed = motor0deltaAngle / deltaTime;
     float motor1Speed = motor1deltaAngle / deltaTime;
     float motor2Speed = motor2deltaAngle / deltaTime;
@@ -192,6 +197,19 @@ float CANController::getRealSpeed(int motorId) {
         return -realSpeeds[motorId];
     }
     return realSpeeds[motorId];
+}
+
+float CANController::getDisplacement(int motorId){
+    if (motorId == 0 || motorId == 1) {
+        float output = -displacements[motorId];
+        displacements[motorId] = 0;
+        return output;
+    }
+    
+    float output = displacements[motorId];
+    displacements[motorId] = 0;
+    return output;
+
 }
 
 void CANController::cutCurrent() {
