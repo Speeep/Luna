@@ -25,7 +25,7 @@ public:
 
     float getRealSpeed(int);
 
-    float getDisplacement(int);
+    int getDisplacement(int);
 
     void cutCurrent();
 
@@ -53,5 +53,5 @@ private:
     float sums[4];
     int setCurrents[4];
     float speedSetpoints[4];
-    float displacements[4];
+    int displacements[4];
 };

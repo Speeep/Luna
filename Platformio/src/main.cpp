@@ -145,7 +145,9 @@ void loop()
     localizerAngle.data = localizer.getAngle();
     localizerAnglePub.publish(&localizerAngle);
 
+
     //update Odom
+    odomIterator ++;
     if(odomIterator >= ODOM_FREQUENCY){
 
       std_msgs::Float32MultiArray stepMsg = drivetrain.stepOdom();
@@ -155,7 +157,5 @@ void loop()
       odomIterator = 0;
 
     }
-
-    odomIterator ++;
   }
 }
