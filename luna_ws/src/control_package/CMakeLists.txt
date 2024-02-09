@@ -205,6 +205,8 @@ include_directories(
 # catkin_add_nosetests(test)
 
 catkin_install_python(PROGRAMS 
+  src/auto_keyboard_control.py
   src/keyboard_control.py
+  src/autonomous_control.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

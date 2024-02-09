@@ -207,8 +207,8 @@ include_directories(
 
 catkin_install_python(PROGRAMS 
   scripts/image_subscriber.py 
-  scripts/image_publisher.py 
-  scripts/listener.py 
+  scripts/image_publisher.py
+  src/tf_solver.py
   src/localization_filter.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

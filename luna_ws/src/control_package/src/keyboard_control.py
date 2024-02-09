@@ -1,5 +1,5 @@
 import rospy
-from std_msgs.msg import Float32, Bool, Int32
+from std_msgs.msg import Float32, Bool
 from pynput import keyboard
 
 class KeyControlNode:
@@ -9,7 +9,6 @@ class KeyControlNode:
         # Define publishers for different key presses
         self.drivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
         self.drivetrain_angle_pub = rospy.Publisher('/drivetrain/angle', Bool, queue_size=10)
-        self.drivetrain_rotate_pub = rospy.Publisher('/drivetrain/rotate', Float32, queue_size=10)
         self.drivetrain_enable_pub = rospy.Publisher('/drivetrain/enable', Bool, queue_size=10)
         self.localizer_error_pub = rospy.Publisher('localizer/error', Float32, queue_size=10)
         self.localizer_enable_pub = rospy.Publisher('/localizer/enable', Bool, queue_size=10)
@@ -24,8 +23,6 @@ class KeyControlNode:
             's': False,
             'q': False,
             'e': False,
-            'a': False,
-            'd': False,
             'o': False,
             'p': False,
             'n': False,
@@ -62,11 +59,11 @@ class KeyControlNode:
         # Keys needed for driving forward and backward
         if self.key_states['w']:
             drive_speed = Float32()
-            drive_speed.data = 0.4
+            drive_speed.data = 0.6
             self.drivetrain_drive_pub.publish(drive_speed)
         elif self.key_states['s']:
             drive_speed = Float32()
-            drive_speed.data = -0.4
+            drive_speed.data = -0.6
             self.drivetrain_drive_pub.publish(drive_speed)
         else:
             drive_speed = Float32()
@@ -82,20 +79,6 @@ class KeyControlNode:
             angled = Bool()
             angled.data = False
             self.drivetrain_angle_pub.publish(angled)
-
-        # Keys needed for rotating the drivetrain about its center axis
-        if self.key_states['a']:
-            rotate_speed = Float32()
-            rotate_speed.data = 0.4
-            self.drivetrain_rotate_pub.publish(rotate_speed)
-        elif self.key_states['d']:
-            rotate_speed = Float32()
-            rotate_speed.data = -0.4
-            self.drivetrain_rotate_pub.publish(rotate_speed)
-        else:
-            rotate_speed = Float32()
-            rotate_speed.data = 0.0
-            self.drivetrain_rotate_pub.publish(rotate_speed)
 
         # Keys needed for enabling and disabling the robot
         if self.key_states['p']:

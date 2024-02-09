@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include "rawEncoder.h"
 #include "../robotMap.h"
+#include "medianFilter.h"
 
 class CANController {
 public:
@@ -22,6 +23,8 @@ public:
 
     float getSpeed(int);
 
+    float getRealSpeed(int);
+
     void cutCurrent();
 
     String getSums();
@@ -32,6 +35,10 @@ private:
     RawEncoder motor1Encoder;
     RawEncoder motor2Encoder;
     RawEncoder motor3Encoder;
+    MedianFilter mf0;
+    MedianFilter mf1;
+    MedianFilter mf2;
+    MedianFilter mf3;
     MCP2515 mcp2515;
     long lastTime;
     float prevAngles[4];
@@ -39,6 +46,8 @@ private:
     float prevErrors[4];
     float setSpeeds[4];
     float speeds[4];
+    float realSpeeds[4];
+    int filterPosition;
     float sums[4];
     int setCurrents[4];
     float speedSetpoints[4];

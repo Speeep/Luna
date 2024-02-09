@@ -28,6 +28,8 @@ class Drivetrain {
 
   float getSpeed(int);
 
+  float getRealSpeed(int);
+
   float getLeftWheelpodAngle();
 
   float getRightWheelpodAngle();

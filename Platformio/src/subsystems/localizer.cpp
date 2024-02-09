@@ -43,7 +43,6 @@ float Localizer::getError() {
     return error;
 }
 
-
 float Localizer::getAngle() {
     return angle;
 }

@@ -139,10 +139,9 @@ void loop()
       ianOutputPub.publish(&ianOutputMsg);
     }
 
-    if (localizer.isEnabled()) {
-      localizerAngle.data = localizer.getAngle();
-      localizerAnglePub.publish(&localizerAngle);
-    }
+    // Regardless of whether the localizer is enabled, return the correct angle
+    localizerAngle.data = localizer.getAngle();
+    localizerAnglePub.publish(&localizerAngle);
   }
 
   if(currentMillis - lastOdomTime >= ODOM_INTERVAL){
