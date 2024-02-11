@@ -202,12 +202,12 @@ float CANController::getRealSpeed(int motorId) {
 
 int CANController::getDisplacement(int motorId){
     if (motorId == 0 || motorId == 1) {
-        float output = -displacements[motorId];
+        int output = -displacements[motorId];
         displacements[motorId] = 0;
         return output;
     }
     
-    float output = displacements[motorId];
+    int output = displacements[motorId];
     displacements[motorId] = 0;
     return output;
 
