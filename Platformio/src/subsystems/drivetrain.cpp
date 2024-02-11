@@ -79,10 +79,10 @@ std_msgs::Float32MultiArray Drivetrain::stepOdom(){
         can_controller.getDisplacement(3) * M_PER_TICK * ODOM_CORRECTION_FACTOR};
 
     // Pre calculate trig of wheel angles
-    float cosThetaL = cos(getLeftWheelpodAngle());
-    float sinThetaL = sin(getLeftWheelpodAngle());
-    float cosThetaR = cos(getRightWheelpodAngle());
-    float sinThetaR = sin(getRightWheelpodAngle());
+    double cosThetaL = cos(getLeftWheelpodAngle());
+    double sinThetaL = sin(getLeftWheelpodAngle());
+    double cosThetaR = cos(getRightWheelpodAngle());
+    double sinThetaR = sin(getRightWheelpodAngle());
 
     // Calculate estimated new wheel positions using the wheel angles and the displacements
     // float newPostion0[2] = {  ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[0],   ROBOT_WIDTH_M / 2 - sinThetaL * wheelDisplacement[0]};
@@ -90,15 +90,15 @@ std_msgs::Float32MultiArray Drivetrain::stepOdom(){
     // float newPostion2[2] = { -ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[2],  -ROBOT_WIDTH_M / 2 + sinThetaR * wheelDisplacement[2]};
     // float newPostion3[2] = {  ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[3],  -ROBOT_WIDTH_M / 2 - sinThetaR * wheelDisplacement[3]};
 
-    float newPostion0[2] = {  ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[0],  ROBOT_WIDTH_M / 2};
-    float newPostion1[2] = { -ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[1],   ROBOT_WIDTH_M / 2};
-    float newPostion2[2] = { -ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[2],  -ROBOT_WIDTH_M / 2};
-    float newPostion3[2] = {  ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[3],  -ROBOT_WIDTH_M / 2};
+    double newPostion0[2] = {(  ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[0]),   ROBOT_WIDTH_M / 2};
+    double newPostion1[2] = {( -ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[1]),   ROBOT_WIDTH_M / 2};
+    double newPostion2[2] = {( -ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[2]),  -ROBOT_WIDTH_M / 2};
+    double newPostion3[2] = {(  ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[3]),  -ROBOT_WIDTH_M / 2};
 
 
     // Calculate the average position of the new wheel positions (rounded to 4 places)
-    output.data[0] = (newPostion0[0] + newPostion1[0] + newPostion2[0] + newPostion3[0]) / 4; 
-    output.data[1] = (newPostion0[1] + newPostion1[1] + newPostion2[1] + newPostion3[1]) / 4;
+    output.data[0] = float((newPostion0[0] + newPostion1[0] + newPostion2[0] + newPostion3[0]) / 4); 
+    output.data[1] = float((newPostion0[1] + newPostion1[1] + newPostion2[1] + newPostion3[1]) / 4);
 
 
     // Calculate the new angle using the new wheel positions
