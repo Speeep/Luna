@@ -111,7 +111,8 @@ std_msgs::Float32MultiArray Drivetrain::stepOdom(){
     float angleFromWheel3 = atan2(newPostion3[1] - output.data[1], newPostion3[0] - output.data[0]) + ANGLE_TO_WHEEL_0;
 
     // Add average angle to output (rounded to 4 places)
-    output.data[2] = (angleFromWheel0 + angleFromWheel1 + angleFromWheel2 + angleFromWheel3) / 4;
+    // output.data[2] = (angleFromWheel0 + angleFromWheel1 + angleFromWheel2 + angleFromWheel3) / 4;
+    output.data[2] = 0.0;
 
     return output;
 }

@@ -91,8 +91,11 @@ def filter():
         current_time = rospy.Time.now()
 
         # Check for timeouts
-        if (current_time - last_odom_time).to_sec() > odom_timeout or (current_time - last_localization_time).to_sec() > localizer_timeout:
-            rospy.logerr("Timeout occurred!")
+        if (current_time - last_odom_time).to_sec() > odom_timeout:
+            rospy.logerr("Odom timeout occurred!")
+
+        if (current_time - last_localization_time).to_sec() > localizer_timeout:
+            rospy.logerr("Localization timeout occurred!")
 
         try:
             filtered_robot_pose = PoseStamped()
@@ -101,7 +104,6 @@ def filter():
             filtered_robot_pose.pose = Pose()
             filtered_robot_pose.pose.position = Point(float(pose[0]), float(pose[1]), float(0.0))
             quat = Quaternion()
-            print(pose[2])
             quat_vals = tf.transformations.quaternion_from_euler(float(0.0), float(0.0), float(pose[2]))
             quat.x = quat_vals[0]
             quat.y = quat_vals[1]
