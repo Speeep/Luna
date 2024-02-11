@@ -20,6 +20,7 @@ void CANController::init() {
         sums[i] = 0.0;
         setCurrents[i] = 0;
         speedSetpoints[i] = 0.0;
+        displacements[i] = 0;
     }
 
     motor0Encoder.init(FRONT_LEFT_DRIVE_ENCODER_ID, MULTIPLEXER_0_ID);
@@ -147,6 +148,11 @@ void CANController::updateMotorSpeeds() {
         motor3deltaAngle += 4096;
     }
 
+    displacements[0] += motor0deltaAngle;
+    displacements[1] += motor1deltaAngle;
+    displacements[2] += motor2deltaAngle;
+    displacements[3] += motor3deltaAngle;
+
     float motor0Speed = motor0deltaAngle / deltaTime;
     float motor1Speed = motor1deltaAngle / deltaTime;
     float motor2Speed = motor2deltaAngle / deltaTime;
@@ -192,6 +198,19 @@ float CANController::getRealSpeed(int motorId) {
         return -realSpeeds[motorId];
     }
     return realSpeeds[motorId];
+}
+
+int CANController::getDisplacement(int motorId){
+    if (motorId == 0 || motorId == 1) {
+        int output = -displacements[motorId];
+        displacements[motorId] = 0;
+        return output;
+    }
+    
+    int output = displacements[motorId];
+    displacements[motorId] = 0;
+    return output;
+
 }
 
 void CANController::cutCurrent() {

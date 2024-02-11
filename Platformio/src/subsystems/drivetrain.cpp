@@ -21,6 +21,30 @@ void Drivetrain::init() {
     rightWheelpodAngle = 0;
     turnMotorEffort = 0;
     driveSpeed = 0.0;
+    poseStepX = 0.0;
+    poseStepY = 0.0;
+    poseStepTheta = 0.0;
+
+    for (int i = 0; i < 2; i++) {
+        wheelDisplacement[i] = 0.0;
+    } 
+
+    cosThetaL = 0.0;
+    sinThetaL = 0.0;
+    cosThetaR = 0.0;
+    sinThetaR = 0.0;
+
+    for (int i = 0; i < 2; i++) {
+        newPostion0[i] = 0;
+        newPostion1[i] = 0;
+        newPostion2[i] = 0;
+        newPostion3[i] = 0;
+    }
+
+    angleFromWheel0 = 0.0;
+    angleFromWheel1 = 0.0;
+    angleFromWheel2 = 0.0;
+    angleFromWheel3 = 0.0;
 }
 
 void Drivetrain::enable() {
@@ -64,55 +88,45 @@ void Drivetrain::loop() {
     }
 }
 
-std_msgs::Float32MultiArray Drivetrain::stepOdom(){
-
-    std_msgs::Float32MultiArray output;
-
-    // Set proper length of output.data
-    output.data_length = 3;
-
-    // Measure step time length
-    long currentTime = millis();
-    long deltaTime = currentTime - previousOdomReadTime;
+void Drivetrain::stepOdom(){
 
     // Calculate distances travelled by each wheel in the previous timestep
-    float wheelDisplacement[4] = {
-        getRealSpeed(0) * deltaTime * M_PER_TICK * ODOM_CORRECTION_FACTOR, 
-        getRealSpeed(1) * deltaTime * M_PER_TICK * ODOM_CORRECTION_FACTOR, 
-        getRealSpeed(2) * deltaTime * M_PER_TICK * ODOM_CORRECTION_FACTOR, 
-        getRealSpeed(3) * deltaTime * M_PER_TICK * ODOM_CORRECTION_FACTOR};
+    wheelDisplacement[0] = can_controller.getDisplacement(0) * M_PER_TICK * ODOM_CORRECTION_FACTOR;
+    wheelDisplacement[1] = can_controller.getDisplacement(1) * M_PER_TICK * ODOM_CORRECTION_FACTOR;
+    wheelDisplacement[2] = can_controller.getDisplacement(2) * M_PER_TICK * ODOM_CORRECTION_FACTOR;
+    wheelDisplacement[3] = can_controller.getDisplacement(3) * M_PER_TICK * ODOM_CORRECTION_FACTOR;
 
     // Pre calculate trig of wheel angles
-    float cosThetaL = cos(getLeftWheelpodAngle());
-    float sinThetaL = sin(getLeftWheelpodAngle());
-    float cosThetaR = cos(getRightWheelpodAngle());
-    float sinThetaR = sin(getRightWheelpodAngle());
+    cosThetaL = cos(getLeftWheelpodAngle());
+    sinThetaL = sin(getLeftWheelpodAngle());
+    cosThetaR = cos(getRightWheelpodAngle());
+    sinThetaR = sin(getRightWheelpodAngle());
 
     // Calculate estimated new wheel positions using the wheel angles and the displacements
-    float newPostion0[2] = {  ROBOT_LENGTH_CM / 2 + cosThetaL * wheelDisplacement[0],   ROBOT_WIDTH_CM / 2 - sinThetaL * wheelDisplacement[0]};
-    float newPostion1[2] = { -ROBOT_LENGTH_CM / 2 + cosThetaL * wheelDisplacement[1],   ROBOT_WIDTH_CM / 2 + sinThetaL * wheelDisplacement[1]};
-    float newPostion2[2] = { -ROBOT_LENGTH_CM / 2 + cosThetaR * wheelDisplacement[2],  -ROBOT_WIDTH_CM / 2 + sinThetaR * wheelDisplacement[2]};
-    float newPostion3[2] = {  ROBOT_LENGTH_CM / 2 + cosThetaR * wheelDisplacement[3],  -ROBOT_WIDTH_CM / 2 - sinThetaR * wheelDisplacement[3]};
-
+    newPostion0[0] =  ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[0];
+    newPostion0[1] =  ROBOT_WIDTH_M / 2 - sinThetaL * wheelDisplacement[0];
+    newPostion1[0] = -ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[1];
+    newPostion1[1] =  ROBOT_WIDTH_M / 2 + sinThetaL * wheelDisplacement[1];
+    newPostion2[0] = -ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[2];
+    newPostion2[1] = -ROBOT_WIDTH_M / 2 + sinThetaR * wheelDisplacement[2];
+    newPostion3[0] =  ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[3];
+    newPostion3[1] = -ROBOT_WIDTH_M / 2 - sinThetaR * wheelDisplacement[3];
 
     // Calculate the average position of the new wheel positions (rounded to 4 places)
-    output.data[0] = (newPostion0[0] + newPostion1[0] + newPostion2[0] + newPostion3[0]) / 4; 
-    output.data[1] = (newPostion0[1] + newPostion1[1] + newPostion2[1] + newPostion3[1]) / 4;
-
+    poseStepX = float((newPostion0[0] + newPostion1[0] + newPostion2[0] + newPostion3[0]) / 4); 
+    poseStepY = float((newPostion0[1] + newPostion1[1] + newPostion2[1] + newPostion3[1]) / 4);
 
     // Calculate the new angle using the new wheel positions
     // Left side
-    float leftAngle  = atan2(newPostion0[1] - newPostion1[1], newPostion0[0] - newPostion1[0]);
-
-    // Right side
-    float rightAngle = atan2(newPostion3[1] - newPostion2[1], newPostion3[0] - newPostion2[0]);
+    // Calculate the new angle using the new wheel positions
+    //Wheel 0
+    angleFromWheel0 = atan2(newPostion0[1] - poseStepY, newPostion0[0] - poseStepX) - ANGLE_TO_WHEEL_0;
+    angleFromWheel1 = atan2(newPostion1[1] - poseStepY, newPostion1[0] - poseStepX) + ANGLE_TO_WHEEL_0 - PI;
+    angleFromWheel2 = atan2(newPostion2[1] - poseStepY, newPostion2[0] - poseStepX) - ANGLE_TO_WHEEL_0 + PI;
+    angleFromWheel3 = atan2(newPostion3[1] - poseStepY, newPostion3[0] - poseStepX) + ANGLE_TO_WHEEL_0;
 
     // Add average angle to output (rounded to 4 places)
-    output.data[2] = (leftAngle + rightAngle) / 2;
-
-    previousOdomReadTime = currentTime;
-
-    return output;
+    poseStepTheta = float((angleFromWheel0 + angleFromWheel1 + angleFromWheel2 + angleFromWheel3) / 4);
 }
 
 void Drivetrain::setWheelSpeeds(float sp0, float sp1, float sp2, float sp3) {
@@ -173,4 +187,16 @@ float Drivetrain::getDriveSpeed() {
 
 String Drivetrain::getSums() {
     return can_controller.getSums();
+}
+
+float Drivetrain::getPoseStepX() {
+    return poseStepX;
+}
+
+float Drivetrain::getPoseStepY() {
+    return poseStepY;
+}
+
+float Drivetrain::getPoseStepTheta() {
+    return poseStepTheta;
 }

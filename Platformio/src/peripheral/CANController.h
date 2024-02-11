@@ -25,6 +25,8 @@ public:
 
     float getRealSpeed(int);
 
+    int getDisplacement(int);
+
     void cutCurrent();
 
     String getSums();
@@ -51,4 +53,5 @@ private:
     float sums[4];
     int setCurrents[4];
     float speedSetpoints[4];
+    int displacements[4];
 };

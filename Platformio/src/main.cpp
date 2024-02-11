@@ -41,7 +41,10 @@ bool drivetrainEnable = false;
 bool drivetrainAngle = false;
 bool localizerEnable = false;
 
-static unsigned long lastOdomTime = 0;
+float poseStepVals[3] = { 0.0, 0.0, 0.0};
+
+int odomIterator = 0;
+
 static unsigned long previousMillis = 0;
 unsigned long currentMillis = millis();
 
@@ -142,14 +145,25 @@ void loop()
     // Regardless of whether the localizer is enabled, return the correct angle
     localizerAngle.data = localizer.getAngle();
     localizerAnglePub.publish(&localizerAngle);
-  }
 
-  if(currentMillis - lastOdomTime >= ODOM_INTERVAL){
 
-    lastOdomTime = currentMillis;
+    //update Odom
+    odomIterator ++;
+    if(odomIterator >= ODOM_FREQUENCY){
 
-    std_msgs::Float32MultiArray stepMsg = drivetrain.stepOdom();
+      drivetrain.stepOdom();
 
-    poseStepPub.publish(&stepMsg);
+      poseStepVals[0] = drivetrain.getPoseStepX();
+      poseStepVals[1] = drivetrain.getPoseStepY();
+      poseStepVals[2] = drivetrain.getPoseStepTheta();
+
+      std_msgs::Float32MultiArray stepMsg;
+      stepMsg.data_length = 3;
+      stepMsg.data = poseStepVals;
+      poseStepPub.publish(&stepMsg);
+
+      odomIterator = 0;
+
+    }
   }
 }
