@@ -20,6 +20,7 @@ void CANController::init() {
         sums[i] = 0.0;
         setCurrents[i] = 0;
         speedSetpoints[i] = 0.0;
+        displacements[i] = 0;
     }
 
     motor0Encoder.init(FRONT_LEFT_DRIVE_ENCODER_ID, MULTIPLEXER_0_ID);

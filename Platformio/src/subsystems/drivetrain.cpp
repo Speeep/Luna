@@ -85,10 +85,15 @@ std_msgs::Float32MultiArray Drivetrain::stepOdom(){
     float sinThetaR = sin(getRightWheelpodAngle());
 
     // Calculate estimated new wheel positions using the wheel angles and the displacements
-    float newPostion0[2] = {  ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[0],   ROBOT_WIDTH_M / 2 - sinThetaL * wheelDisplacement[0]};
-    float newPostion1[2] = { -ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[1],   ROBOT_WIDTH_M / 2 + sinThetaL * wheelDisplacement[1]};
-    float newPostion2[2] = { -ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[2],  -ROBOT_WIDTH_M / 2 + sinThetaR * wheelDisplacement[2]};
-    float newPostion3[2] = {  ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[3],  -ROBOT_WIDTH_M / 2 - sinThetaR * wheelDisplacement[3]};
+    // float newPostion0[2] = {  ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[0],   ROBOT_WIDTH_M / 2 - sinThetaL * wheelDisplacement[0]};
+    // float newPostion1[2] = { -ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[1],   ROBOT_WIDTH_M / 2 + sinThetaL * wheelDisplacement[1]};
+    // float newPostion2[2] = { -ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[2],  -ROBOT_WIDTH_M / 2 + sinThetaR * wheelDisplacement[2]};
+    // float newPostion3[2] = {  ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[3],  -ROBOT_WIDTH_M / 2 - sinThetaR * wheelDisplacement[3]};
+
+    float newPostion0[2] = {  ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[0],  ROBOT_WIDTH_M / 2};
+    float newPostion1[2] = { -ROBOT_LENGTH_M / 2 + cosThetaL * wheelDisplacement[1],   ROBOT_WIDTH_M / 2};
+    float newPostion2[2] = { -ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[2],  -ROBOT_WIDTH_M / 2};
+    float newPostion3[2] = {  ROBOT_LENGTH_M / 2 + cosThetaR * wheelDisplacement[3],  -ROBOT_WIDTH_M / 2};
 
 
     // Calculate the average position of the new wheel positions (rounded to 4 places)
