@@ -8,8 +8,8 @@ import tf.transformations
 import math
 
 # Constants for filter tuning
-alpha = 0.10  # Weight for localization estimates
-beta = 0.90   # Weight for pose steps
+alpha = 0.0  # Weight for localization estimates
+beta = 1.0   # Weight for pose steps
 
 pose = (0.0, 0.0, 0.0)
 pose_step = (0.0, 0.0, 0.0)
@@ -22,12 +22,22 @@ last_localization_time = rospy.Time(0)
 
 
 def update_odom_data_cb(odom_msg):
-    global pose_step, last_odom_time
+    global pose, pose_step, last_odom_time
     pose_step = odom_msg.data
     last_odom_time = rospy.Time.now()
 
+    odom_pose = (
+            pose[0] + pose_step[0],
+            pose[1] + pose_step[1],
+            pose[2] + pose_step[2]
+        )
+    
+    pose = odom_pose
+
+
 def update_localization_estimate_cb(localization_estimate_msg):
-    global localization_estimate, last_localization_time
+    global pose, localization_estimate, last_localization_time
+
     x = localization_estimate_msg.pose.position.x
     y = localization_estimate_msg.pose.position.y
     quat = (
@@ -40,6 +50,22 @@ def update_localization_estimate_cb(localization_estimate_msg):
     theta = euler[2]
     localization_estimate = [x, y, theta]
     last_localization_time = rospy.Time.now()
+
+    # If there isn't a base pose yet, use 100% localization estimate from webcam
+    if pose == (0.0, 0.0, 0.0):
+
+        # If localization_estimate is also (0.0, 0.0, 0.0) this will result in an infinite loop until timeout.
+        pose = localization_estimate
+
+    else:
+        # Async Complementary Filter Here
+        fused_pose = (
+            ((alpha * localization_estimate[0]) + (beta * pose[0])),
+            ((alpha * localization_estimate[1]) + (beta * pose[1])),
+            ((alpha * localization_estimate[2]) + (beta * pose[2]))
+        )
+
+        pose = fused_pose
 
 def filter():
     
@@ -64,64 +90,37 @@ def filter():
 
         current_time = rospy.Time.now()
 
-        # If there isn't a base pose yet, use 100% localization estimate from webcam
-        if pose == (0.0, 0.0, 0.0):
-
-            # If localization_estimate is also (0.0, 0.0, 0.0) this will result in an infinite loop until timeout.
-            pose = localization_estimate
-
         # Check for timeouts
         if (current_time - last_odom_time).to_sec() > odom_timeout or (current_time - last_localization_time).to_sec() > localizer_timeout:
             rospy.logerr("Timeout occurred!")
-            pose = (0.0, 0.0, 0.0)
 
-        else:
+        filtered_robot_pose = PoseStamped()
+        filtered_robot_pose.header = Header()
+        filtered_robot_pose.header.stamp = rospy.Time.now()
+        filtered_robot_pose.pose = Pose()
+        filtered_robot_pose.pose.position = Point(float(pose[0]), float(pose[1]), float(0.0))
+        quat = Quaternion()
+        quat_vals = tf.transformations.quaternion_from_euler(float(0.0), float(0.0), float(pose[2]))
+        quat.x = quat_vals[0]
+        quat.y = quat_vals[1]
+        quat.z = quat_vals[2]
+        quat.w = quat_vals[3]
+        filtered_robot_pose.pose.orientation = quat
+        filtered_pose_pub.publish(filtered_robot_pose)
 
-            print("Localization estimate[0]: " + str(localization_estimate[0]))
-            print("Localization estimate[1]: " + str(localization_estimate[1]))
-            print("Localization estimate[2]: " + str(localization_estimate[2]))
+        robot_transform = TransformStamped()
+        robot_transform.header.frame_id = "world"
+        robot_transform.child_frame_id = "robot"
+        robot_transform.header.stamp = rospy.Time.now()
+        robot_transform.transform.translation.x = float(pose[0])
+        robot_transform.transform.translation.y = float(pose[1])
+        robot_transform.transform.translation.z = float(0.0)
+        robot_transform.transform.rotation.x = quat_vals[0]
+        robot_transform.transform.rotation.y = quat_vals[1]
+        robot_transform.transform.rotation.z = quat_vals[2]
+        robot_transform.transform.rotation.w = quat_vals[3]
 
-            # Complementary Filter Here
-            fused_pose = (
-                alpha * localization_estimate[0] + beta * (pose[0] + pose_step[0]*math.cos(pose[2]) - pose_step[1]*math.sin(pose[2])),
-                alpha * localization_estimate[1] + beta * (pose[1] + pose_step[0]*math.sin(pose[2]) + pose_step[1]*math.cos(pose[2])),
-                alpha * localization_estimate[2] + beta * (pose[2] + pose_step[2])
-            )
-
-            # Update the pose
-            pose = fused_pose
-
-            filtered_robot_pose = PoseStamped()
-            filtered_robot_pose.header = Header()
-            filtered_robot_pose.header.stamp = rospy.Time.now()
-            filtered_robot_pose.pose = Pose()
-            filtered_robot_pose.pose.position = Point(float(pose[0]), float(pose[1]), float(0.0))
-            quat = Quaternion()
-            quat_vals = tf.transformations.quaternion_from_euler(float(0.0), float(0.0), float(pose[2]))
-            quat.x = quat_vals[0]
-            quat.y = quat_vals[1]
-            quat.z = quat_vals[2]
-            quat.w = quat_vals[3]
-            filtered_robot_pose.pose.orientation = quat
-            filtered_pose_pub.publish(filtered_robot_pose)
-
-            robot_transform = TransformStamped()
-            robot_transform.header.frame_id = "world"
-            robot_transform.child_frame_id = "robot"
-            robot_transform.header.stamp = rospy.Time.now()
-            robot_transform.transform.translation.x = float(pose[0])
-            robot_transform.transform.translation.y = float(pose[1])
-            robot_transform.transform.translation.z = float(0.0)
-            robot_transform.transform.rotation.x = quat_vals[0]
-            robot_transform.transform.rotation.y = quat_vals[1]
-            robot_transform.transform.rotation.z = quat_vals[2]
-            robot_transform.transform.rotation.w = quat_vals[3]
-
-            broadcaster.sendTransform(robot_transform)
-
-            print("pose[0]: " + str(pose[0]))
-            print("pose[1]: " + str(pose[1]))
-            print("pose[2]: " + str(pose[2]))
+        broadcaster.sendTransform(robot_transform)
         
         rate.sleep()  
 

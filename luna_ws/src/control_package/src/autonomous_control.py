@@ -61,7 +61,7 @@ def main():
             # Use localizer to search for the marker
             if (localizer_error == 0.0):
                 localizer_error = 500.0
-            elif (localizer_error == 500.0):
+            elif (localizer_error == 1000.0):
                 localizer_error = 0.0
             localizer_error_pub.publish(localizer_error)
         else: 
