@@ -71,6 +71,12 @@ class Drivetrain {
     bool isAngled;
     float driveSpeed;
     long previousOdomReadTime;
+    std_msgs::Float32MultiArray poseStep;
+    float wheelDisplacement[4];
+    double cosThetaL;
+    double sinThetaL;
+    double cosThetaR;
+    double sinThetaR;
     float newPostion0[2];
     float newPostion1[2];
     float newPostion2[2];
