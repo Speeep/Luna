@@ -21,9 +21,9 @@ void Drivetrain::init() {
     rightWheelpodAngle = 0;
     turnMotorEffort = 0;
     driveSpeed = 0.0;
-
-    // Set proper length of poseStep.data
-    poseStep.data_length = 3;
+    poseStepX = 0.0;
+    poseStepY = 0.0;
+    poseStepTheta = 0.0;
 
     for (int i = 0; i < 2; i++) {
         wheelDisplacement[i] = 0.0;
@@ -88,7 +88,7 @@ void Drivetrain::loop() {
     }
 }
 
-std_msgs::Float32MultiArray Drivetrain::stepOdom(){
+void Drivetrain::stepOdom(){
 
     // Calculate distances travelled by each wheel in the previous timestep
     wheelDisplacement[0] = can_controller.getDisplacement(0) * M_PER_TICK * ODOM_CORRECTION_FACTOR;
@@ -113,23 +113,20 @@ std_msgs::Float32MultiArray Drivetrain::stepOdom(){
     newPostion3[1] = -ROBOT_WIDTH_M / 2 - sinThetaR * wheelDisplacement[3];
 
     // Calculate the average position of the new wheel positions (rounded to 4 places)
-    poseStep.data[0] = float((newPostion0[0] + newPostion1[0] + newPostion2[0] + newPostion3[0]) / 4); 
-    poseStep.data[1] = float((newPostion0[1] + newPostion1[1] + newPostion2[1] + newPostion3[1]) / 4);
+    poseStepX = float((newPostion0[0] + newPostion1[0] + newPostion2[0] + newPostion3[0]) / 4); 
+    poseStepY = float((newPostion0[1] + newPostion1[1] + newPostion2[1] + newPostion3[1]) / 4);
 
     // Calculate the new angle using the new wheel positions
     // Left side
     // Calculate the new angle using the new wheel positions
     //Wheel 0
-    angleFromWheel0 = atan2(newPostion0[1] - poseStep.data[1], newPostion0[0] - poseStep.data[0]) - ANGLE_TO_WHEEL_0;
-    angleFromWheel1 = atan2(newPostion1[1] - poseStep.data[1], newPostion1[0] - poseStep.data[0]) + ANGLE_TO_WHEEL_0 - PI;
-    angleFromWheel2 = atan2(newPostion2[1] - poseStep.data[1], newPostion2[0] - poseStep.data[0]) - ANGLE_TO_WHEEL_0 + PI;
-    angleFromWheel3 = atan2(newPostion3[1] - poseStep.data[1], newPostion3[0] - poseStep.data[0]) + ANGLE_TO_WHEEL_0;
+    angleFromWheel0 = atan2(newPostion0[1] - poseStepY, newPostion0[0] - poseStepX) - ANGLE_TO_WHEEL_0;
+    angleFromWheel1 = atan2(newPostion1[1] - poseStepY, newPostion1[0] - poseStepX) + ANGLE_TO_WHEEL_0 - PI;
+    angleFromWheel2 = atan2(newPostion2[1] - poseStepY, newPostion2[0] - poseStepX) - ANGLE_TO_WHEEL_0 + PI;
+    angleFromWheel3 = atan2(newPostion3[1] - poseStepY, newPostion3[0] - poseStepX) + ANGLE_TO_WHEEL_0;
 
     // Add average angle to output (rounded to 4 places)
-    // poseStep.data[2] = float((angleFromWheel0 + angleFromWheel1 + angleFromWheel2 + angleFromWheel3) / 4);
-    poseStep.data[2] = 0.0;
-
-    return poseStep;
+    poseStepTheta = float((angleFromWheel0 + angleFromWheel1 + angleFromWheel2 + angleFromWheel3) / 4);
 }
 
 void Drivetrain::setWheelSpeeds(float sp0, float sp1, float sp2, float sp3) {
@@ -190,4 +187,16 @@ float Drivetrain::getDriveSpeed() {
 
 String Drivetrain::getSums() {
     return can_controller.getSums();
+}
+
+float Drivetrain::getPoseStepX() {
+    return poseStepX;
+}
+
+float Drivetrain::getPoseStepY() {
+    return poseStepY;
+}
+
+float Drivetrain::getPoseStepTheta() {
+    return poseStepTheta;
 }

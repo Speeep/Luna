@@ -54,7 +54,13 @@ class Drivetrain {
 
   String getSums();
 
-  std_msgs::Float32MultiArray stepOdom();
+  void stepOdom();
+
+  float getPoseStepX();
+
+  float getPoseStepY();
+
+  float getPoseStepTheta();
 
  private:
     HBridge left_turn_motor;
@@ -71,7 +77,9 @@ class Drivetrain {
     bool isAngled;
     float driveSpeed;
     long previousOdomReadTime;
-    std_msgs::Float32MultiArray poseStep;
+    float poseStepX;
+    float poseStepY;
+    float poseStepTheta;
     float wheelDisplacement[4];
     double cosThetaL;
     double sinThetaL;

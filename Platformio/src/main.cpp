@@ -41,6 +41,8 @@ bool drivetrainEnable = false;
 bool drivetrainAngle = false;
 bool localizerEnable = false;
 
+float poseStepVals[3] = { 0.0, 0.0, 0.0};
+
 int odomIterator = 0;
 
 static unsigned long previousMillis = 0;
@@ -149,8 +151,15 @@ void loop()
     odomIterator ++;
     if(odomIterator >= ODOM_FREQUENCY){
 
-      std_msgs::Float32MultiArray stepMsg = drivetrain.stepOdom();
+      drivetrain.stepOdom();
 
+      poseStepVals[0] = drivetrain.getPoseStepX();
+      poseStepVals[1] = drivetrain.getPoseStepY();
+      poseStepVals[2] = drivetrain.getPoseStepTheta();
+
+      std_msgs::Float32MultiArray stepMsg;
+      stepMsg.data_length = 3;
+      stepMsg.data = poseStepVals;
       poseStepPub.publish(&stepMsg);
 
       odomIterator = 0;
