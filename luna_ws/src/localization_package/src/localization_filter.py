@@ -26,13 +26,15 @@ def update_odom_data_cb(odom_msg):
     pose_step = odom_msg.data
     last_odom_time = rospy.Time.now()
 
-    odom_pose = (
-            (pose[0] + pose_step[0]*math.cos(pose[2]) - pose_step[1]*math.sin(pose[2])),
-            (pose[1] + pose_step[0]*math.sin(pose[2]) + pose_step[1]*math.cos(pose[2])),
-            (pose[2] + pose_step[2])
-        )
-    
-    pose = odom_pose
+    if pose != (0.0, 0.0, 0.0):
+
+        odom_pose = (
+                (pose[0] + pose_step[0]*math.cos(pose[2]) - pose_step[1]*math.sin(pose[2])),
+                (pose[1] + pose_step[0]*math.sin(pose[2]) + pose_step[1]*math.cos(pose[2])),
+                (pose[2] + pose_step[2])
+            )
+
+        pose = odom_pose
 
 
 def update_localization_estimate_cb(localization_estimate_msg):
