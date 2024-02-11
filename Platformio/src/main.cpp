@@ -43,7 +43,6 @@ bool localizerEnable = false;
 
 int odomIterator = 0;
 
-static unsigned long lastOdomTime = 0;
 static unsigned long previousMillis = 0;
 unsigned long currentMillis = millis();
 

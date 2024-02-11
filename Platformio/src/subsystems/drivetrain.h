@@ -71,4 +71,13 @@ class Drivetrain {
     bool isAngled;
     float driveSpeed;
     long previousOdomReadTime;
+    float newPostion0[2];
+    float newPostion1[2];
+    float newPostion2[2];
+    float newPostion3[2];
+    double angleFromWheel0;
+    double angleFromWheel1;
+    double angleFromWheel2;
+    double angleFromWheel3;
+
 };
