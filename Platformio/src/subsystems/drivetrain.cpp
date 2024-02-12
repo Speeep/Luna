@@ -14,7 +14,6 @@ void Drivetrain::init() {
     left_wheelpod_encoder.init(LEFT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, LEFT_WHEELPOD_ENCODER_START_ANGLE);
     right_wheelpod_encoder.init(RIGHT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, RIGHT_WHEELPOD_ENCODER_START_ANGLE);
     can_controller.init();
-    enabled = false;
     leftWheelpodAngleSetpoint = 0.0;
     rightWheelpodAngleSetpoint = 0.0;
     leftWheelpodAngle = 0;
@@ -24,6 +23,7 @@ void Drivetrain::init() {
     poseStepX = 0.0;
     poseStepY = 0.0;
     poseStepTheta = 0.0;
+    state = 0;
 
     for (int i = 0; i < 2; i++) {
         wheelDisplacement[i] = 0.0;
@@ -48,13 +48,18 @@ void Drivetrain::init() {
 }
 
 void Drivetrain::enable() {
-    enabled = true;    
+    state = DRIVE_STRAIGHT;
+    driveSpeed = 0;
 }
 
 void Drivetrain::disable() {
     // Set wheel speeds to 0 before disabling
     can_controller.cutCurrent();
-    enabled = false;
+    state = 0;
+}
+
+void Drivetrain::setState(uint8_t newState){
+    state = newState;
 }
 
 void Drivetrain::loop() {
@@ -64,27 +69,32 @@ void Drivetrain::loop() {
     leftWheelpodAngle = left_wheelpod_encoder.getAngle();
     rightWheelpodAngle = right_wheelpod_encoder.getAngle();
 
-    if (isAngled) {
-        setLeftWheelpodAngleSetpoint(0.7853);
-        setRightWheelpodAngleSetpoint(-0.7853);
-    } else {
-        setLeftWheelpodAngleSetpoint(0.0);
-        setRightWheelpodAngleSetpoint(0.0);
+    switch(state){
+        case DISABLED:
+            setLeftWheelpodAngleSetpoint(0.0);
+            setRightWheelpodAngleSetpoint(0.0);
+            can_controller.cutCurrent();
+            break;
+        case DRIVE_STRAIGHT:
+            setLeftWheelpodAngleSetpoint(0.0);
+            setRightWheelpodAngleSetpoint(0.0);
+            setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
+            break;
+        case POINT_TURN:
+            setLeftWheelpodAngleSetpoint(0.7853);
+            setRightWheelpodAngleSetpoint(-0.7853);
+            setWheelSpeeds(-driveSpeed, -driveSpeed, driveSpeed, driveSpeed);
+            break;
+        case ICC_TURN:
+            turnICC(yICC, driveSpeed);
+            break;
     }
-
-    // If enabled, control the motors, else cut current to the motors
-    if (enabled) {
+    
+    // If enabled, control the steering motors
+    if (state != DISABLED) {
         left_turn_motor.setEffort(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
         right_turn_motor.setEffort(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
 
-        if (isAngled) {
-            setWheelSpeeds(-driveSpeed, -driveSpeed, driveSpeed, driveSpeed);
-        } else {
-            setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
-        }
-
-    } else {
-        can_controller.cutCurrent();
     }
 }
 
@@ -230,13 +240,24 @@ void Drivetrain::setAngle(bool angle) {
 }
 
 bool Drivetrain::isEnabled() {
-    return enabled;
+    return (state != DISABLED);
 }
 
 void Drivetrain::setDriveSpeed(float speed) {
     driveSpeed = speed;
 }
 
+<<<<<<< HEAD
+=======
+void Drivetrain::setYICC(float y){
+    yICC = y;
+}
+
+void Drivetrain::setRotateSpeed(float speed) {
+    driveSpeed = speed;
+}
+
+>>>>>>> Saving code here
 float Drivetrain::getDriveSpeed() {
     return driveSpeed;
 }
@@ -245,7 +266,6 @@ String Drivetrain::getSums() {
     return can_controller.getSums();
 }
 
-<<<<<<< HEAD
 float Drivetrain::getPoseStepX() {
     return poseStepX;
 }
@@ -257,5 +277,8 @@ float Drivetrain::getPoseStepY() {
 float Drivetrain::getPoseStepTheta() {
     return poseStepTheta;
 }
+<<<<<<< HEAD
 =======
 >>>>>>> added an attempt at turnICC(), takes in speed and ICC and sets the drivetrain correctly. - Ian
+=======
+>>>>>>> Saving code here

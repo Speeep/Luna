@@ -2,5 +2,6 @@
     "C_Cpp.default.compilerPath": "/home/speeep/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
     "files.associations": {
         "new": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
