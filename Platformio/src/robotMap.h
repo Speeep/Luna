@@ -71,3 +71,8 @@
 #define ODOM_CORRECTION_FACTOR 1
 
 #define ANGLE_TO_WHEEL_0 0.809784
+
+#define DISABLED 0
+#define DRIVE_STRAIGHT 1
+#define POINT_TURN 2
+#define ICC_TURN 3

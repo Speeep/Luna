@@ -37,7 +37,8 @@ def main():
 
     # Define publishers for different key presses
     drivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
-    drivetrain_angle_pub = rospy.Publisher('/drivetrain/angle', Bool, queue_size=10)
+    # drivetrain_angle_pub = rospy.Publisher('/drivetrain/angle', Bool, queue_size=10)
+    drivetrain_angle_pub = rospy.Publisher('/drivetrain/angle', Float32, queue_size=10)
     drivetrain_rotate_pub = rospy.Publisher('/drivetrain/rotate', Float32, queue_size=10)
     localizer_error_pub = rospy.Publisher('/localizer/error', Float32, queue_size=10)
 
@@ -60,7 +61,7 @@ def main():
 
             # Use localizer to search for the marker
             if (localizer_error == 0.0):
-                localizer_error = 500.0
+                localizer_error = 1000.0
             elif (localizer_error == 1000.0):
                 localizer_error = 0.0
             localizer_error_pub.publish(localizer_error)
