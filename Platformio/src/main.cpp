@@ -64,7 +64,7 @@ void localizerEnableCallback(const std_msgs::Bool &localizerEnableMsg) {
 
 ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Int32> driveStateSub("/drivetrain/switchState", &drivetrainSwitchStateCallback);
-ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICCallback);
+ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc_step", &drivetrainICCallback);
 ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
 ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
 
