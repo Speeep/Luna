@@ -251,10 +251,6 @@ void Drivetrain::setYICC(float y){
     yICC = y;
 }
 
-void Drivetrain::setRotateSpeed(float speed) {
-    driveSpeed = speed;
-}
-
 float Drivetrain::getDriveSpeed() {
     return driveSpeed;
 }
