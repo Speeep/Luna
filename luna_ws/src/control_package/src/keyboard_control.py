@@ -8,10 +8,10 @@ class KeyControlNode:
 
         # Define publishers for different key presses
         self.drivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
+        self.drivetrain_state_pub = rospy.Publisher('/drivetrain/state', Int32, queue_size=10)
         self.drivetrain_icc_step_pub = rospy.Publisher('/drivetrain/icc_step', Float32, queue_size=10)
         self.localizer_error_pub = rospy.Publisher('localizer/error', Float32, queue_size=10)
         self.localizer_enable_pub = rospy.Publisher('/localizer/enable', Bool, queue_size=10)
-        self.drivetrain_state_pub = rospy.Publisher('/drivetrain/switchState', Int32, queue_size=10)
 
         # Create a listener for keyboard events
         self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
@@ -78,12 +78,16 @@ class KeyControlNode:
         # Keys needed for moving the ICC
         if self.key_states['q']:
             ICC_step = Float32()
-            ICC_step.data = 0.10
-            self.drivetrain_angle_pub.publish(ICC_step)
+            ICC_step.data = 0.02
+            self.drivetrain_icc_step_pub.publish(ICC_step)
         elif self.key_states['e']:
             ICC_step = Float32()
-            ICC_step.data = -0.10
-            self.drivetrain_angle_pub.publish(ICC_step)
+            ICC_step.data = -0.02
+            self.drivetrain_icc_step_pub.publish(ICC_step)
+        else:
+            ICC_step = Float32()
+            ICC_step.data = 0.0
+            self.drivetrain_icc_step_pub.publish(ICC_step)
 
         # Keys needed for enabling and disabling the robot
             
