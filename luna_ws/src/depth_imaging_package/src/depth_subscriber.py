@@ -5,7 +5,7 @@ import cv2
 import json
 
 # File Path to RealSense Calibration Data
-file_path = '/home/speeep/Development/Luna/luna_ws/src/depth_imaging_package/src/d455_calib_data'
+file_path = '/home/jetson/Development/Luna/luna_ws/src/depth_imaging_package/src/d455_calib_data'
 
 with open(file_path, 'r') as file:
     calibration_data = json.load(file)
