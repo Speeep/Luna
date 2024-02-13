@@ -104,8 +104,6 @@ void setup()
   nh.advertise(localizerAnglePub);
   nh.advertise(poseStepPub);
   nh.subscribe(driveSpeedSub);
-  nh.subscribe(driveEnableSub);
-  nh.subscribe(driveAngleSub);
   nh.subscribe(localizerErrorSub);
   nh.subscribe(localizerEnableSub);
 
