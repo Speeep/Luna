@@ -54,9 +54,7 @@ class Drivetrain {
 
   void setDriveSpeed(float);
 
-  void setYICC(float):
-
-  void setRotateSpeed(float);
+  void setYICC(float);
 
   float getDriveSpeed();
 

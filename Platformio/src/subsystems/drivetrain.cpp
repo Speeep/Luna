@@ -247,17 +247,10 @@ void Drivetrain::setDriveSpeed(float speed) {
     driveSpeed = speed;
 }
 
-<<<<<<< HEAD
-=======
 void Drivetrain::setYICC(float y){
     yICC = y;
 }
 
-void Drivetrain::setRotateSpeed(float speed) {
-    driveSpeed = speed;
-}
-
->>>>>>> Saving code here
 float Drivetrain::getDriveSpeed() {
     return driveSpeed;
 }
@@ -277,8 +270,3 @@ float Drivetrain::getPoseStepY() {
 float Drivetrain::getPoseStepTheta() {
     return poseStepTheta;
 }
-<<<<<<< HEAD
-=======
->>>>>>> added an attempt at turnICC(), takes in speed and ICC and sets the drivetrain correctly. - Ian
-=======
->>>>>>> Saving code here
