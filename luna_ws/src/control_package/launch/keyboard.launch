@@ -30,4 +30,11 @@
     name="autonomous_control" 
     output="screen"
   />
+  <node
+    pkg="mapping_package"
+    type="map.py"
+    name="map" 
+    output="screen"
+  />
+
 </launch> 

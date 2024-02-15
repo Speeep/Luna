@@ -9,14 +9,14 @@ from nav_msgs.msg import OccupancyGrid
 GRID_CELL_SIZE_M = 0.08
 
 # initialize node
-rospy.init_node('map_node')
+rospy.init_node('map')
 
 # Initialize occupancy grid message
 map_msg = OccupancyGrid()
 map_msg.header.frame_id = 'map'
 resolution = GRID_CELL_SIZE_M
-width = 6.88 / GRID_CELL_SIZE_M
-height = 5 / GRID_CELL_SIZE_M
+width = int(6.88 / GRID_CELL_SIZE_M)
+height = int(5 / GRID_CELL_SIZE_M)
 
 # Map update rate (defaulted to 5 Hz)
 rate = 5.0
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     map_msg.info.resolution = resolution
     map_msg.info.width = width
     map_msg.info.height = height
-    map_msg.data = range(width*height)
+    map_msg.data = [0] * (width * height)
 
     # initialize grid with -1 (unknown)
     grid = numpy.ndarray((width, height), buffer=numpy.zeros((width, height), dtype=numpy.int),
