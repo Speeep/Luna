@@ -3,6 +3,7 @@ import numpy
 import rospy
 import tf
 from nav_msgs.msg import OccupancyGrid
+from geometry_msgs.msg import TransformStamped
 
 
 # Grid Cell Size
@@ -52,6 +53,9 @@ def set_obstacles(grid, x, y, size): # size in m
 # Publishers
 occ_pub = rospy.Publisher("/robot/map", OccupancyGrid, queue_size = 10)
 
+# TF Broadcaster
+tf_broadcaster = tf.TransformBroadcaster()
+
 # main function
 if __name__ == '__main__':
     
@@ -62,9 +66,9 @@ if __name__ == '__main__':
     map_msg.data = [0] * (width * height)
 
     # initialize grid with -1 (unknown)
-    grid = numpy.ndarray((width, height), buffer=numpy.zeros((width, height), dtype=numpy.int),
+    grid = numpy.ndarray((height, width), buffer=numpy.zeros((width, height), dtype=numpy.int),
              dtype=numpy.int)
-    grid.fill(int(-1))
+    grid.fill(int(0))
 
     # set map origin [meters]
     map_msg.info.origin.position.x = 0.0
@@ -79,4 +83,14 @@ if __name__ == '__main__':
         for i in range(width*height):
             map_msg.data[i] = grid.flat[i]
         occ_pub.publish(map_msg)
+
+        # Publish TF transform between "map" and "world" frame
+        tf_broadcaster.sendTransform(
+            (0.0, 0.0, 0.0),
+            (0.0, 0.0, 0.0, 1.0),
+            rospy.Time.now(),
+            "map",
+            "world"
+        )
+
         loop_rate.sleep()
