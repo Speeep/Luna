@@ -16,8 +16,8 @@ rospy.init_node('map')
 map_msg = OccupancyGrid()
 map_msg.header.frame_id = 'map'
 resolution = GRID_CELL_SIZE_M
-width = int(6.88 / GRID_CELL_SIZE_M)
-height = int(5 / GRID_CELL_SIZE_M)
+width = int(6.88 / GRID_CELL_SIZE_M) # 86
+height = int(5 / GRID_CELL_SIZE_M) # 62
 
 # Map update rate (defaulted to 5 Hz)
 rate = 5.0
@@ -69,6 +69,14 @@ if __name__ == '__main__':
     grid = numpy.ndarray((height, width), buffer=numpy.zeros((width, height), dtype=numpy.int),
              dtype=numpy.int)
     grid.fill(int(0))
+
+    for i in range(width):
+        grid[0][i] = 100
+        grid[height-1][i] = 100
+
+    for i in range(height):
+        grid[i][0] = 100
+        grid[i][width-1] = 100
 
     # set map origin [meters]
     map_msg.info.origin.position.x = 0.0
