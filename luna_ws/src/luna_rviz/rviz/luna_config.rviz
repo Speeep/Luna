@@ -6,8 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Grid1
-        - /Grid1/Offset1
       Splitter Ratio: 0.5
     Tree Height: 549
   - Class: rviz/Selection
@@ -35,24 +33,6 @@ Toolbars:
 Visualization Manager:
   Class: ""
   Displays:
-    - Alpha: 0.5
-      Cell Size: 1
-      Class: rviz/Grid
-      Color: 160; 160; 164
-      Enabled: true
-      Line Style:
-        Line Width: 0.029999999329447746
-        Value: Lines
-      Name: Grid
-      Normal Cell Count: 0
-      Offset:
-        X: 5
-        Y: 5
-        Z: 0
-      Plane: XY
-      Plane Cell Count: 10
-      Reference Frame: world
-      Value: true
     - Alpha: 1
       Class: rviz/Axes
       Enabled: true
@@ -118,9 +98,19 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Alpha: 0.699999988079071
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /robot/map
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
   Enabled: true
   Global Options:
-    Background Color: 46; 52; 54
+    Background Color: 48; 48; 48
     Default Light: true
     Fixed Frame: world
     Frame Rate: 30
@@ -146,7 +136,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 20.84074592590332
+      Distance: 15.010048866271973
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -154,17 +144,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 3.8529269695281982
-        Y: 6.12035608291626
-        Z: -3.208808422088623
+        X: 2.550507068634033
+        Y: 6.102250576019287
+        Z: -3.6469955444335938
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7097971439361572
+      Pitch: 0.6297972202301025
       Target Frame: <Fixed Frame>
-      Yaw: 0.5053955316543579
+      Yaw: 4.478594779968262
     Saved: ~
 Window Geometry:
   Displays:
@@ -182,5 +172,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 441
-  Y: 36
+  X: 519
+  Y: 84
