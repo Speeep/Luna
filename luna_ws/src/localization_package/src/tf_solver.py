@@ -71,7 +71,7 @@ if __name__ == '__main__':
     world_2_aruco.child_frame_id = "aruco"
     world_2_aruco.header.stamp = rospy.Time.now()
     world_2_aruco.transform.translation.x = 0.0
-    world_2_aruco.transform.translation.y = 5.0
+    world_2_aruco.transform.translation.y = 1.5
     world_2_aruco.transform.translation.z = 0.0
     world_2_aruco.transform.rotation.x = 0.0
     world_2_aruco.transform.rotation.y = 0.0
