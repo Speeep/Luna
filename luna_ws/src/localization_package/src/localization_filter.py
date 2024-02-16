@@ -8,15 +8,14 @@ import tf.transformations
 import math
 
 # Constants for filter tuning
-alpha = 0.0  # Weight for localization estimates
-beta = 1.0   # Weight for pose steps
+alpha = 0.1  # Weight for localization estimates
+beta = 0.9   # Weight for pose steps
 
 pose = (0.0, 0.0, 0.0)
 pose_step = (0.0, 0.0, 0.0)
 localization_estimate = (0.0, 0.0, 0.0)
 odom_timeout = 3.0
-localizer_timeout = 10000.0 # TODO Delete this line after testing
-# localizer_timeout = 10.0 # TODO Un comment this line after testing
+localizer_timeout = 10000.0 # TODO Change this line after testing
 last_odom_time = rospy.Time(0)
 last_localization_time = rospy.Time(0)
 
@@ -131,7 +130,7 @@ def filter():
         except:
             print("There was an error in publishing localization filter data!")
         
-        rate.sleep()  
+        rate.sleep()
 
 if __name__ == '__main__':
     filter()
