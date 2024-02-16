@@ -142,7 +142,6 @@ void loop()
       poseStepPub.publish(&stepMsg);
 
       odomIterator = 0;
-
     }
   }
 }

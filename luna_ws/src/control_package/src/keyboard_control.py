@@ -31,7 +31,7 @@ class KeyControlNode:
         }
 
         # Create a timer to check key presses periodically
-        self.timer = rospy.Timer(rospy.Duration(0.01), self.check_key_presses)
+        self.timer = rospy.Timer(rospy.Duration(0.05), self.check_key_presses)
 
         # Robot enable
         self.robot_enable = False
