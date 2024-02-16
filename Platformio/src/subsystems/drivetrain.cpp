@@ -177,10 +177,6 @@ void Drivetrain::setDriveSpeed(float speed) {
     driveSpeed = speed;
 }
 
-void Drivetrain::setRotateSpeed(float speed) {
-    driveSpeed = speed;
-}
-
 float Drivetrain::getDriveSpeed() {
     return driveSpeed;
 }
