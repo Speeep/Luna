@@ -48,6 +48,13 @@ void drivetrainSwitchStateCallback(const std_msgs::Int32 &driveStateMsg) {
   drivetrain.setState(drivetrainState);
 }
 
+// TODO: Delete after testing ICCs
+void drivetrainICCallback(const std_msgs::Float32 &driveICCMsg) {
+  float iccStep = driveICCMsg.data;
+  float newIcc = icc + iccStep;
+  icc = newIcc;
+}
+
 void localizerErrorCallback(const std_msgs::Float32 &localizerErrorMsg) {
   localizer.setError(localizerErrorMsg.data);
 }

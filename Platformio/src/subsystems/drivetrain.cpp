@@ -143,19 +143,19 @@ void Drivetrain::setWheelSpeeds(float sp0, float sp1, float sp2, float sp3) {
     can_controller.setSpeed(-sp0, -sp1, sp2, sp3);
 }
 
-woid Drivetrain::setWheelSpeeds(float speedL, float speedR){
+void Drivetrain::setWheelSpeeds(float speedL, float speedR){
     //allows for setting left and right wheel speeds
     setWheelSpeeds(speedL, speedL, speedR, speedR);
 }
 
-void Drivetrain::turnICC(float yICC, float topSpeed){
+void Drivetrain::turnICC(float yICC, float topSpeed) {
     // Calculate angles
     
     // float thetaR = atan2((ROBOT_LENGTH_CM/2), (- yICC - (ROBOT_WIDTH_CM/2)));
     // float thetaL = atan2((ROBOT_LENGTH_CM/2), (- yICC + (ROBOT_WIDTH_CM/2)));
-    float thetaR = -atan2((ROBOT_WIDTH_CM / 2) + yICC,   ROBOT_LENGTH_CM / 2);
+    float thetaR = -atan2((ROBOT_WIDTH_M / 2) + yICC,   ROBOT_LENGTH_M / 2);
     //note: right angle is inverted from our calculations, this math assumes turning the front wheels inwards is positive theta for L and R. If confused, ask Ian
-    float thetaL = atan2((ROBOT_WIDTH_CM / 2) - yICC,   ROBOT_LENGTH_CM / 2);
+    float thetaL = atan2((ROBOT_WIDTH_M / 2) - yICC,   ROBOT_LENGTH_M / 2);
 
     //limit angles to be from -pi/2 to pi/2
     if (thetaR > HALF_PI){
@@ -174,9 +174,9 @@ void Drivetrain::turnICC(float yICC, float topSpeed){
         thetaL += PI;
     }
 
-    float radiusR = sqrt(pow((double)ROBOT_LENGTH_CM / 2, 2) + pow(((double)ROBOT_WIDTH_CM/2) + yICC, 2));
+    float radiusR = sqrt(pow((double)ROBOT_LENGTH_M / 2, 2) + pow(((double)ROBOT_WIDTH_M/2) + yICC, 2));
     
-    float radiusL = sqrt(pow((double)ROBOT_LENGTH_CM / 2, 2) + pow(((double)ROBOT_WIDTH_CM/2) - yICC, 2));
+    float radiusL = sqrt(pow((double)ROBOT_LENGTH_M / 2, 2) + pow(((double)ROBOT_WIDTH_M/2) - yICC, 2));
 
     float speedL = topSpeed;
     float speedR = topSpeed;
@@ -190,10 +190,10 @@ void Drivetrain::turnICC(float yICC, float topSpeed){
     }
 
     //correct speeds in case icc is between wheels
-    if(0 <= yICC && yICC < ROBOT_WIDTH_CM / 2){
+    if(0 <= yICC && yICC < ROBOT_WIDTH_M / 2){
         speedL *= -1;
     }
-    if(0 > yICC && yICC > ROBOT_WIDTH_CM / -2){
+    if(0 > yICC && yICC > ROBOT_WIDTH_M / -2){
         speedR *= -1;
     }
 
