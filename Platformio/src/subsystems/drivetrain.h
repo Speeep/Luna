@@ -18,7 +18,9 @@ class Drivetrain {
 
   void disable();
 
-  void setState(uint8_t);
+  void setState(int);
+
+  int getState();
 
   void loop();
 

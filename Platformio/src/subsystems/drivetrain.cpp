@@ -58,8 +58,12 @@ void Drivetrain::disable() {
     state = 0;
 }
 
-void Drivetrain::setState(uint8_t newState){
+void Drivetrain::setState(int newState){
     state = newState;
+}
+
+int Drivetrain::getState() {
+    return state;
 }
 
 void Drivetrain::loop() {
@@ -153,9 +157,9 @@ void Drivetrain::turnICC(float yICC, float topSpeed) {
     
     // float thetaR = atan2((ROBOT_LENGTH_CM/2), (- yICC - (ROBOT_WIDTH_CM/2)));
     // float thetaL = atan2((ROBOT_LENGTH_CM/2), (- yICC + (ROBOT_WIDTH_CM/2)));
-    float thetaR = -atan2((ROBOT_WIDTH_M / 2) + yICC,   ROBOT_LENGTH_M / 2);
+    float thetaR = atan2((ROBOT_WIDTH_M / 2) + yICC,   ROBOT_LENGTH_M / 2) - HALF_PI;
     //note: right angle is inverted from our calculations, this math assumes turning the front wheels inwards is positive theta for L and R. If confused, ask Ian
-    float thetaL = atan2((ROBOT_WIDTH_M / 2) - yICC,   ROBOT_LENGTH_M / 2);
+    float thetaL = HALF_PI - atan2((ROBOT_WIDTH_M / 2) - yICC,   ROBOT_LENGTH_M / 2);
 
     //limit angles to be from -pi/2 to pi/2
     if (thetaR > HALF_PI){
@@ -170,7 +174,7 @@ void Drivetrain::turnICC(float yICC, float topSpeed) {
         thetaL -= PI;
     }
 
-    else if(thetaL < HALF_PI){
+    else if(thetaL < -HALF_PI){
         thetaL += PI;
     }
 

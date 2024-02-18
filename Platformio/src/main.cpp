@@ -53,6 +53,7 @@ void drivetrainICCallback(const std_msgs::Float32 &driveICCMsg) {
   float iccStep = driveICCMsg.data;
   float newIcc = icc + iccStep;
   icc = newIcc;
+  drivetrain.setYICC(icc);
 }
 
 void localizerErrorCallback(const std_msgs::Float32 &localizerErrorMsg) {
@@ -90,6 +91,8 @@ void setup()
   nh.subscribe(driveSpeedSub);
   nh.subscribe(localizerErrorSub);
   nh.subscribe(localizerEnableSub);
+  nh.subscribe(driveStateSub);
+  nh.subscribe(driveICCSub);
 
   drivetrain.init();
   localizer.init();
@@ -111,7 +114,7 @@ void loop()
     localizer.loop();
 
     if (drivetrain.isEnabled()) {
-      String drivetrainWheel0Speed = String(drivetrain.getRightWheelpodAngle());
+      String drivetrainWheel0Speed = String("ICC: ") + String(icc) + String("    Right Wheelpod Angle Setpoint: ") + String(drivetrain.getRightWheelpodAngleSetpoint());
       String ianOutputString = drivetrainWheel0Speed;
       ianOutputMsg.data = ianOutputString.c_str();
       ianOutputPub.publish(&ianOutputMsg);
