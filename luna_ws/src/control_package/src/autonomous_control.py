@@ -1,5 +1,5 @@
 import rospy
-from std_msgs.msg import Float32, Bool
+from std_msgs.msg import Float32, Bool, Int32
 from pynput import keyboard
 
 
@@ -37,14 +37,13 @@ def main():
 
     # Define publishers for different key presses
     drivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
-    drivetrain_angle_pub = rospy.Publisher('/drivetrain/angle', Bool, queue_size=10)
-    drivetrain_rotate_pub = rospy.Publisher('/drivetrain/rotate', Float32, queue_size=10)
+    drivetrain_icc_pub = rospy.Publisher('/drivetrain/icc', Float32, queue_size=10)
     localizer_error_pub = rospy.Publisher('/localizer/error', Float32, queue_size=10)
 
     # Subscribers for Autonomous Routine
     rospy.Subscriber('/localizer/error', Float32, update_localizer_error_cb)
     rospy.Subscriber('/localizer/enable', Bool, update_localizer_enable_cb)
-    rospy.Subscriber('/drivetrain/enable', Bool, update_drivetrain_enable_cb)
+    rospy.Subscriber('/drivetrain/state', Int32, update_drivetrain_enable_cb)
     rospy.Subscriber('/jetson/localizer_angle', Float32, update_localizer_angle_cb)
     rospy.Subscriber('/drivetrain/angle', Bool, update_drivetrain_angle_cb)
 
@@ -60,7 +59,7 @@ def main():
 
             # Use localizer to search for the marker
             if (localizer_error == 0.0):
-                localizer_error = 500.0
+                localizer_error = 1000.0
             elif (localizer_error == 1000.0):
                 localizer_error = 0.0
             localizer_error_pub.publish(localizer_error)

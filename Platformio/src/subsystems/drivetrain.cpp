@@ -14,7 +14,6 @@ void Drivetrain::init() {
     left_wheelpod_encoder.init(LEFT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, LEFT_WHEELPOD_ENCODER_START_ANGLE);
     right_wheelpod_encoder.init(RIGHT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, RIGHT_WHEELPOD_ENCODER_START_ANGLE);
     can_controller.init();
-    enabled = false;
     leftWheelpodAngleSetpoint = 0.0;
     rightWheelpodAngleSetpoint = 0.0;
     leftWheelpodAngle = 0;
@@ -24,6 +23,7 @@ void Drivetrain::init() {
     poseStepX = 0.0;
     poseStepY = 0.0;
     poseStepTheta = 0.0;
+    state = 0;
 
     for (int i = 0; i < 2; i++) {
         wheelDisplacement[i] = 0.0;
@@ -48,13 +48,22 @@ void Drivetrain::init() {
 }
 
 void Drivetrain::enable() {
-    enabled = true;    
+    state = DRIVE_STRAIGHT;
+    driveSpeed = 0;
 }
 
 void Drivetrain::disable() {
     // Set wheel speeds to 0 before disabling
     can_controller.cutCurrent();
-    enabled = false;
+    state = 0;
+}
+
+void Drivetrain::setState(int newState){
+    state = newState;
+}
+
+int Drivetrain::getState() {
+    return state;
 }
 
 void Drivetrain::loop() {
@@ -64,27 +73,32 @@ void Drivetrain::loop() {
     leftWheelpodAngle = left_wheelpod_encoder.getAngle();
     rightWheelpodAngle = right_wheelpod_encoder.getAngle();
 
-    if (isAngled) {
-        setLeftWheelpodAngleSetpoint(0.7853);
-        setRightWheelpodAngleSetpoint(-0.7853);
-    } else {
-        setLeftWheelpodAngleSetpoint(0.0);
-        setRightWheelpodAngleSetpoint(0.0);
+    switch(state){
+        case DISABLED:
+            setLeftWheelpodAngleSetpoint(0.0);
+            setRightWheelpodAngleSetpoint(0.0);
+            can_controller.cutCurrent();
+            break;
+        case DRIVE_STRAIGHT:
+            setLeftWheelpodAngleSetpoint(0.0);
+            setRightWheelpodAngleSetpoint(0.0);
+            setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
+            break;
+        case POINT_TURN:
+            setLeftWheelpodAngleSetpoint(0.7853);
+            setRightWheelpodAngleSetpoint(-0.7853);
+            setWheelSpeeds(-driveSpeed, -driveSpeed, driveSpeed, driveSpeed);
+            break;
+        case ICC_TURN:
+            turnICC(yICC, driveSpeed);
+            break;
     }
-
-    // If enabled, control the motors, else cut current to the motors
-    if (enabled) {
+    
+    // If enabled, control the steering motors
+    if (state != DISABLED) {
         left_turn_motor.setEffort(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
         right_turn_motor.setEffort(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
 
-        if (isAngled) {
-            setWheelSpeeds(-driveSpeed, -driveSpeed, driveSpeed, driveSpeed);
-        } else {
-            setWheelSpeeds(driveSpeed, driveSpeed, driveSpeed, driveSpeed);
-        }
-
-    } else {
-        can_controller.cutCurrent();
     }
 }
 
@@ -133,6 +147,66 @@ void Drivetrain::setWheelSpeeds(float sp0, float sp1, float sp2, float sp3) {
     can_controller.setSpeed(-sp0, -sp1, sp2, sp3);
 }
 
+void Drivetrain::setWheelSpeeds(float speedL, float speedR){
+    //allows for setting left and right wheel speeds
+    setWheelSpeeds(speedL, speedL, speedR, speedR);
+}
+
+void Drivetrain::turnICC(float yICC, float topSpeed) {
+    // Calculate angles
+    
+    // float thetaR = atan2((ROBOT_LENGTH_CM/2), (- yICC - (ROBOT_WIDTH_CM/2)));
+    // float thetaL = atan2((ROBOT_LENGTH_CM/2), (- yICC + (ROBOT_WIDTH_CM/2)));
+    float thetaR = atan2((ROBOT_WIDTH_M / 2) + yICC,   ROBOT_LENGTH_M / 2) - HALF_PI;
+    //note: right angle is inverted from our calculations, this math assumes turning the front wheels inwards is positive theta for L and R. If confused, ask Ian
+    float thetaL = HALF_PI - atan2((ROBOT_WIDTH_M / 2) - yICC,   ROBOT_LENGTH_M / 2);
+
+    //limit angles to be from -pi/2 to pi/2
+    if (thetaR > HALF_PI){
+        thetaR -= PI;
+    }
+
+    else if(thetaR < -HALF_PI){
+        thetaR += PI;
+    }
+
+    if (thetaL > HALF_PI){
+        thetaL -= PI;
+    }
+
+    else if(thetaL < -HALF_PI){
+        thetaL += PI;
+    }
+
+    float radiusR = sqrt(pow((double)ROBOT_LENGTH_M / 2, 2) + pow(((double)ROBOT_WIDTH_M/2) + yICC, 2));
+    
+    float radiusL = sqrt(pow((double)ROBOT_LENGTH_M / 2, 2) + pow(((double)ROBOT_WIDTH_M/2) - yICC, 2));
+
+    float speedL = topSpeed;
+    float speedR = topSpeed;
+
+    //Adjust speeds to match differential wheel speeds
+    if(radiusL > radiusR){
+        speedR *= radiusR / radiusL;
+    }
+    if(radiusR > radiusL){
+        speedL *= radiusL / radiusR;
+    }
+
+    //correct speeds in case icc is between wheels
+    if(0 <= yICC && yICC < ROBOT_WIDTH_M / 2){
+        speedL *= -1;
+    }
+    if(0 > yICC && yICC > ROBOT_WIDTH_M / -2){
+        speedR *= -1;
+    }
+
+    setLeftWheelpodAngleSetpoint(thetaL);
+    setRightWheelpodAngleSetpoint(thetaR);
+    setWheelSpeeds(speedL, speedR);
+    
+}
+
 float Drivetrain::getSpeed(int motorId) {
     return can_controller.getSpeed(motorId);
 }
@@ -170,11 +244,15 @@ void Drivetrain::setAngle(bool angle) {
 }
 
 bool Drivetrain::isEnabled() {
-    return enabled;
+    return (state != DISABLED);
 }
 
 void Drivetrain::setDriveSpeed(float speed) {
     driveSpeed = speed;
+}
+
+void Drivetrain::setYICC(float y){
+    yICC = y;
 }
 
 float Drivetrain::getDriveSpeed() {

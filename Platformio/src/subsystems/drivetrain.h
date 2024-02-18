@@ -18,6 +18,10 @@ class Drivetrain {
 
   void disable();
 
+  void setState(int);
+
+  int getState();
+
   void loop();
 
   void setLeftWheelpodAngle(int);
@@ -25,6 +29,10 @@ class Drivetrain {
   void setRightWheelpodAngle(int);
 
   void setWheelSpeeds(float, float, float, float);
+
+  void setWheelSpeeds(float, float);
+  
+  void turnICC(float, float);
 
   float getSpeed(int);
 
@@ -48,7 +56,7 @@ class Drivetrain {
 
   void setDriveSpeed(float);
 
-  void setRotateSpeed(float);
+  void setYICC(float);
 
   float getDriveSpeed();
 
@@ -62,13 +70,13 @@ class Drivetrain {
 
   float getPoseStepTheta();
 
+
  private:
     HBridge left_turn_motor;
     HBridge right_turn_motor;
     Encoder left_wheelpod_encoder;
     Encoder right_wheelpod_encoder;
     CANController can_controller;
-    bool enabled;
     float leftWheelpodAngleSetpoint;
     float rightWheelpodAngleSetpoint;
     float leftWheelpodAngle;
@@ -93,5 +101,7 @@ class Drivetrain {
     double angleFromWheel1;
     double angleFromWheel2;
     double angleFromWheel3;
+    int state;
+    float yICC;
 
 };

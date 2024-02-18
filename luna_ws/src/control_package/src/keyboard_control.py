@@ -1,5 +1,5 @@
 import rospy
-from std_msgs.msg import Float32, Bool
+from std_msgs.msg import Float32, Bool, Int32
 from pynput import keyboard
 
 class KeyControlNode:
@@ -8,8 +8,8 @@ class KeyControlNode:
 
         # Define publishers for different key presses
         self.drivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
-        self.drivetrain_angle_pub = rospy.Publisher('/drivetrain/angle', Bool, queue_size=10)
-        self.drivetrain_enable_pub = rospy.Publisher('/drivetrain/enable', Bool, queue_size=10)
+        self.drivetrain_state_pub = rospy.Publisher('/drivetrain/state', Int32, queue_size=10)
+        self.drivetrain_icc_step_pub = rospy.Publisher('/drivetrain/icc_step', Float32, queue_size=10)
         self.localizer_error_pub = rospy.Publisher('localizer/error', Float32, queue_size=10)
         self.localizer_enable_pub = rospy.Publisher('/localizer/enable', Bool, queue_size=10)
 
@@ -23,18 +23,23 @@ class KeyControlNode:
             's': False,
             'q': False,
             'e': False,
-            'o': False,
-            'p': False,
             'n': False,
             'm': False,
-            'b': False
+            'b': False,
+            '0': False,
+            '1': False,
+            '2': False,
+            '3': False,
         }
 
         # Create a timer to check key presses periodically
         self.timer = rospy.Timer(rospy.Duration(0.05), self.check_key_presses)
 
         # Robot enable
-        self.robot_enable = False
+        self.drivetrain_state = 0
+
+        # Localizer Enable
+        self.localizer_enable = False
 
         # Localizer Angle Setpoint
         self.localizer_error = 0.0
@@ -69,35 +74,46 @@ class KeyControlNode:
             drive_speed = Float32()
             drive_speed.data = 0.0
             self.drivetrain_drive_pub.publish(drive_speed)
-
-        # Keys needed for angling the wheel pods in and out
+            
+        # Keys needed for moving the ICC
         if self.key_states['q']:
-            angled = Bool()
-            angled.data = True
-            self.drivetrain_angle_pub.publish(angled)
+            ICC_step = Float32()
+            ICC_step.data = 0.02
+            self.drivetrain_icc_step_pub.publish(ICC_step)
         elif self.key_states['e']:
-            angled = Bool()
-            angled.data = False
-            self.drivetrain_angle_pub.publish(angled)
+            ICC_step = Float32()
+            ICC_step.data = -0.02
+            self.drivetrain_icc_step_pub.publish(ICC_step)
+        else:
+            ICC_step = Float32()
+            ICC_step.data = 0.0
+            self.drivetrain_icc_step_pub.publish(ICC_step)
 
         # Keys needed for enabling and disabling the robot
-        if self.key_states['p']:
-            disable = Bool()
-            self.robot_enable = False
-            disable.data = self.robot_enable
-            self.drivetrain_enable_pub.publish(self.robot_enable)
-            self.localizer_enable_pub.publish(self.robot_enable)
-        elif self.key_states['o']:
-            enable = Bool()
-            self.robot_enable = True
-            enable.data = self.robot_enable
-            self.drivetrain_enable_pub.publish(self.robot_enable)
-            self.localizer_enable_pub.publish(self.robot_enable)
-        else:
-            disable = Bool()
-            disable.data = self.robot_enable
-            self.drivetrain_enable_pub.publish(self.robot_enable)
-            self.localizer_enable_pub.publish(self.robot_enable)
+            
+        state = Int32()
+        localizer_enable = Bool()
+
+        if self.key_states['0']:
+            self.drivetrain_state = 0
+            self.localizer_enable = False
+        elif self.key_states['1']:
+            self.drivetrain_state = 1
+            self.localizer_enable = True
+            localizer_enable.data = self.localizer_enable
+        elif self.key_states['2']:
+            self.drivetrain_state = 2
+            self.localizer_enable = True
+            localizer_enable.data = self.localizer_enable
+        elif self.key_states['3']:
+            self.drivetrain_state = 3
+            self.localizer_enable = True
+            localizer_enable.data = self.localizer_enable
+
+        state.data = self.drivetrain_state
+        self.drivetrain_state_pub.publish(state)
+        localizer_enable.data = self.localizer_enable
+        self.localizer_enable_pub.publish(localizer_enable)
 
         if self.key_states['b']:
             self.localizer_error = 100.0
