@@ -93,7 +93,6 @@ class Mapping:
                                 None in case of error.
         """
         self.map_msg = map_msg
-        self.frontier_detection()
             
     @staticmethod
     def neighbors_of_8(self, map_msg, x, y):
@@ -170,38 +169,6 @@ class Mapping:
             return False
 
         return True
-
-
-    def get_frontier_cells(self):
-            width = self.map_msg.info.width
-            height = self.map_msg.info.height
-            map_array = np.array(self.map_msg.data)
-
-            # reshape into 2D map
-            map_matrix = np.reshape(map_array, (height, width))
-
-            # use sobel to detect large differences between cells
-            sx = ndimage.sobel(map_matrix, axis=0, mode='constant')
-            sy = ndimage.sobel(map_matrix, axis=1 , mode='constant')
-            sob = np.hypot(sx, sy)
-
-            # create filter to remove edges that border boundaries
-            footprint = np.array([[1,1,1],
-                                [1,0,1],
-                                [1,1,1]])
-
-            def boundary_helper(values):
-                return 100 in values
-            
-            boundary_neighbors = ndimage.generic_filter(map_matrix, boundary_helper, footprint=footprint)
-            
-            # filter
-            indices = np.where((sob >= 1) & (map_matrix == 0) & (boundary_neighbors == 0))
-            
-            # convert to array of tuple coordinates
-            indices = np.array(indices)
-            indices = indices.T
-            return list(map(tuple, indices))
         
     def publish_grid_cells(self, cells, publisher):
         # create and publish grid cells message
@@ -216,38 +183,6 @@ class Mapping:
         msg_grid_cells.cells = world_cells
 
         publisher.publish(msg_grid_cells)
-        
-    def segment_frontiers(self, cells):
-        frontiers = []
-        world_cells = [self.grid_to_world(self.map_msg, i[1], i[0]) for i in cells]
-
-        frontier_count = 0
-        while len(cells) > 0:
-            # search neighboring cells to build frontier
-            frontiers.append([])
-            search_queue = []
-            search_queue.append(cells.pop())
-            frontiers[frontier_count] = []
-            while len(search_queue) > 0:
-                cell = search_queue.pop()
-                frontiers[frontier_count].append(cell)
-                x = cell[0]
-                y = cell[1]
-                neighbors = self.neighbors_of_8(self, self.map_msg, x, y)
-                for neighbor in neighbors:
-                    if neighbor in cells:
-                        search_queue.append(neighbor)
-                        cells.remove(neighbor)
-            frontier_count += 1
-        
-        # filter frontiers by size
-        filtered_frontiers = [frontier for frontier in frontiers if len(frontier) > self.FRONTIER_SIZE_TRESHOLD]
-        return filtered_frontiers
-
-    def frontier_detection(self):
-        cell_indices = self.get_frontier_cells()
-        # group nearby frontier cells into arrays
-        frontiers = self.segment_frontiers(cell_indices)
         
     def run(self):
         """
@@ -277,3 +212,4 @@ class Mapping:
 # main function
 if __name__ == '__main__':
     Mapping.run()
+    
