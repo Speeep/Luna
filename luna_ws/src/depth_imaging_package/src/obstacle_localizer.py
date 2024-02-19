@@ -2,8 +2,6 @@ import rospy
 from std_msgs.msg import Float32MultiArray, Float32
 import numpy as np
 from math import cos, sin, sqrt, pi
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 WEBCAM_HEIGHT = 0.98 # 98 cm
 
@@ -63,11 +61,6 @@ def update_obstacle_pose(data):
 
     webcam_2_world_tf = webcam_2_world(webcam_2_world_theta, x, y, WEBCAM_HEIGHT)
 
-    # print("Webcam 2 World TF")
-    # print(webcam_2_world_tf)
-
-    # print(f'X: {x}, Y: {y}, Theta: {aruco_theta}')
-
     obstacle_location_world = np.dot(webcam_2_world_tf, obstacle_location_webcam)
     obstacle_location_world = np.round(obstacle_location_world, 3)
 
@@ -82,16 +75,16 @@ def update_aruco_data(data):
     x = data.data[0] * 0.01 # Convert cm to m
     y = data.data[1] * 0.01 # Convert cm to m
     aruco_theta = data.data[2]
-    # print(f'ARUCO DATA X: {x}, Y: {y}, Theta: {aruco_theta}')
 
 def obstacle_localizer():
+
+    rospy.init_node('obstacle_localizer', anonymous=True)
+
+    rospy.Subscriber('/realsense/depth/obstacle', Float32MultiArray, update_obstacle_pose)
+    rospy.Subscriber('magnetic_pos', Float32, update_webcam_theta)
+    rospy.Subscriber('aruco_data', Float32MultiArray, update_aruco_data)
+    
     while not rospy.is_shutdown():
-
-        rospy.init_node('obstacle_localizer', anonymous=True)
-
-        rospy.Subscriber('/realsense/depth/obstacle', Float32MultiArray, update_obstacle_pose)
-        rospy.Subscriber('magnetic_pos', Float32, update_webcam_theta)
-        rospy.Subscriber('aruco_data', Float32MultiArray, update_aruco_data)
 
         rospy.spin()
 
