@@ -120,18 +120,29 @@ def main():
                                 radius = int(radius)
                                 cv2.circle(color_frame_np, center, radius, (0, 0, 255), 2)
 
+                                # Find cartesian coords of center of object
                                 u, v = center[1], center[0]
                                 depth = depth_data[u][v] / 1000 # Depth in meters
 
                                 # Get X, Y, Z coordinates
                                 depth_point = rs.rs2_deproject_pixel_to_point(depth_frame.profile.as_video_stream_profile().intrinsics, [v, u], depth)
-                                x, y, z = depth_point
+                                x0, y0, z0 = depth_point
+                                x0, y0, z0 = map(lambda val: round(val, 2), (x0, y0, z0))
 
-                                x, y, z = map(lambda val: round(val, 2), (x, y, z))
+                                # Find radius in meters for object mapping
+                                s, t = center[1], (center[0] + radius)
+                                depth = depth_data[s][t] / 1000 # Depth in meters
+
+                                # Get X, Y, Z coordinates
+                                depth_point = rs.rs2_deproject_pixel_to_point(depth_frame.profile.as_video_stream_profile().intrinsics, [t, s], depth)
+                                x1, y1, z1 = depth_point
+                                x1, y1, z1 = map(lambda val: round(val, 2), (x1, y1, z1))
+
+                                rad_m = abs(x0 - x1)
 
                                 # Publish Obstacle pose in Realsense Camera Frame
                                 obstacle_msg = Float32MultiArray()
-                                obstacle_msg.data = [x, y, z]
+                                obstacle_msg.data = [x0, y0, rad_m]
                                 obstacle_pub.publish(obstacle_msg)
 
             # Apply temporal smoothing

@@ -3,7 +3,7 @@ import numpy
 import rospy
 import tf
 from nav_msgs.msg import OccupancyGrid
-from geometry_msgs.msg import TransformStamped
+from geometry_msgs.msg import TransformStamped, PointStamped
 from std_msgs.msg import Float32MultiArray
 
 # Grid Cell Size
@@ -26,6 +26,13 @@ rate = 5.0
 grid = numpy.ndarray((height, width), buffer=numpy.zeros((width, height), dtype=numpy.int),dtype=numpy.int)
 grid.fill(int(0))
 
+def world_to_grid(x, y):
+
+    # Grid cell indices for (x, y) point
+    grid_x = int(x / resolution)
+    grid_y = int(y / resolution)
+    return (grid_y, grid_x)
+
 def set_obstacles(grid, x, y, radius): # size in m
     x = int(x)
     y = int(y)
@@ -47,7 +54,8 @@ def set_obstacles(grid, x, y, radius): # size in m
             # If the cell is within the padding area (outside the circle but within the padding thickness),
             # set its value to 1
             elif distance <= rad + padding:
-                grid[i, j] = 10
+                if grid[i, j] < 10:
+                    grid[i, j] = 10
 
 def set_obstacles_cb(obstacle_msg):
     data = obstacle_msg.data
@@ -56,10 +64,16 @@ def set_obstacles_cb(obstacle_msg):
     radius = data[2]
     set_obstacles(grid=grid, x=x, y=y, radius=radius)
 
+def clicked_point_cb(click_msg):
+    x = click_msg.point.x
+    y = click_msg.point.y
+    grid_x, grid_y = world_to_grid(x, y)
+    set_obstacles(grid=grid, x=grid_x, y=grid_y, radius=0.0)
+
 # Publishers
 occ_pub = rospy.Publisher("/robot/map", OccupancyGrid, queue_size = 10)
 rospy.Subscriber('/map/obstacle', Float32MultiArray, set_obstacles_cb)
-rospy.Subscriber('/clicked_point', Float32MultiArray, clicked_point_cb)
+rospy.Subscriber('/clicked_point', PointStamped, clicked_point_cb)
 
 # TF Broadcaster
 tf_broadcaster = tf.TransformBroadcaster()
