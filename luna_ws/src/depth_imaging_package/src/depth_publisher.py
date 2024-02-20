@@ -41,10 +41,12 @@ def main():
     align = rs.align(rs.stream.color)
 
     # Set up ROS publisher
-    image_pub = rospy.Publisher('/realsense/depth/image_aligned', Image, queue_size=10)
+    # image_pub = rospy.Publisher('/realsense/depth/image_aligned', Image, queue_size=10)
     contour_pub = rospy.Publisher('/realsense/depth/contour_image', Image, queue_size=10)
     obstacle_pub = rospy.Publisher('/realsense/depth/obstacle', Float32MultiArray, queue_size=10)
     bridge = CvBridge()
+
+    rate = rospy.Rate(10)  # 10 Hz
 
     try:
         while not rospy.is_shutdown():
@@ -157,16 +159,18 @@ def main():
             depth_buffer.append(depth_data)
             smoothed_depth_data = np.mean(depth_buffer, axis=0)
 
-            # Publish smoothed depth image to ROS
-            depth_ros_msg = bridge.cv2_to_imgmsg(smoothed_depth_data, encoding="passthrough")
-            depth_ros_msg.header.stamp = rospy.Time.now()
-            image_pub.publish(depth_ros_msg)
+            # # Publish smoothed depth image to ROS
+            # depth_ros_msg = bridge.cv2_to_imgmsg(smoothed_depth_data, encoding="passthrough")
+            # depth_ros_msg.header.stamp = rospy.Time.now()
+            # image_pub.publish(depth_ros_msg)
 
             # Publish contour BGR image to ROS
             scaled_image = cv2.resize(color_frame_np, (0, 0), fx=0.5, fy=0.5)
             contour_ros_msg = bridge.cv2_to_imgmsg(scaled_image, encoding="bgr8")
             contour_ros_msg.header.stamp = rospy.Time.now()
             contour_pub.publish(contour_ros_msg)
+
+            rate.sleep()
 
     except rospy.ROSInterruptException:
         pass
