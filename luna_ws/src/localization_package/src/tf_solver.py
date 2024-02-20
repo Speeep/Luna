@@ -103,7 +103,7 @@ if __name__ == '__main__':
     aruco_pose_pub = rospy.Publisher('/rviz/aruco_marker_pose', PoseStamped, queue_size=10)
 
 
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(5)
     while not rospy.is_shutdown():
         try:
             # Define tf between Aruco Marker and Webcam
