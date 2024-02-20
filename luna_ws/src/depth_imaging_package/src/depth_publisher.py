@@ -142,7 +142,7 @@ def main():
 
                                 # Publish Obstacle pose in Realsense Camera Frame
                                 obstacle_msg = Float32MultiArray()
-                                obstacle_msg.data = [x0, y0, rad_m]
+                                obstacle_msg.data = [x0, y0, z0, rad_m]
                                 obstacle_pub.publish(obstacle_msg)
 
             # Apply temporal smoothing
@@ -155,7 +155,8 @@ def main():
             image_pub.publish(depth_ros_msg)
 
             # Publish contour BGR image to ROS
-            contour_ros_msg = bridge.cv2_to_imgmsg(color_frame_np, encoding="bgr8")
+            scaled_image = cv2.resize(color_frame_np, (0, 0), fx=0.25, fy=0.25)
+            contour_ros_msg = bridge.cv2_to_imgmsg(scaled_image, encoding="bgr8")
             contour_ros_msg.header.stamp = rospy.Time.now()
             contour_pub.publish(contour_ros_msg)
 
