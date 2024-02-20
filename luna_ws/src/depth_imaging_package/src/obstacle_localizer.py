@@ -5,7 +5,7 @@ from math import cos, sin, sqrt, pi
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-WEBCAM_HEIGHT = 0.98 # 98 cm
+WEBCAM_HEIGHT = 1.17 # 117 cm
 
 aruco_theta = 0
 webcam_theta = 0
