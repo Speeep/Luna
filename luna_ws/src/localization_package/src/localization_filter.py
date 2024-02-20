@@ -85,7 +85,7 @@ def filter():
 
     broadcaster = tf2_ros.StaticTransformBroadcaster()
     
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(10) # 10 hz
 
     while not rospy.is_shutdown():
 
