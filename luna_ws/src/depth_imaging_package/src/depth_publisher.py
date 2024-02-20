@@ -22,14 +22,17 @@ min_roundness = 0.7
 SHOW_CONTOUR = False
 SHOW_CONVEX = False
 
+RS_FRAME_WIDTH = 680
+RS_FRAME_HEIGHT = 480
+
 def main():
     rospy.init_node('realsense_depth_publisher', anonymous=True)
 
     # Initialize RealSense pipeline
     pipeline = rs.pipeline()
     config = rs.config()
-    config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 15)
-    config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 15)
+    config.enable_stream(rs.stream.depth, RS_FRAME_WIDTH, RS_FRAME_HEIGHT, rs.format.z16, 15)
+    config.enable_stream(rs.stream.color, RS_FRAME_WIDTH, RS_FRAME_HEIGHT, rs.format.bgr8, 15)
 
     # Start streaming
     pipeline.start(config)
@@ -130,7 +133,12 @@ def main():
                                 x0, y0, z0 = map(lambda val: round(val, 2), (x0, y0, z0))
 
                                 # Find radius in meters for object mapping
-                                s, t = center[1], (center[0] + radius)
+                                if (center[0] + radius < RS_FRAME_WIDTH):
+                                    s, t = center[1], (center[0] + radius)
+                                elif (center[0] - radius > 0):
+                                    s, t = center[1], (center[0] - radius)
+                                else:
+                                    s, t = u, v
                                 depth = depth_data[s][t] / 1000 # Depth in meters
 
                                 # Get X, Y, Z coordinates
@@ -155,7 +163,7 @@ def main():
             image_pub.publish(depth_ros_msg)
 
             # Publish contour BGR image to ROS
-            scaled_image = cv2.resize(color_frame_np, (0, 0), fx=0.25, fy=0.25)
+            scaled_image = cv2.resize(color_frame_np, (0, 0), fx=0.5, fy=0.5)
             contour_ros_msg = bridge.cv2_to_imgmsg(scaled_image, encoding="bgr8")
             contour_ros_msg.header.stamp = rospy.Time.now()
             contour_pub.publish(contour_ros_msg)
