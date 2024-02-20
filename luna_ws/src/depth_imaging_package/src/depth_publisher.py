@@ -31,8 +31,8 @@ def main():
     # Initialize RealSense pipeline
     pipeline = rs.pipeline()
     config = rs.config()
-    config.enable_stream(rs.stream.depth, 680, 480, rs.format.z16, 15)
-    config.enable_stream(rs.stream.color, 680, 480, rs.format.bgr8, 15)
+    config.enable_stream(rs.stream.depth, RS_FRAME_WIDTH, RS_FRAME_HEIGHT, rs.format.z16, 15)
+    config.enable_stream(rs.stream.color, RS_FRAME_WIDTH, RS_FRAME_HEIGHT, rs.format.bgr8, 15)
 
     # Start streaming
     pipeline.start(config)
