@@ -22,9 +22,6 @@ min_roundness = 0.7
 SHOW_CONTOUR = False
 SHOW_CONVEX = False
 
-RS_FRAME_WIDTH = 680
-RS_FRAME_HEIGHT = 480
-
 def main():
     rospy.init_node('realsense_depth_publisher', anonymous=True)
 
@@ -32,8 +29,8 @@ def main():
         # Initialize RealSense pipeline
         pipeline = rs.pipeline()
         config = rs.config()
-        config.enable_stream(rs.stream.depth, 640, 360, rs.format.z16, 15)
-        config.enable_stream(rs.stream.color, 640, 360, rs.format.bgr8, 15)
+        config.enable_stream(rs.stream.depth, rs.format.z16, 15)
+        config.enable_stream(rs.stream.color, rs.format.bgr8, 15)
 
         # Start streaming
         pipeline.start(config)
