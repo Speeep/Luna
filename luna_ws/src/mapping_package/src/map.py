@@ -95,18 +95,31 @@ class Mapping:
         self.map_msg = map_msg
             
     @staticmethod
+    def neighbors_of_4(self, map_msg, x, y):
+        """
+        Returns the walkable 4-neighbors cells of (x,y) in the occupancy grid.
+        :param map_msg [OccupancyGrid] The map information.
+        :param x       [int]           The X coordinate in the grid.
+        :param y       [int]           The Y coordinate in the grid.
+        :return        [[(int,int)]]   A list of walkable 4-neighbors.
+        """
+        walkable_neighbors = [(x, y-1), (x-1, y), (x+1, y), (x, y+1)]
+
+        return filter(lambda cell: self.is_cell_walkable(self, map_msg, cell[0], cell[1]), walkable_neighbors)
+    
+    @staticmethod
     def neighbors_of_8(self, map_msg, x, y):
         """
         Returns the walkable 8-neighbors cells of (x,y) in the occupancy grid.
-        :param map_msgF [OccupancyGrid] The map information.
+        :param map_msg [OccupancyGrid] The map information.
         :param x       [int]           The X coordinate in the grid.
         :param y       [int]           The Y coordinate in the grid.
         :return        [[(int,int)]]   A list of walkable 8-neighbors.
         """
-        neighbors = [(x-1, y-1), (x, y-1), (x+1, y-1), (x-1, y), (x+1, y), (x-1, y+1), (x, y+1), (x+1, y+1)]
-
-        return neighbors
-
+        walkable_neighbors = [(x-1, y-1), (x, y-1), (x+1, y-1), (x-1, y), (x+1, y), (x-1, y+1), (x, y+1), (x+1, y+1)]
+        
+        return filter(lambda cell: self.is_cell_walkable(self, map_msg, cell[0], cell[1]), walkable_neighbors)
+    
     @staticmethod
     def world_to_grid(self, x, y):
         
@@ -121,7 +134,7 @@ class Mapping:
         return point
 
     @staticmethod
-    def grid_to_world(grid_x, grid_y):
+    def grid_to_world(self, grid_x, grid_y):
         # real-world coordinates for given grid cell
         x = (grid_x * map_msg.info.resolution) + map_msg.info.origin.position.x + (map_msg.info.resolution / 2.0)
         y = (grid_y * map_msg.info.resolution) + map_msg.info.origin.position.y + (map_msg.info.resolution / 2.0)
@@ -174,7 +187,7 @@ class Mapping:
         # create and publish grid cells message
         world_cells = [self.grid_to_world(self.msg, i[1], i[0]) for i in cells]
 
-        resolution = self.mapdata.info.resolution
+        resolution = self.map_msg.info.resolution
         msg_grid_cells = GridCells()
         msg_grid_cells.header.stamp = rospy.Time.now()
         msg_grid_cells.header.frame_id = "map"
