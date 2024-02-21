@@ -59,14 +59,13 @@ def main():
                 depth_frame = aligned_frames.get_depth_frame()
                 color_frame = aligned_frames.get_color_frame()
 
-                print("depth frame shape: " + str(len(depth_frame)) + " " + str(len(depth_frame[0])))
-                print("color frame shape: " + str(len(color_frame)) + " " + str(len(color_frame[0])))
-
                 if not depth_frame or not color_frame:
                     continue
 
                 # Convert depth frame to depth image
                 depth_data = np.asanyarray(depth_frame.get_data())
+
+                print("depth frame shape: " + str(len(depth_data)) + " " + str(len(depth_data[0])))
 
                 # Apply spatial smoothing (Gaussian blur)
                 smoothed_depth_data = cv2.GaussianBlur(depth_data, (5, 5), 0)
@@ -86,6 +85,8 @@ def main():
 
                     # Convert color_frame to NumPy array
                 color_frame_np = np.asanyarray(color_frame.get_data())
+
+                print("color frame shape: " + str(len(color_frame_np)) + " " + str(len(color_frame_np[0])))
 
                 # Filter contours based on depth difference
                 for contour in contours:
