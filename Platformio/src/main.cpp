@@ -143,4 +143,6 @@ void loop()
       odomIterator = 0;
     }
   }
+
+  delay(2);
 }

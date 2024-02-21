@@ -82,8 +82,8 @@ rospy.init_node('obstacle_localizer', anonymous=True)
 # Initialize publishers and subscribers
 obstacle_pub = rospy.Publisher('jetson/localized_obstacle', Float32MultiArray, queue_size=10)
 rospy.Subscriber('/realsense/depth/obstacle', Float32MultiArray, update_obstacle_pose)
-rospy.Subscriber('magnetic_pos', Float32, update_webcam_theta)
-rospy.Subscriber('aruco_data', Float32MultiArray, update_aruco_data)
+rospy.Subscriber('/jetson/localizer_angle', Float32, update_webcam_theta)
+rospy.Subscriber('/jetson/aruco_data', Float32MultiArray, update_aruco_data)
 
 # Define timer callback function
 def timer_callback(event):
