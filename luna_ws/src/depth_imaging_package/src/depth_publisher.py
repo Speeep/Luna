@@ -59,6 +59,9 @@ def main():
                 depth_frame = aligned_frames.get_depth_frame()
                 color_frame = aligned_frames.get_color_frame()
 
+                print("depth frame shape: " + str(len(depth_frame)) + " " + str(len(depth_frame[0])))
+                print("color frame shape: " + str(len(color_frame)) + " " + str(len(color_frame[0])))
+
                 if not depth_frame or not color_frame:
                     continue
 
