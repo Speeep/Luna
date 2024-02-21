@@ -31,12 +31,13 @@ def main():
     try: 
         # Initialize RealSense pipeline
         pipeline = rs.pipeline()
-        config = rs.config()
-        config.enable_stream(rs.stream.depth, RS_FRAME_WIDTH, RS_FRAME_HEIGHT, rs.format.z16, 30)
-        config.enable_stream(rs.stream.color, RS_FRAME_WIDTH, RS_FRAME_HEIGHT, rs.format.bgr8, 30)
+        # config = rs.config()
+        # config.enable_stream(rs.stream.depth, RS_FRAME_WIDTH, RS_FRAME_HEIGHT, rs.format.z16, 30)
+        # config.enable_stream(rs.stream.color, RS_FRAME_WIDTH, RS_FRAME_HEIGHT, rs.format.bgr8, 30)
 
-        # Start streaming
-        pipeline.start(config)
+        # # Start streaming
+        # pipeline.start(config)
+        pipeline.start()
 
         # Set up align object
         align = rs.align(rs.stream.color)
