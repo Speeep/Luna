@@ -82,7 +82,7 @@ def main():
                 depth_data = np.asanyarray(depth_frame.get_data())
 
                 # Apply spatial smoothing (Gaussian blur)
-                smoothed_depth_data = cv2.GaussianBlur(depth_data, (5, 5), 0)
+                smoothed_depth_data = cv2.GaussianBlur(depth_data, (3, 3), 0)
 
                 # Convert to 8-bit unsigned integer
                 smoothed_depth_data = (smoothed_depth_data / np.max(smoothed_depth_data) * 255).astype(np.uint8)
@@ -91,7 +91,7 @@ def main():
                 edges = cv2.Canny(smoothed_depth_data, canny_threshold1, canny_threshold2)
 
                 # Apply morphological operations
-                kernel = np.ones((5, 5), np.uint8)
+                kernel = np.ones((3, 3), np.uint8)
                 edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
 
                 # Find contours in the edges
