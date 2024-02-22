@@ -45,8 +45,8 @@ def main():
         # Initialize RealSense pipeline
         pipeline = rs.pipeline()
         config = rs.config()
-        config.enable_stream(rs.stream.depth, IMAGE_WIDTH, IMAGE_HEIGHT, rs.format.z16, 30)
-        config.enable_stream(rs.stream.color, IMAGE_WIDTH, IMAGE_HEIGHT, rs.format.yuyv, 30)
+        config.enable_stream(rs.stream.depth, IMAGE_WIDTH, IMAGE_HEIGHT, rs.format.z16, 15)
+        config.enable_stream(rs.stream.color, IMAGE_WIDTH, IMAGE_HEIGHT, rs.format.yuyv, 15)
 
         # Start streaming
         pipeline.start(config)
@@ -60,7 +60,7 @@ def main():
         obstacle_pub = rospy.Publisher('/realsense/depth/obstacle', Float32MultiArray, queue_size=10)
         # bridge = CvBridge()
 
-        rate = rospy.Rate(10)  # 10 Hz
+        rate = rospy.Rate(15)  # 10 Hz
 
         try:
             while not rospy.is_shutdown():
