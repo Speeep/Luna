@@ -81,96 +81,99 @@ def main():
                 # Convert depth frame to depth image
                 depth_data = np.asanyarray(depth_frame.get_data())
 
-                # Apply spatial smoothing (Gaussian blur)
-                smoothed_depth_data = cv2.GaussianBlur(depth_data, (3, 3), 0)
+                cv2.imshow("Color Frame", color_frame_np)
+                cv2.waitKey(1)
 
-                # Convert to 8-bit unsigned integer
-                smoothed_depth_data = (smoothed_depth_data / np.max(smoothed_depth_data) * 255).astype(np.uint8)
+                # # Apply spatial smoothing (Gaussian blur)
+                # smoothed_depth_data = cv2.GaussianBlur(depth_data, (3, 3), 0)
 
-                # Compute the gradient using the Canny edge detector
-                edges = cv2.Canny(smoothed_depth_data, canny_threshold1, canny_threshold2)
+                # # Convert to 8-bit unsigned integer
+                # smoothed_depth_data = (smoothed_depth_data / np.max(smoothed_depth_data) * 255).astype(np.uint8)
 
-                # Apply morphological operations
-                kernel = np.ones((3, 3), np.uint8)
-                edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
+                # # Compute the gradient using the Canny edge detector
+                # edges = cv2.Canny(smoothed_depth_data, canny_threshold1, canny_threshold2)
 
-                # Find contours in the edges
-                contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                # # Apply morphological operations
+                # kernel = np.ones((3, 3), np.uint8)
+                # edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
 
-                # Filter contours based on depth difference
-                for contour in contours:
-                    # Calculate the average depth within the contour
-                    mask = np.zeros_like(smoothed_depth_data, dtype=np.uint8)
-                    cv2.drawContours(mask, [contour], 0, 255, thickness=cv2.FILLED)
-                    avg_depth = np.mean(smoothed_depth_data[mask > 0])
+                # # Find contours in the edges
+                # contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-                    # Check if the depth difference is significant
-                    if np.abs(avg_depth - smoothed_depth_data[contour[0][0][1], contour[0][0][0]]) > min_depth_difference:
+                # # Filter contours based on depth difference
+                # for contour in contours:
+                #     # Calculate the average depth within the contour
+                #     mask = np.zeros_like(smoothed_depth_data, dtype=np.uint8)
+                #     cv2.drawContours(mask, [contour], 0, 255, thickness=cv2.FILLED)
+                #     avg_depth = np.mean(smoothed_depth_data[mask > 0])
 
-                        if SHOW_CONTOUR:
-                            # Draw the contour on the color frame
-                            cv2.drawContours(color_frame_np, [contour], 0, (0, 255, 0), 2)
+                #     # Check if the depth difference is significant
+                #     if np.abs(avg_depth - smoothed_depth_data[contour[0][0][1], contour[0][0][0]]) > min_depth_difference:
 
-                        else:
-                            # Find the convex hull of the contour
-                            convex_hull = cv2.convexHull(contour)
+                #         if SHOW_CONTOUR:
+                #             # Draw the contour on the color frame
+                #             cv2.drawContours(color_frame_np, [contour], 0, (0, 255, 0), 2)
 
-                            area_convex_hull = cv2.contourArea(convex_hull)
-                            perimeter_convex_hull = cv2.arcLength(convex_hull, True)
-                            roundness = (4 * np.pi * area_convex_hull) / (perimeter_convex_hull ** 2)
+                #         else:
+                #             # Find the convex hull of the contour
+                #             convex_hull = cv2.convexHull(contour)
 
-                            if SHOW_CONVEX:
-                                cv2.drawContours(color_frame_np, [convex_hull], 0, (255, 0, 0), 2)
-                                print(f"Convex Hull Size: {cv2.contourArea(convex_hull)}")
-                                print(f"Roundness: {roundness}")
-                                cv2.imshow("Convex Hulls", color_frame_np)
-                                cv2.waitKey(0)
+                #             area_convex_hull = cv2.contourArea(convex_hull)
+                #             perimeter_convex_hull = cv2.arcLength(convex_hull, True)
+                #             roundness = (4 * np.pi * area_convex_hull) / (perimeter_convex_hull ** 2)
 
-                            else:
-                                # Filter convex hulls based on size and roundness
-                                if min_size <= area_convex_hull <= max_size and roundness >= min_roundness:
+                #             if SHOW_CONVEX:
+                #                 cv2.drawContours(color_frame_np, [convex_hull], 0, (255, 0, 0), 2)
+                #                 print(f"Convex Hull Size: {cv2.contourArea(convex_hull)}")
+                #                 print(f"Roundness: {roundness}")
+                #                 cv2.imshow("Convex Hulls", color_frame_np)
+                #                 cv2.waitKey(0)
 
-                                    # Draw the convex hull on the color frame
-                                    cv2.drawContours(color_frame_np, [convex_hull], 0, (255, 0, 0), 2)
+                #             else:
+                #                 # Filter convex hulls based on size and roundness
+                #                 if min_size <= area_convex_hull <= max_size and roundness >= min_roundness:
 
-                                    # Draw the smallest enclosing circle
-                                    (center, radius) = cv2.minEnclosingCircle(convex_hull)
-                                    center = tuple(map(int, center))
-                                    radius = int(radius)
-                                    cv2.circle(color_frame_np, center, radius, (0, 0, 255), 2)
+                #                     # Draw the convex hull on the color frame
+                #                     cv2.drawContours(color_frame_np, [convex_hull], 0, (255, 0, 0), 2)
 
-                                    # Find cartesian coords of center of object
-                                    u, v = center[1], center[0]
-                                    depth = depth_data[u][v] / 1000 # Depth in meters
+                #                     # Draw the smallest enclosing circle
+                #                     (center, radius) = cv2.minEnclosingCircle(convex_hull)
+                #                     center = tuple(map(int, center))
+                #                     radius = int(radius)
+                #                     cv2.circle(color_frame_np, center, radius, (0, 0, 255), 2)
 
-                                    # Get X, Y, Z coordinates
-                                    depth_point = rs.rs2_deproject_pixel_to_point(depth_frame.profile.as_video_stream_profile().intrinsics, [v, u], depth)
-                                    x0, y0, z0 = depth_point
-                                    x0, y0, z0 = map(lambda val: round(val, 2), (x0, y0, z0))
+                #                     # Find cartesian coords of center of object
+                #                     u, v = center[1], center[0]
+                #                     depth = depth_data[u][v] / 1000 # Depth in meters
 
-                                    # Find radius in meters for object mapping
-                                    if (center[0] + radius < 1280):
-                                        s, t = center[1], (center[0] + radius)
-                                    elif (center[0] - radius > 0):
-                                        s, t = center[1], (center[0] - radius)
-                                    else:
-                                        s, t = u, v
-                                    depth = depth_data[s][t] / 1000 # Depth in meters
+                #                     # Get X, Y, Z coordinates
+                #                     depth_point = rs.rs2_deproject_pixel_to_point(depth_frame.profile.as_video_stream_profile().intrinsics, [v, u], depth)
+                #                     x0, y0, z0 = depth_point
+                #                     x0, y0, z0 = map(lambda val: round(val, 2), (x0, y0, z0))
 
-                                    # Get X, Y, Z coordinates
-                                    depth_point = rs.rs2_deproject_pixel_to_point(depth_frame.profile.as_video_stream_profile().intrinsics, [t, s], depth)
-                                    x1, y1, z1 = depth_point
-                                    x1, y1, z1 = map(lambda val: round(val, 2), (x1, y1, z1))
+                #                     # Find radius in meters for object mapping
+                #                     if (center[0] + radius < 1280):
+                #                         s, t = center[1], (center[0] + radius)
+                #                     elif (center[0] - radius > 0):
+                #                         s, t = center[1], (center[0] - radius)
+                #                     else:
+                #                         s, t = u, v
+                #                     depth = depth_data[s][t] / 1000 # Depth in meters
 
-                                    rad_m = abs(x0 - x1)
+                #                     # Get X, Y, Z coordinates
+                #                     depth_point = rs.rs2_deproject_pixel_to_point(depth_frame.profile.as_video_stream_profile().intrinsics, [t, s], depth)
+                #                     x1, y1, z1 = depth_point
+                #                     x1, y1, z1 = map(lambda val: round(val, 2), (x1, y1, z1))
 
-                                    # Publish Obstacle pose in Realsense Camera Frame
-                                    obstacle_msg = Float32MultiArray()
-                                    obstacle_msg.data = [x0, y0, z0, rad_m]
-                                    obstacle_pub.publish(obstacle_msg)
+                #                     rad_m = abs(x0 - x1)
 
-                                    cv2.imshow("Color Frame", color_frame_np)
-                                    cv2.waitKey(1)
+                #                     # Publish Obstacle pose in Realsense Camera Frame
+                #                     obstacle_msg = Float32MultiArray()
+                #                     obstacle_msg.data = [x0, y0, z0, rad_m]
+                #                     obstacle_pub.publish(obstacle_msg)
+
+                #                     cv2.imshow("Color Frame", color_frame_np)
+                #                     cv2.waitKey(1)
 
                 # # Apply temporal smoothing
                 # depth_buffer.append(depth_data)
