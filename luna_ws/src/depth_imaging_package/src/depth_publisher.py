@@ -20,7 +20,10 @@ max_size = 27000
 min_roundness = 0.7
 
 SHOW_CONTOUR = False
-SHOW_CONVEX = False
+SHOW_CONVEX = True
+
+IMAGE_WIDTH = 1280
+IMAGE_HEIGHT = 720
 
 def main():
     rospy.init_node('realsense_depth_publisher', anonymous=True)
@@ -29,8 +32,8 @@ def main():
         # Initialize RealSense pipeline
         pipeline = rs.pipeline()
         config = rs.config()
-        config.enable_stream(rs.stream.depth, rs.format.z16, 15)
-        config.enable_stream(rs.stream.color, rs.format.bgr8, 15)
+        config.enable_stream(rs.stream.depth, rs.format.z16, 30)
+        config.enable_stream(rs.stream.color, rs.format.bgr8, 30)
 
         # Start streaming
         pipeline.start(config)
@@ -62,8 +65,6 @@ def main():
                 # Convert depth frame to depth image
                 depth_data = np.asanyarray(depth_frame.get_data())
 
-                print("depth frame shape: " + str(len(depth_data)) + " " + str(len(depth_data[0])))
-
                 # Apply spatial smoothing (Gaussian blur)
                 smoothed_depth_data = cv2.GaussianBlur(depth_data, (5, 5), 0)
 
@@ -82,8 +83,6 @@ def main():
 
                     # Convert color_frame to NumPy array
                 color_frame_np = np.asanyarray(color_frame.get_data())
-
-                print("color frame shape: " + str(len(color_frame_np)) + " " + str(len(color_frame_np[0])))
 
                 # Filter contours based on depth difference
                 for contour in contours:
