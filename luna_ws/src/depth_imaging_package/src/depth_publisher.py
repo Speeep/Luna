@@ -76,7 +76,7 @@ def main():
                     continue
 
                 # Convert from YUYV to BGR
-                color_frame = GetBGR(color_frame)
+                color_frame_np = GetBGR(color_frame)
 
                 # Convert depth frame to depth image
                 depth_data = np.asanyarray(depth_frame.get_data())
@@ -96,9 +96,6 @@ def main():
 
                 # Find contours in the edges
                 contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-                    # Convert color_frame to NumPy array
-                color_frame_np = np.asanyarray(color_frame.get_data())
 
                 # Filter contours based on depth difference
                 for contour in contours:
