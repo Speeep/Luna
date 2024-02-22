@@ -32,8 +32,8 @@ def main():
         # Initialize RealSense pipeline
         pipeline = rs.pipeline()
         config = rs.config()
-        config.enable_stream(rs.stream.depth, rs.format.z16, 30)
-        config.enable_stream(rs.stream.color, rs.format.bgr8, 30)
+        config.enable_stream(rs.stream.depth, 320, 240, rs.format.z16, 30)
+        config.enable_stream(rs.stream.color, 320, 240, rs.format.bgr8, 30)
 
         # Start streaming
         pipeline.start(config)
@@ -166,7 +166,7 @@ def main():
                 # image_pub.publish(depth_ros_msg)
 
                 # Publish contour BGR image to ROS
-                scaled_image = cv2.resize(color_frame_np, (0, 0), fx=0.25, fy=0.25)
+                scaled_image = cv2.resize(color_frame_np, (0, 0), fx=0.5, fy=0.5)
                 contour_ros_msg = bridge.cv2_to_imgmsg(scaled_image, encoding="bgr8")
                 contour_ros_msg.header.stamp = rospy.Time.now()
                 contour_pub.publish(contour_ros_msg)
