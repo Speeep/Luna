@@ -25,6 +25,19 @@ SHOW_CONVEX = False
 IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 480
 
+def GetBGR(frame_color):
+    # Input: Intel handle to 16-bit YU/YV data
+    # Output: BGR8
+    H = frame_color.get_height()
+    W = frame_color.get_width()
+    Y = np.frombuffer(frame_color.get_data(), dtype=np.uint8)[0::2].reshape(H,W)
+    UV = np.frombuffer(frame_color.get_data(), dtype=np.uint8)[1::2].reshape(H,W)
+    YUV =  np.zeros((H,W,2), 'uint8')
+    YUV[:,:,0] = Y
+    YUV[:,:,1] = UV
+    BGR = cv2.cvtColor(YUV,cv2.COLOR_YUV2BGR_YUYV)
+    return BGR
+
 def main():
     rospy.init_node('realsense_depth_publisher', anonymous=True)
 
@@ -61,6 +74,9 @@ def main():
 
                 if not depth_frame or not color_frame:
                     continue
+
+                # Convert from YUYV to BGR
+                color_frame = GetBGR(color_frame)
 
                 # Convert depth frame to depth image
                 depth_data = np.asanyarray(depth_frame.get_data())
