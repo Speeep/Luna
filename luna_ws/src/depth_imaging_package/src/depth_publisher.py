@@ -81,8 +81,8 @@ def main():
                 # Convert depth frame to depth image
                 depth_data = np.asanyarray(depth_frame.get_data())
 
-                print("depth frame shape: " + str(len(depth_frame)) + " " + str(len(depth_frame[0])))
-                print("color frame shape: " + str(len(color_frame)) + " " + str(len(color_frame[0])))
+                print("depth frame shape: " + str(len(depth_data)) + " " + str(len(depth_data[0])))
+                print("color frame shape: " + str(len(color_frame_np)) + " " + str(len(color_frame_np[0])))
 
                 # Apply spatial smoothing (Gaussian blur)
                 smoothed_depth_data = cv2.GaussianBlur(depth_data, (5, 5), 0)
