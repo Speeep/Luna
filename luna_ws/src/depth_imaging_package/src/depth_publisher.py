@@ -19,7 +19,7 @@ min_size = 4000
 max_size = 27000
 min_roundness = 0.7
 
-SHOW_CONTOUR = True
+SHOW_CONTOUR = False
 SHOW_CONVEX = False
 
 IMAGE_WIDTH = 640
@@ -56,9 +56,9 @@ def main():
 
         # Set up ROS publisher
         # image_pub = rospy.Publisher('/realsense/depth/image_aligned', Image, queue_size=10)
-        contour_pub = rospy.Publisher('/realsense/depth/contour_image', Image, queue_size=10)
+        # contour_pub = rospy.Publisher('/realsense/depth/contour_image', Image, queue_size=10)
         obstacle_pub = rospy.Publisher('/realsense/depth/obstacle', Float32MultiArray, queue_size=10)
-        bridge = CvBridge()
+        # bridge = CvBridge()
 
         rate = rospy.Rate(10)  # 10 Hz
 
@@ -80,6 +80,9 @@ def main():
 
                 # Convert depth frame to depth image
                 depth_data = np.asanyarray(depth_frame.get_data())
+
+                print("depth frame shape: " + str(len(depth_frame)) + " " + str(len(depth_frame[0])))
+                print("color frame shape: " + str(len(color_frame)) + " " + str(len(color_frame[0])))
 
                 # Apply spatial smoothing (Gaussian blur)
                 smoothed_depth_data = cv2.GaussianBlur(depth_data, (5, 5), 0)
@@ -169,6 +172,9 @@ def main():
                                     obstacle_msg.data = [x0, y0, z0, rad_m]
                                     obstacle_pub.publish(obstacle_msg)
 
+                                    cv2.imshow("Color Frame", color_frame_np)
+                                    cv2.waitKey(1)
+
                 # Apply temporal smoothing
                 depth_buffer.append(depth_data)
                 smoothed_depth_data = np.mean(depth_buffer, axis=0)
@@ -179,10 +185,10 @@ def main():
                 # image_pub.publish(depth_ros_msg)
 
                 # Publish contour BGR image to ROS
-                scaled_image = cv2.resize(color_frame_np, (0, 0), fx=0.5, fy=0.5)
-                contour_ros_msg = bridge.cv2_to_imgmsg(scaled_image, encoding="bgr8")
-                contour_ros_msg.header.stamp = rospy.Time.now()
-                contour_pub.publish(contour_ros_msg)
+                # scaled_image = cv2.resize(color_frame_np, (0, 0), fx=0.5, fy=0.5)
+                # contour_ros_msg = bridge.cv2_to_imgmsg(scaled_image, encoding="bgr8")
+                # contour_ros_msg.header.stamp = rospy.Time.now()
+                # contour_pub.publish(contour_ros_msg)
 
                 rate.sleep()
 
