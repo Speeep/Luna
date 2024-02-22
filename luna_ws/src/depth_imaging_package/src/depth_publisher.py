@@ -19,8 +19,8 @@ min_size = 4000
 max_size = 27000
 min_roundness = 0.7
 
-SHOW_CONTOUR = False
-SHOW_CONVEX = True
+SHOW_CONTOUR = True
+SHOW_CONVEX = False
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 720
