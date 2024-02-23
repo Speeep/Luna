@@ -83,13 +83,13 @@ def main():
                 #     frame_counter = 0
 
                 # Convert from YUYV to BGR
-                # color_frame_np = GetBGR(color_frame)
+                color_frame_np = GetBGR(color_frame)
 
                 # Convert depth frame to depth image
-                # depth_data = np.asanyarray(depth_frame.get_data())
+                depth_data = np.asanyarray(depth_frame.get_data())
 
-                # cv2.imshow("Color Frame", color_frame_np)
-                # cv2.waitKey(1)
+                cv2.imshow("Color Frame", color_frame_np)
+                cv2.waitKey(1)
 
                 # # Apply spatial smoothing (Gaussian blur)
                 # smoothed_depth_data = cv2.GaussianBlur(depth_data, (3, 3), 0)
