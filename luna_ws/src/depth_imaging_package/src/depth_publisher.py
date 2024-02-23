@@ -128,9 +128,6 @@ def main():
                             cv2.drawContours(color_frame_np, [contour], 0, (0, 255, 0), 2)
 
                         else:
-                            # TODO DELETE THIS LINE
-                            cv2.drawContours(color_frame_np, [contour], 0, (0, 255, 0), 2)
-
                             # Find the convex hull of the contour
                             convex_hull = cv2.convexHull(contour)
 
