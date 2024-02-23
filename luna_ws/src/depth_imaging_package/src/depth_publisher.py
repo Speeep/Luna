@@ -63,7 +63,7 @@ def main():
         obstacle_pub = rospy.Publisher('/realsense/depth/obstacle', Float32MultiArray, queue_size=10)
         # bridge = CvBridge()
 
-        rate = rospy.Rate(15)  # 1 Hz
+        rate = rospy.Rate(3)  # 1 Hz
 
         try:
             while not rospy.is_shutdown():
@@ -162,7 +162,7 @@ def main():
                                     x0, y0, z0 = map(lambda val: round(val, 2), (x0, y0, z0))
 
                                     # Find radius in meters for object mapping
-                                    if (center[0] + radius < 1280):
+                                    if (center[0] + radius < 576):
                                         s, t = center[1], (center[0] + radius)
                                     elif (center[0] - radius > 0):
                                         s, t = center[1], (center[0] - radius)
