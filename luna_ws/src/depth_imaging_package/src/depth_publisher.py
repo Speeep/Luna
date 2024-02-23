@@ -91,6 +91,9 @@ def main():
                 color_frame_np = color_frame_np[crop_height:-crop_height, crop_width:-crop_width, :]
                 depth_data = depth_data[crop_height:-crop_height, crop_width:-crop_width]
 
+                print("Color Frame shape after cropping:", color_frame_np.shape)
+                print("Depth data shape after cropping:", depth_data.shape)
+
                 cv2.imshow("Color Frame", color_frame_np)
                 cv2.waitKey(1)
 
