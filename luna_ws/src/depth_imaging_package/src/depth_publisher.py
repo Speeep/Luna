@@ -128,6 +128,9 @@ def main():
                             cv2.drawContours(color_frame_np, [contour], 0, (0, 255, 0), 2)
 
                         else:
+                            # TODO Delete this line
+                            cv2.drawContours(color_frame_np, [contour], 0, (0, 255, 0), 2)      
+
                             # Find the convex hull of the contour
                             convex_hull = cv2.convexHull(contour)
 
@@ -185,8 +188,8 @@ def main():
                                     obstacle_msg.data = [x0, y0, z0, rad_m]
                                     obstacle_pub.publish(obstacle_msg)
 
-                                    cv2.imshow("Color Frame", color_frame_np)
-                                    cv2.waitKey(1)
+                cv2.imshow("Color Frame", color_frame_np)
+                cv2.waitKey(1)
 
                 # # Apply temporal smoothing
                 # depth_buffer.append(depth_data)
