@@ -107,7 +107,7 @@ def main():
                 edges = cv2.Canny(smoothed_depth_data, canny_threshold1, canny_threshold2)
 
                 # Apply morphological operations
-                kernel = np.ones((3, 3), np.uint8)
+                kernel = np.ones((7, 7), np.uint8)
                 edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
 
                 # Find contours in the edges
