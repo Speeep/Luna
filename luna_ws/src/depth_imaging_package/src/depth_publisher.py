@@ -60,10 +60,10 @@ def main():
         obstacle_pub = rospy.Publisher('/realsense/depth/obstacle', Float32MultiArray, queue_size=10)
         # bridge = CvBridge()
 
-        rate = rospy.Rate(15)  # 15 Hz
+        rate = rospy.Rate(1)  # 15 Hz
 
         try:
-            frame_counter = 0
+            # frame_counter = 0
             while not rospy.is_shutdown():
                 # Wait for the next set of frames
                 frames = pipeline.wait_for_frames()
@@ -76,20 +76,20 @@ def main():
                 if not depth_frame or not color_frame:
                     continue
 
-                if frame_counter < 15:
-                    frame_counter += 1
-                    continue
-                else:
-                    frame_counter = 0
+                # if frame_counter < 15:
+                #     frame_counter += 1
+                #     continue
+                # else:
+                #     frame_counter = 0
 
                 # Convert from YUYV to BGR
-                color_frame_np = GetBGR(color_frame)
+                # color_frame_np = GetBGR(color_frame)
 
                 # Convert depth frame to depth image
-                depth_data = np.asanyarray(depth_frame.get_data())
+                # depth_data = np.asanyarray(depth_frame.get_data())
 
-                cv2.imshow("Color Frame", color_frame_np)
-                cv2.waitKey(1)
+                # cv2.imshow("Color Frame", color_frame_np)
+                # cv2.waitKey(1)
 
                 # # Apply spatial smoothing (Gaussian blur)
                 # smoothed_depth_data = cv2.GaussianBlur(depth_data, (3, 3), 0)
