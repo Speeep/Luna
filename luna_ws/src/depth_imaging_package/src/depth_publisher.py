@@ -26,7 +26,7 @@ IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 480
 
 WIDTH_CROP = 0.05
-HEIGHT_CROP = 0.2
+HEIGHT_CROP = 0.3
 
 def GetBGR(frame_color):
     # Input: Intel handle to 16-bit YU/YV data
@@ -94,8 +94,8 @@ def main():
                 print("Color Frame shape after cropping:", color_frame_np.shape)
                 print("Depth data shape after cropping:", depth_data.shape)
 
-                cv2.imshow("Color Frame", color_frame_np)
-                cv2.waitKey(1)
+                # cv2.imshow("Color Frame", color_frame_np)
+                # cv2.waitKey(1)
 
                 # Apply spatial smoothing (Gaussian blur)
                 smoothed_depth_data = cv2.GaussianBlur(depth_data, (3, 3), 0)
@@ -128,6 +128,9 @@ def main():
                             cv2.drawContours(color_frame_np, [contour], 0, (0, 255, 0), 2)
 
                         else:
+                            # TODO DELETE THIS LINE
+                            cv2.drawContours(color_frame_np, [contour], 0, (0, 255, 0), 2)
+
                             # Find the convex hull of the contour
                             convex_hull = cv2.convexHull(contour)
 
