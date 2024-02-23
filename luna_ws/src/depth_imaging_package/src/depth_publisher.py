@@ -25,6 +25,9 @@ SHOW_CONVEX = False
 IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 480
 
+WIDTH_CROP = 0.05
+HEIGHT_CROP = 0.5
+
 def GetBGR(frame_color):
     # Input: Intel handle to 16-bit YU/YV data
     # Output: BGR8
@@ -80,6 +83,13 @@ def main():
 
                 # Convert depth frame to depth image
                 depth_data = np.asanyarray(depth_frame.get_data())
+
+                # Crop Images to reduce processing time
+                height, width, _ = color_frame_np.shape
+                crop_height = int(height * HEIGHT_CROP)
+                crop_width = int(width * WIDTH_CROP)
+                color_frame_np = color_frame_np[crop_height:-crop_height, crop_width:-crop_width, :]
+                depth_data = depth_data[crop_height:-crop_height, crop_width:-crop_width]
 
                 cv2.imshow("Color Frame", color_frame_np)
                 cv2.waitKey(1)
