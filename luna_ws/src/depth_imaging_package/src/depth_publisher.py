@@ -26,7 +26,7 @@ IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 480
 
 WIDTH_CROP = 0.05
-HEIGHT_CROP = 0.5
+HEIGHT_CROP = 0.2
 
 def GetBGR(frame_color):
     # Input: Intel handle to 16-bit YU/YV data
@@ -88,8 +88,8 @@ def main():
                 height, width, _ = color_frame_np.shape
                 crop_height = int(height * HEIGHT_CROP)
                 crop_width = int(width * WIDTH_CROP)
-                color_frame_np = color_frame_np[crop_height:-crop_height, crop_width:-crop_width, :]
-                depth_data = depth_data[crop_height:-crop_height, crop_width:-crop_width]
+                color_frame_np = color_frame_np[0:-crop_height, crop_width:-crop_width, :]
+                depth_data = depth_data[0:-crop_height, crop_width:-crop_width]
 
                 print("Color Frame shape after cropping:", color_frame_np.shape)
                 print("Depth data shape after cropping:", depth_data.shape)
