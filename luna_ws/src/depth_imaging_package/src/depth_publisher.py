@@ -63,7 +63,7 @@ def main():
         obstacle_pub = rospy.Publisher('/realsense/depth/obstacle', Float32MultiArray, queue_size=10)
         # bridge = CvBridge()
 
-        rate = rospy.Rate(1)  # 1 Hz
+        rate = rospy.Rate(15)  # 1 Hz
 
         try:
             while not rospy.is_shutdown():
@@ -90,12 +90,6 @@ def main():
                 crop_width = int(width * WIDTH_CROP)
                 color_frame_np = color_frame_np[0:-crop_height, crop_width:-crop_width, :]
                 depth_data = depth_data[0:-crop_height, crop_width:-crop_width]
-
-                print("Color Frame shape after cropping:", color_frame_np.shape)
-                print("Depth data shape after cropping:", depth_data.shape)
-
-                # cv2.imshow("Color Frame", color_frame_np)
-                # cv2.waitKey(1)
 
                 # Apply spatial smoothing (Gaussian blur)
                 smoothed_depth_data = cv2.GaussianBlur(depth_data, (3, 3), 0)
