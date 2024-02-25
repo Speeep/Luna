@@ -1,0 +1,8 @@
+prefix=/home/wigglywalrus/projects/Luna/luna_ws/install
+
+Name: luna_rviz
+Description: Description of luna_rviz
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

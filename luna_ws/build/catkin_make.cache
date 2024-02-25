@@ -1,0 +1,2 @@
+control_package:depth_imaging_package:localization_package:luna_rviz:mapping_package:robot_package:robot_sim_package
+-DCATKIN_DEVEL_PREFIX=/home/wigglywalrus/projects/Luna/luna_ws/devel -DCMAKE_INSTALL_PREFIX=/home/wigglywalrus/projects/Luna/luna_ws/install -G Unix Makefiles

@@ -1,0 +1,8 @@
+prefix=/home/wigglywalrus/projects/Luna/luna_ws/install
+
+Name: localization_package
+Description: Description of localization_package
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

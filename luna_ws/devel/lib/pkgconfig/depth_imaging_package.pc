@@ -1,0 +1,8 @@
+prefix=/home/wigglywalrus/projects/Luna/luna_ws/devel
+
+Name: depth_imaging_package
+Description: Description of depth_imaging_package
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
