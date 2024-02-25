@@ -52,3 +52,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/robot_sim_package" TYPE FILE FILES "/home/wigglywalrus/projects/Luna/luna_ws/src/robot_sim_package/package.xml")
 endif()
 
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/robot_sim_package" TYPE PROGRAM FILES "/home/wigglywalrus/projects/Luna/luna_ws/build/robot_sim_package/catkin_generated/installspace/simulator.py")
+endif()
+

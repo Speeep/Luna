@@ -25,15 +25,13 @@ def update_odom_data_cb(odom_msg):
     pose_step = odom_msg.data
     last_odom_time = rospy.Time.now()
 
-    if pose != (0.0, 0.0, 0.0):
+    odom_pose = (
+            (pose[0] + pose_step[0]*math.cos(pose[2]) - pose_step[1]*math.sin(pose[2])),
+            (pose[1] + pose_step[0]*math.sin(pose[2]) + pose_step[1]*math.cos(pose[2])),
+            (pose[2] + pose_step[2])
+        )
 
-        odom_pose = (
-                (pose[0] + pose_step[0]*math.cos(pose[2]) - pose_step[1]*math.sin(pose[2])),
-                (pose[1] + pose_step[0]*math.sin(pose[2]) + pose_step[1]*math.cos(pose[2])),
-                (pose[2] + pose_step[2])
-            )
-
-        pose = odom_pose
+    pose = odom_pose
 
 
 def update_localization_estimate_cb(localization_estimate_msg):
@@ -52,21 +50,15 @@ def update_localization_estimate_cb(localization_estimate_msg):
     localization_estimate = [x, y, theta]
     last_localization_time = rospy.Time.now()
 
-    # If there isn't a base pose yet, use 100% localization estimate from webcam
-    if pose == (0.0, 0.0, 0.0):
+   
+    # Async Complementary Filter Here
+    fused_pose = (
+        ((alpha * localization_estimate[0]) + (beta * pose[0])),
+        ((alpha * localization_estimate[1]) + (beta * pose[1])),
+        ((alpha * localization_estimate[2]) + (beta * pose[2]))
+    )
 
-        # If localization_estimate is also (0.0, 0.0, 0.0) this will result in an infinite loop until timeout.
-        pose = localization_estimate
-
-    else:
-        # Async Complementary Filter Here
-        fused_pose = (
-            ((alpha * localization_estimate[0]) + (beta * pose[0])),
-            ((alpha * localization_estimate[1]) + (beta * pose[1])),
-            ((alpha * localization_estimate[2]) + (beta * pose[2]))
-        )
-
-        pose = fused_pose
+    pose = fused_pose
 
 def filter():
     

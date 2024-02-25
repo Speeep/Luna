@@ -1,6 +1,6 @@
 from math import cos, sqrt, sin
 import rospy
-from std_msgs import Float32MultiArray, Float32, Int32
+from std_msgs.msg import Float32MultiArray, Float32, Int32
 
 rospy.init_node("simulator")
 
@@ -10,8 +10,11 @@ ROBOT_WIDTH_M = .5334
 ROBOT_LENGTH_M = .5080
 
 # state variables
+global state
 state = 0
+global drive_speed
 drive_speed = 0
+global icc
 icc = 0
 prev_time = 0
 pose_step_msg = Float32MultiArray()
@@ -19,12 +22,16 @@ pose_step_msg = Float32MultiArray()
 # callback functions
 def drive_cb(drive_speed_data):
     # convert drive speed from ticks/millis to meters/millis
+    global drive_speed
     drive_speed = drive_speed_data.data * M_PER_TICK
 
 def state_cb(state_data):
+    global state
     state = state_data.data
+    print("read state: " + str(state_data.data))
 
 def icc_cb(icc_data):
+    global icc
     icc = icc_data.data
 
 # publishers
@@ -36,10 +43,10 @@ rospy.Subscriber('/drivetrain/state', Int32, state_cb)
 rospy.Subscriber('/drivetrain/icc', Float32, icc_cb)
 
 if __name__ == '__main__':
-    prev_time = rospy.get_rostime() / 1000
+    prev_time = rospy.get_time() / 1000
 
     while not rospy.is_shutdown():
-        new_time = rospy.get_rostime() / 1000
+        new_time = rospy.get_time() / 1000
         delta_time = new_time - prev_time
 
         # diabled state
@@ -72,6 +79,7 @@ if __name__ == '__main__':
 
                 pose_step_msg.data[0] = icc * sin(theta)
                 pose_step_msg.data[1] = icc - icc * cos(theta)
+                print(str(cos(theta)))
                 pose_step_msg.data[2] = theta
             
             elif(icc == 0):
@@ -84,7 +92,7 @@ if __name__ == '__main__':
         step_pub.publish(pose_step_msg)
 
         prev_time = new_time
-        rospy.sleep(.05)
+        rospy.sleep(.1)
 
 
 
