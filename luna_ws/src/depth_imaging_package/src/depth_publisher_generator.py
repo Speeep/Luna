@@ -128,21 +128,12 @@ def main():
                     # Check if the depth difference is significant
                     if np.abs(avg_depth - smoothed_depth_data[contour[0][0][1], contour[0][0][0]]) > min_depth_difference:
 
-                        contour_image = color_frame_np.copy()
-                        cv2.drawContours(contour_image, [contour], 0, (0, 255, 0), 2)
-                        cv2.imshow("Contour Image", contour_image)
-                        cv2.waitKey(0)  
-
                         # Find the convex hull of the contour
                         convex_hull = cv2.convexHull(contour)
 
                         area_convex_hull = cv2.contourArea(convex_hull)
                         perimeter_convex_hull = cv2.arcLength(convex_hull, True)
                         roundness = (4 * np.pi * area_convex_hull) / (perimeter_convex_hull ** 2)
-
-                        cv2.drawContours(convex_image, [convex_hull], 0, (255, 0, 0), 2)
-                        cv2.imshow("Convex Hulls", convex_image)
-                        cv2.waitKey(0)
 
                         # Filter convex hulls based on size and roundness
                         if min_size <= area_convex_hull <= max_size and roundness >= min_roundness:
