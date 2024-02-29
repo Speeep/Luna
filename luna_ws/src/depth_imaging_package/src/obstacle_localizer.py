@@ -23,8 +23,8 @@ realsense_2_webcam_tf = np.array([
 def update_obstacle_pose(data):
     global obstacle_location_realsense
     obstacle_location_realsense[0][0] = data.data[0]
-    obstacle_location_realsense[0][1] = data.data[1]
-    obstacle_location_realsense[0][2] = data.data[2]
+    obstacle_location_realsense[1][0] = data.data[1]
+    obstacle_location_realsense[2][0] = data.data[2]
     rad_m = data.data[3]
     owf = np.matmul(realsense_2_webcam_tf, obstacle_location_realsense)
     obstacle_location_webcam = np.array([owf[0][0], owf[1][0], owf[2][0], 1])
