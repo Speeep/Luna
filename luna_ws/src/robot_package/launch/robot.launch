@@ -27,7 +27,7 @@
   />
   <node
     pkg="depth_imaging_package"
-    type="depth_publisher_generator.py"
+    type="depth_publisher.py"
     name="depth_publisher" 
     output="screen"
   />
