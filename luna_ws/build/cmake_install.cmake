@@ -136,6 +136,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/home/wigglywalrus/projects/Luna/luna_ws/build/depth_imaging_package/cmake_install.cmake")
   include("/home/wigglywalrus/projects/Luna/luna_ws/build/localization_package/cmake_install.cmake")
   include("/home/wigglywalrus/projects/Luna/luna_ws/build/mapping_package/cmake_install.cmake")
+  include("/home/wigglywalrus/projects/Luna/luna_ws/build/navigator_package/cmake_install.cmake")
   include("/home/wigglywalrus/projects/Luna/luna_ws/build/robot_package/cmake_install.cmake")
   include("/home/wigglywalrus/projects/Luna/luna_ws/build/robot_sim_package/cmake_install.cmake")
 

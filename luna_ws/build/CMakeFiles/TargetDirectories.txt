@@ -106,6 +106,13 @@
 /home/wigglywalrus/projects/Luna/luna_ws/build/mapping_package/CMakeFiles/list_install_components.dir
 /home/wigglywalrus/projects/Luna/luna_ws/build/mapping_package/CMakeFiles/nav_msgs_generate_messages_py.dir
 /home/wigglywalrus/projects/Luna/luna_ws/build/mapping_package/CMakeFiles/actionlib_msgs_generate_messages_cpp.dir
+/home/wigglywalrus/projects/Luna/luna_ws/build/navigator_package/CMakeFiles/install/strip.dir
+/home/wigglywalrus/projects/Luna/luna_ws/build/navigator_package/CMakeFiles/install/local.dir
+/home/wigglywalrus/projects/Luna/luna_ws/build/navigator_package/CMakeFiles/install.dir
+/home/wigglywalrus/projects/Luna/luna_ws/build/navigator_package/CMakeFiles/list_install_components.dir
+/home/wigglywalrus/projects/Luna/luna_ws/build/navigator_package/CMakeFiles/rebuild_cache.dir
+/home/wigglywalrus/projects/Luna/luna_ws/build/navigator_package/CMakeFiles/edit_cache.dir
+/home/wigglywalrus/projects/Luna/luna_ws/build/navigator_package/CMakeFiles/test.dir
 /home/wigglywalrus/projects/Luna/luna_ws/build/robot_package/CMakeFiles/install/strip.dir
 /home/wigglywalrus/projects/Luna/luna_ws/build/robot_package/CMakeFiles/install/local.dir
 /home/wigglywalrus/projects/Luna/luna_ws/build/robot_package/CMakeFiles/install.dir

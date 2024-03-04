@@ -24,15 +24,16 @@ def drive_cb(drive_speed_data):
     # convert drive speed from ticks/millis to meters/millis
     global drive_speed
     drive_speed = drive_speed_data.data * M_PER_TICK
+    print("Drive Speed: " + str(drive_speed))
 
 def state_cb(state_data):
     global state
     state = state_data.data
-    print("read state: " + str(state_data.data))
 
 def icc_cb(icc_data):
     global icc
     icc = icc_data.data
+    print("ICC: " + str(icc))
 
 # publishers
 step_pub = rospy.Publisher("/jetson/pose_step", Float32MultiArray, queue_size = 10)
@@ -43,10 +44,10 @@ rospy.Subscriber('/drivetrain/state', Int32, state_cb)
 rospy.Subscriber('/drivetrain/icc', Float32, icc_cb)
 
 if __name__ == '__main__':
-    prev_time = rospy.get_time() / 1000
+    prev_time = rospy.get_time() * 1000
 
     while not rospy.is_shutdown():
-        new_time = rospy.get_time() / 1000
+        new_time = rospy.get_time() * 1000
         delta_time = new_time - prev_time
 
         # diabled state

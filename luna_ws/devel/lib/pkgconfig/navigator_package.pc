@@ -1,0 +1,8 @@
+prefix=/home/wigglywalrus/projects/Luna/luna_ws/devel
+
+Name: navigator_package
+Description: Description of navigator_package
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

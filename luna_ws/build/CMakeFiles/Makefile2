@@ -59,6 +59,7 @@ all: control_package/all
 all: depth_imaging_package/all
 all: localization_package/all
 all: mapping_package/all
+all: navigator_package/all
 all: robot_package/all
 all: robot_sim_package/all
 
@@ -71,6 +72,7 @@ preinstall: control_package/preinstall
 preinstall: depth_imaging_package/preinstall
 preinstall: localization_package/preinstall
 preinstall: mapping_package/preinstall
+preinstall: navigator_package/preinstall
 preinstall: robot_package/preinstall
 preinstall: robot_sim_package/preinstall
 
@@ -88,6 +90,7 @@ clean: control_package/clean
 clean: depth_imaging_package/clean
 clean: localization_package/clean
 clean: mapping_package/clean
+clean: navigator_package/clean
 clean: robot_package/clean
 clean: robot_sim_package/clean
 
@@ -271,6 +274,24 @@ mapping_package/clean: mapping_package/CMakeFiles/nav_msgs_generate_messages_py.
 mapping_package/clean: mapping_package/CMakeFiles/actionlib_msgs_generate_messages_cpp.dir/clean
 
 .PHONY : mapping_package/clean
+
+#=============================================================================
+# Directory level rules for directory navigator_package
+
+# Recursive "all" directory target.
+navigator_package/all:
+
+.PHONY : navigator_package/all
+
+# Recursive "preinstall" directory target.
+navigator_package/preinstall:
+
+.PHONY : navigator_package/preinstall
+
+# Recursive "clean" directory target.
+navigator_package/clean:
+
+.PHONY : navigator_package/clean
 
 #=============================================================================
 # Directory level rules for directory robot_package
