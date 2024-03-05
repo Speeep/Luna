@@ -9,6 +9,9 @@ REALSENSE_OFFSET_X = 0.125
 REALSENSE_OFFSET_Y = 0.215
 REALSENSE_OFFSET_Z = 1.08
 
+CORRECTION_FACTOR_X = -0.20
+CORRECTION_FACTOR_Y = -0.155
+
 x = 0
 y = 0
 theta = 0
@@ -17,7 +20,7 @@ obstacle_location_realsense = [0, 0, 0, 0]
 
 # Define callback functions
 def update_obstacle_pose(data):
-    global obstacle_location_realsense, REALSENSE_OFFSET_X, REALSENSE_OFFSET_Y, REALSENSE_OFFSET_Z
+    global obstacle_location_realsense, REALSENSE_OFFSET_X, REALSENSE_OFFSET_Y, REALSENSE_OFFSET_Z, CORRECTION_FACTOR_X, CORRECTION_FACTOR_Y
     obstacle_location_realsense = data.data
 
     point_realsense = np.array([obstacle_location_realsense[2], -obstacle_location_realsense[0], -obstacle_location_realsense[1], 1])
@@ -30,6 +33,9 @@ def update_obstacle_pose(data):
     ])
 
     point_robot = np.dot(realsense_to_robot_tf, point_realsense)
+
+    point_robot[0] += CORRECTION_FACTOR_X
+    point_robot[1] += CORRECTION_FACTOR_Y
 
     print("Obstace Location Robot: " + str(point_robot))
 
