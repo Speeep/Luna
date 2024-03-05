@@ -19,7 +19,7 @@ def update_obstacle_pose(data):
     obstacle_location_realsense[2][0] = data.data[2]
     rad_m = data.data[3]
 
-    print("Obstace Location Realsense: " + str(obstacle_location_realsense[0][0]) + " " + str(obstacle_location_realsense[1][0]) + " " + str(obstacle_location_realsense[2][0]))
+    print("Obstace Location Realsense: " + str(data.data))
 
     # obstacle = Float32MultiArray()
     # obstacle.data = [obstacle_location_world[0], obstacle_location_world[1], rad_m]
