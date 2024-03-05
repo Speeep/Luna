@@ -12,15 +12,17 @@ REALSENSE_OFFSET_Z = 1.08
 CORRECTION_FACTOR_X = -0.20
 CORRECTION_FACTOR_Y = -0.155
 
-x = 0
-y = 0
-theta = 0
+robot_pose = [0, 0, 0]
 obstacle_location_realsense = [0, 0, 0, 0]
 
+def update_robot_pose(data):
+    global robot_pose
+    robot_pose = data.data
+    print(robot_pose)
 
 # Define callback functions
 def update_obstacle_pose(data):
-    global obstacle_location_realsense, REALSENSE_OFFSET_X, REALSENSE_OFFSET_Y, REALSENSE_OFFSET_Z, CORRECTION_FACTOR_X, CORRECTION_FACTOR_Y
+    global robot_pose, obstacle_location_realsense, REALSENSE_OFFSET_X, REALSENSE_OFFSET_Y, REALSENSE_OFFSET_Z, CORRECTION_FACTOR_X, CORRECTION_FACTOR_Y
     obstacle_location_realsense = data.data
 
     point_realsense = np.array([obstacle_location_realsense[2], -obstacle_location_realsense[0], -obstacle_location_realsense[1], 1])
@@ -37,7 +39,7 @@ def update_obstacle_pose(data):
     point_robot[0] += CORRECTION_FACTOR_X
     point_robot[1] += CORRECTION_FACTOR_Y
 
-    print("Obstace Location Robot: " + str(point_robot))
+    # print("Obstace Location Robot: " + str(point_robot))
 
     # obstacle = Float32MultiArray()
     # obstacle.data = [obstacle_location_world[0], obstacle_location_world[1], rad_m]
@@ -50,6 +52,7 @@ rospy.init_node('obstacle_localizer', anonymous=True)
 # Initialize publishers and subscribers
 obstacle_pub = rospy.Publisher('jetson/localized_obstacle', Float32MultiArray, queue_size=10)
 rospy.Subscriber('/realsense/depth/obstacle', Float32MultiArray, update_obstacle_pose)
+rospy.Subscriber('/jetson/filtered_pose', Float32MultiArray, update_robot_pose)
 
 # Define timer callback function
 def timer_callback(event):
