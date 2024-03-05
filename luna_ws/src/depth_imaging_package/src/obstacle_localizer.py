@@ -7,19 +7,15 @@ from math import cos, sin, sqrt, pi
 x = 0
 y = 0
 theta = 0
-
-obstacle_location_realsense = np.array([[0], [0], [0], [1]])
+obstacle_location_realsense = [0, 0, 0, 0]
 
 
 # Define callback functions
 def update_obstacle_pose(data):
     global obstacle_location_realsense
-    obstacle_location_realsense[0][0] = data.data[0]
-    obstacle_location_realsense[1][0] = data.data[1]
-    obstacle_location_realsense[2][0] = data.data[2]
-    rad_m = data.data[3]
+    obstacle_location_realsense = data.data
 
-    print("Obstace Location Realsense: " + str(data.data))
+    print("Obstace Location Realsense: " + str(obstacle_location_realsense))
 
     # obstacle = Float32MultiArray()
     # obstacle.data = [obstacle_location_world[0], obstacle_location_world[1], rad_m]
