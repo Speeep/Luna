@@ -31,6 +31,8 @@ def update_obstacle_pose(data):
     owf = np.matmul(realsense_2_webcam_tf, obstacle_location_realsense)
     obstacle_location_webcam = np.array([owf[0][0], owf[1][0], owf[2][0], 1])
 
+    print("Obstace Location Webcam: " + str(owf[0][0]) + " " + str(owf[1][0]) + " " + str(owf[2][0]))
+
     # Solve for the theta value to rotate about z axis for world to webcam tf
     if aruco_theta > 0:
         webcam_2_world_theta = pi + aruco_theta
