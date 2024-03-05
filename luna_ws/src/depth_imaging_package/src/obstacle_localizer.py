@@ -23,9 +23,9 @@ def update_obstacle_pose(data):
     point_realsense = np.array([obstacle_location_realsense[2], -obstacle_location_realsense[0], -obstacle_location_realsense[1], 1])
 
     realsense_to_robot_tf = np.array([
-        [0.707, 0,  -0.707, REALSENSE_OFFSET_X],
+        [0.707, 0,  0.707, REALSENSE_OFFSET_X],
         [0,     1,  0,      REALSENSE_OFFSET_Y],
-        [0.707, 0,  0.707,  REALSENSE_OFFSET_Z],
+        [-0.707, 0,  0.707,  REALSENSE_OFFSET_Z],
         [0,     0,  0,      1]
     ])
 
