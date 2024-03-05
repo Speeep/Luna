@@ -17,14 +17,16 @@ def update_obstacle_pose(data):
 
     point_realsense = np.array([obstacle_location_realsense[2], -obstacle_location_realsense[0], -obstacle_location_realsense[1], 1])
 
-    print("Obstace Location Realsense: " + str(point_realsense))
-
     realsense_to_robot_tf = np.array([
         [0.707, 0, -0.707, 0.076],
         [0, 1, 0, -0.048],
         [0.707, 0, 0.707, -0.076],
         [0, 0, 0, 1]
     ])
+
+    point_robot = np.dot(realsense_to_robot_tf, point_realsense)
+
+    print("Obstace Location Robot: " + str(point_robot))
 
     # obstacle = Float32MultiArray()
     # obstacle.data = [obstacle_location_world[0], obstacle_location_world[1], rad_m]
