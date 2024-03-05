@@ -5,6 +5,8 @@ from math import cos, sin, sqrt, pi
 
 WEBCAM_HEIGHT = 1.17 # 117 cm
 
+# Define global variables
+WEBCAM_HEIGHT = 1.17 # 98 cm
 aruco_theta = 0
 webcam_theta = 0
 x = 0
