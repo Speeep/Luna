@@ -137,5 +137,3 @@ if __name__ == '__main__':
     PathFinder()
     rospy.spin()
 
-
-
