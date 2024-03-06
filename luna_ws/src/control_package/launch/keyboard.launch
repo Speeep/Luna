@@ -36,5 +36,11 @@
     name="map" 
     output="screen"
   />
+  <node
+    pkg="navigator_package"
+    type="pathfinder.py"
+    name="pathfinder"
+    output="screen"
+  />
 
 </launch> 
