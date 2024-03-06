@@ -1,4 +1,4 @@
-from math import cos, sqrt, sin
+from math import sqrt
 import rospy
 import queue
 from std_msgs.msg import Float32, Int32
@@ -6,18 +6,21 @@ from nav_msgs.msg import OccupancyGrid, Path
 from geometry_msgs.msg import PoseStamped, Pose, Point
 
 
-
 class PathFinder:
     # state variables
     goal = (0,0)
-    occupancy_grid:OccupancyGrid
+    occupancy_grid:OccupancyGrid = OccupancyGrid()
     current_pose = (1,1)
 
     def __init__(self):
         #subscribers
         self.goal_sub = rospy.Subscriber('/move_base_simple/goal', PoseStamped, self.nav_goal_cb)
         self.map_sub = rospy.Subscriber('/robot/map', OccupancyGrid, self.new_map_cb)
+        self.fused_pose_sub = rospy.Subscriber('/jetson/filtered_pose', PoseStamped, self.fused_pose_cb)
+
+        #publishers
         self.path_pub = rospy.Publisher('/jetson/nav_path', Path, queue_size = 1)
+        self.occupancy_grid.info.resolution = 1
     
 
     # callback functions
@@ -37,7 +40,12 @@ class PathFinder:
     def new_map_cb(self, grid:OccupancyGrid):
         self.occupancy_grid = grid
     
-    
+    def fused_pose_cb(self, pose:PoseStamped):
+        point = pose.pose.position
+        resolution = self.occupancy_grid.info.resolution
+
+        self.current_pose = (int(point.x / resolution), int(point.y / resolution))
+        
     #helper functions
 
     #isDrivable takes a tuple representing x and y cell numbers in the occupancy grid

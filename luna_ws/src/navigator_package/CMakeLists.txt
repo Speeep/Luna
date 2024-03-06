@@ -209,3 +209,8 @@ catkin_install_python(PROGRAMS
   src/pathfinder.py 
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+catkin_install_python(PROGRAMS 
+  src/path_follower.py 
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
