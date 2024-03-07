@@ -46,7 +46,14 @@ class PathFollower:
 
 
     # callback functions
-        
+    
+    # disables path following TODO: Implement this with KBL
+    def e_stop(self, message):
+        self.following = False
+        self.state.data = 0
+        self.state_pub.publish(self.state)
+
+
     # Receives a path and starts following it
     def path_cb(self, path):
         self.current_path = path
