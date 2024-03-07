@@ -24,7 +24,6 @@ def update_robot_pose(data):
     quat = data.pose.orientation
     roll, pitch, yaw = tf.transformations.euler_from_quaternion([quat.x, quat.y, quat.z, quat.w])
     robot_pose = [pose_x, pose_y, yaw]
-    print(robot_pose)
 
 # Define callback functions
 def update_obstacle_pose(data):
