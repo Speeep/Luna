@@ -1,6 +1,6 @@
 from math import atan2, cos, sqrt, sin
 import rospy
-from std_msgs.msg import Float32, Int32
+from std_msgs.msg import Float32, Int32, Bool
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped, Pose, Point
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
@@ -38,7 +38,6 @@ class PathFollower:
         self.state_pub = rospy.Publisher('/drivetrain/state', Int32, queue_size = 10)
         self.speed_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size = 10)
         self.icc_pub = rospy.Publisher('/drivetrain/icc', Float32, queue_size = 10)
-
         self.target_pub = rospy.Publisher('/target', PoseStamped, queue_size = 10)
 
 
