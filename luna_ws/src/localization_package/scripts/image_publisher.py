@@ -71,19 +71,7 @@ def main():
     bridge = CvBridge()
 
     # Define Camera to Use
-    # cam = cv.VideoCapture(0)
-    width = 1280
-    height = 720
-
-    gst_str = ('nvarguscamerasrc ! ' + 'video/x-raw(memory:NVMM), ' +
-            'width=(int)1920, height=(int)1080, ' +
-            'format=(string)NV12, framerate=(fraction)30/1 ! ' + 
-            'nvvidconv flip-method=2 ! ' + 
-            'video/x-raw, width=(int){}, height=(int){}, ' + 
-            'format=(string)BGRx ! ' +
-            'videoconvert ! appsink').format(width, height)
-
-    cam = cv.VideoCapture(gst_str, cv.CAP_GSTREAMER) 
+    cam = cv.VideoCapture(0)
 
     # Define green color
     YELLOW = (0, 255, 255)
@@ -201,6 +189,8 @@ def main():
             image_publisher.publish(image_message)
             
         rate.sleep()
+
+    cam.release()
 
 if __name__ == '__main__':
     try:
