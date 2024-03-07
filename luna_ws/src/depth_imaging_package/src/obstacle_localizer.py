@@ -17,7 +17,7 @@ obstacle_location_realsense = [0, 0, 0, 0]
 
 def update_robot_pose(data):
     global robot_pose
-    robot_pose = data.data
+    robot_pose = data.data.pose.position
     print(robot_pose)
 
 # Define callback functions
@@ -38,6 +38,8 @@ def update_obstacle_pose(data):
 
     point_robot[0] += CORRECTION_FACTOR_X
     point_robot[1] += CORRECTION_FACTOR_Y
+
+
 
     # print("Obstace Location Robot: " + str(point_robot))
 
