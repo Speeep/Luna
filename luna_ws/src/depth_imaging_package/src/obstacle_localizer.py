@@ -21,7 +21,8 @@ def update_robot_pose(data):
     global robot_pose
     pose_x = data.pose.position.x
     pose_y = data.pose.position.y
-    roll, pitch, yaw = tf.transformations.euler_from_quaternion(data.pose.orientation)
+    quat = data.pose.orientation
+    roll, pitch, yaw = tf.transformations.euler_from_quaternion([quat.x, quat.y, quat.z, quat.w])
     robot_pose = [pose_x, pose_y, yaw]
     print(robot_pose)
 
@@ -46,7 +47,7 @@ def update_obstacle_pose(data):
 
 
     print("X: " + str(robot_pose[0]) + "        Y: " + str(robot_pose[1]) + "       Yaw: " + str(robot_pose[2]))
-
+    
     # print("Obstace Location Robot: " + str(point_robot))
 
     # obstacle = Float32MultiArray()
