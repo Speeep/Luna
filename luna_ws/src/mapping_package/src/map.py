@@ -62,7 +62,8 @@ def set_obstacles_cb(obstacle_msg):
     x = data[0]
     y = data[1]
     radius = data[2]
-    set_obstacles(grid=grid, x=x, y=y, radius=radius)
+    grid_x, grid_y = world_to_grid(x, y)
+    set_obstacles(grid=grid, x=grid_x, y=grid_y, radius=radius)
 
 def clicked_point_cb(click_msg):
     x = click_msg.point.x
