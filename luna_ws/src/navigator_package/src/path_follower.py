@@ -14,6 +14,22 @@ class PathFollower:
     next_pos = (0,0)
     next_index = 1
 
+    
+    # set up outputs
+    state = Int32()
+    speed = Float32()
+
+    #constants
+    DRIVE_STRAIGHT = .015 #max delta heading to drive staright
+    ICC_TURN = .6 #max delta heading to use ICC turn
+    ICC_SCALE_FACTOR = .9 #makes turns tighter than necessary to avoid runaway oscilation
+    NORMAL_LOOK_AHEAD = .25
+    FINAL_LOOK_AHEAD = .0625
+    FINAL_PATH_LEN = 3
+    ICC_HYST = .3 #hysteresis for transition from point to ICC turn
+
+
+
     #init
     def __init__(self):
         self.path_sub = rospy.Subscriber('/jetson/nav_path', Path, self.path_cb)
@@ -21,6 +37,9 @@ class PathFollower:
 
         self.state_pub = rospy.Publisher('/drivetrain/state', Int32, queue_size = 10)
         self.speed_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size = 10)
+        self.icc_pub = rospy.Publisher('/drivetrain/icc', Float32, queue_size = 10)
+
+        self.target_pub = rospy.Publisher('/target', PoseStamped, queue_size = 10)
 
 
 
@@ -52,7 +71,14 @@ class PathFollower:
         if not self.following:
             return
         
-        if self.euchlidean_distance(self.curr_pos, self.next_pos) < .0625:
+        
+        #check euclidean distance
+        dist = self.euchlidean_distance(self.curr_pos, self.next_pos)
+        
+        if dist < self.NORMAL_LOOK_AHEAD and self.index > self.FINAL_PATH_LEN:
+            self.extract_next_pos()
+            return
+        elif dist < self.FINAL_LOOK_AHEAD:
             self.extract_next_pos()
             return
         
@@ -73,33 +99,46 @@ class PathFollower:
             delta_heading += 6.28318530718
 
 
-        # set up outputs
-        state = Int32()
-        speed = Float32()
 
         #drive straight condition
-        if(abs(delta_heading) < 0.01):
-            state.data = 1
-            self.state_pub.publish(state)
+        if(abs(delta_heading) < self.DRIVE_STRAIGHT):
+            self.state.data = 1
+            self.state_pub.publish(self.state)
 
-            speed.data = .5
-            self.speed_pub.publish(speed)
+            self.speed.data = .5
+            self.speed_pub.publish(self.speed)
 
-        #turning conditions
+        #icc turning condition
+        elif (self.state.data == 3 and abs(delta_heading) < self.ICC_TURN) or (abs(delta_heading) < self.ICC_TURN - self.ICC_HYST):
+            #ask Ian for this proof, Hes right.
+            r_icc = dist / (2*sin(delta_heading))
+            r_icc *= self.ICC_SCALE_FACTOR
+
+            self.state.data = 3
+            self.state_pub.publish(self.state)
+
+            icc = Float32()
+            icc.data = r_icc
+            self.icc_pub.publish(icc)
+
+            self.speed.data = .5
+            self.speed_pub.publish(self.speed)
+
+        #point turning condition
+        #negative
         elif(delta_heading < 0):
-            state.data = 2
-            self.state_pub.publish(state)
+            self.state.data = 2
+            self.state_pub.publish(self.state)
 
-            speed.data = -.25
-            self.speed_pub.publish(speed)
+            self.speed.data = -.25
+            self.speed_pub.publish(self.speed)
+        #positive
         else:
-            state.data = 2
-            self.state_pub.publish(state)
+            self.state.data = 2
+            self.state_pub.publish(self.state)
 
-            speed.data = .25
-            self.speed_pub.publish(speed)
-
-
+            self.speed.data = .25
+            self.speed_pub.publish(self.speed)
 
     # helper functions
     def euchlidean_distance(self, pos_1, pos_2):
@@ -112,7 +151,7 @@ class PathFollower:
         self.index -= 1
 
         #if we are at the end of the path, stop following and disable DT
-        if self.index == 0:
+        if self.index < 0:
             self.following = False
             state = Int32()
             state.data = 0
@@ -125,6 +164,10 @@ class PathFollower:
         y = pose_stamped.pose.position.y
         self.next_pos = (x,y)
 
+        pose_stamped.header.frame_id = "world"
+
+        self.target_pub.publish(pose_stamped)
+
 
 
 
@@ -134,7 +177,10 @@ if __name__ == '__main__':
     follower = PathFollower()
 
     while not rospy.is_shutdown():
-        follower.follow()
+        if(follower.is_following()):
+            follower.follow()
+        else:
+            rospy.sleep(.125)
 
 
 

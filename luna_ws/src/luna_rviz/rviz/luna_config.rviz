@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /Path1
+        - /LookAhead1
       Splitter Ratio: 0.5
     Tree Height: 555
   - Class: rviz/Selection
@@ -133,6 +134,22 @@ Visualization Manager:
       Topic: /jetson/nav_path
       Unreliable: false
       Value: true
+    - Alpha: 1
+      Axes Length: 0.0625
+      Axes Radius: 0.10000000149011612
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
+      Name: LookAhead
+      Queue Size: 10
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Axes
+      Topic: /target
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -161,7 +178,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 13.301614761352539
+      Distance: 16.445274353027344
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -197,5 +214,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 455
-  Y: 20
+  X: 861
+  Y: 398

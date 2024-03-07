@@ -104,8 +104,8 @@ class PathFinder:
                 new_cost = cost_to[current] + self.euchlid_dist(current, next_pos)
 
                 # reward paths that dont turn as much
-                if(next_dir == current_dir):
-                    new_cost -= .5
+                if(next_dir != current_dir):
+                    new_cost += .5
                 
                 
                 if next_pos not in cost_to or new_cost < cost_to[next_pos]:
