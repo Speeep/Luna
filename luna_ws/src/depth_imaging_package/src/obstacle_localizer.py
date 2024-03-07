@@ -1,6 +1,7 @@
 import rospy
 from std_msgs.msg import Float32MultiArray, Float32
 from geometry_msgs.msg import PoseStamped, Pose, Point
+import tf.transformations
 import numpy as np
 from math import cos, sin, sqrt, pi
 
@@ -18,7 +19,11 @@ obstacle_location_realsense = [0, 0, 0, 0]
 
 def update_robot_pose(data):
     global robot_pose
-    robot_pose = data.pose.position
+    pose_x = data.pose.position.x
+    pose_y = data.pose.position.y
+    quat = data.pose.orientation
+    roll, pitch, yaw = tf.transformations.euler_from_quaternion(quat.x, quat.y, quat.z, quat.w)
+    robot_pose = [pose_x, pose_y, yaw]
     print(robot_pose)
 
 # Define callback functions
@@ -41,7 +46,8 @@ def update_obstacle_pose(data):
     point_robot[1] += CORRECTION_FACTOR_Y
 
 
-
+    print("X: " + str(robot_pose[0]) + "        Y: " + str(robot_pose[1]) + "       Yaw: " + str(robot_pose[2]))
+    
     # print("Obstace Location Robot: " + str(point_robot))
 
     # obstacle = Float32MultiArray()
