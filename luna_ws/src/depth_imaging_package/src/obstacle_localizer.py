@@ -54,7 +54,7 @@ rospy.init_node('obstacle_localizer', anonymous=True)
 # Initialize publishers and subscribers
 obstacle_pub = rospy.Publisher('jetson/localized_obstacle', Float32MultiArray, queue_size=10)
 rospy.Subscriber('/realsense/depth/obstacle', Float32MultiArray, update_obstacle_pose)
-rospy.Subscriber('/jetson/filtered_pose', Float32MultiArray, update_robot_pose)
+rospy.Subscriber('/jetson/filtered_pose', PoseStamped, update_robot_pose)
 
 # Define timer callback function
 def timer_callback(event):
