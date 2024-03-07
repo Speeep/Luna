@@ -29,6 +29,7 @@ def update_robot_pose(data):
 def update_obstacle_pose(data):
     global robot_pose, obstacle_location_realsense, REALSENSE_OFFSET_X, REALSENSE_OFFSET_Y, REALSENSE_OFFSET_Z, CORRECTION_FACTOR_X, CORRECTION_FACTOR_Y
     obstacle_location_realsense = data.data
+    rad_m = obstacle_location_realsense[3]
 
     point_realsense = np.array([obstacle_location_realsense[2], -obstacle_location_realsense[0], -obstacle_location_realsense[1], 1])
 
@@ -53,21 +54,19 @@ def update_obstacle_pose(data):
 
     point_world = np.dot(robot_to_world_tf, point_robot)
 
-    print("X: " + str(robot_pose[0]) + "        Y: " + str(robot_pose[1]) + "       Yaw: " + str(robot_pose[2]))
-    print("Point X: " + str(point_world[0]) + "        Point Y: " + str(point_world[1]))
-    
-    # print("Obstace Location Robot: " + str(point_robot))
+    # print("X: " + str(robot_pose[0]) + "        Y: " + str(robot_pose[1]) + "       Yaw: " + str(robot_pose[2]))
+    # print("Point X: " + str(point_world[0]) + "        Point Y: " + str(point_world[1]))
 
-    # obstacle = Float32MultiArray()
-    # obstacle.data = [obstacle_location_world[0], obstacle_location_world[1], rad_m]
+    obstacle = Float32MultiArray()
+    obstacle.data = [point_world[0], point_world[1], rad_m]
 
-    # obstacle_pub.publish(obstacle)
+    obstacle_pub.publish(obstacle)
 
 # Initialize ROS node
 rospy.init_node('obstacle_localizer', anonymous=True)
 
 # Initialize publishers and subscribers
-obstacle_pub = rospy.Publisher('jetson/localized_obstacle', Float32MultiArray, queue_size=10)
+obstacle_pub = rospy.Publisher('/map/obstacle', Float32MultiArray, queue_size=10)
 rospy.Subscriber('/realsense/depth/obstacle', Float32MultiArray, update_obstacle_pose)
 rospy.Subscriber('/jetson/filtered_pose', PoseStamped, update_robot_pose)
 
