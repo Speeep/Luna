@@ -1,7 +1,7 @@
 from math import sqrt
 import rospy
 from queue import PriorityQueue
-from std_msgs.msg import Float32, Int32
+from std_msgs.msg import Float32, Int32, Bool
 from nav_msgs.msg import OccupancyGrid, Path, GridCells
 from geometry_msgs.msg import PoseStamped, Pose, Point, PointStamped
 
@@ -18,7 +18,7 @@ class PathFinder:
         self.goal_sub = rospy.Subscriber('/move_base_simple/goal', PoseStamped, self.nav_goal_cb)
         self.map_sub = rospy.Subscriber('/robot/map', OccupancyGrid, self.new_map_cb)
         self.fused_pose_sub = rospy.Subscriber('/jetson/filtered_pose', PoseStamped, self.fused_pose_cb)
-        self.clicked_point_sub = rospy.Subscriber('/clicked_point', PointStamped, self.new_obstacle_cb)
+        self.clicked_point_sub = rospy.Subscriber('/robot/map_change', Bool, self.new_obstacle_cb)
 
         #publishers
         self.path_pub = rospy.Publisher('/jetson/nav_path', Path, queue_size = 1)
@@ -38,11 +38,11 @@ class PathFinder:
         #sets the generate path flag to true, will generate when a new map is available
         self.ready_for_path = True
     
-    def new_obstacle_cb(self, message):
-        print("new obstacle")
+    def new_obstacle_cb(self, message:Bool):
         
-        #sets the generate path flag to true, will generate when a new map is available
-        self.ready_for_path = True
+        # sets the generate path flag to true, will generate when a new map is available
+        if(message.data):
+            self.ready_for_path = True
 
     def new_map_cb(self, grid:OccupancyGrid):
         # update internal map
