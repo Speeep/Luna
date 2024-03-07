@@ -27,14 +27,17 @@ class PathFollower:
     FINAL_LOOK_AHEAD = .0625
     FINAL_PATH_LEN = 3
     ICC_HYST = .3 #hysteresis for transition from point to ICC turn
+    DRIVE_SPEED = .75
 
 
 
     #init
     def __init__(self):
+        # subscribers
         self.path_sub = rospy.Subscriber('/jetson/nav_path', Path, self.path_cb)
         self.fused_pose_sub = rospy.Subscriber('/jetson/filtered_pose', PoseStamped, self.fused_pose_cb)
 
+        # publishers
         self.state_pub = rospy.Publisher('/drivetrain/state', Int32, queue_size = 10)
         self.speed_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size = 10)
         self.icc_pub = rospy.Publisher('/drivetrain/icc', Float32, queue_size = 10)
@@ -43,12 +46,15 @@ class PathFollower:
 
 
     # callback functions
+        
+    # Receives a path and starts following it
     def path_cb(self, path):
         self.current_path = path
         self.following = True
         self.index = len(path.poses) - 1
         self.extract_next_pos()
 
+    # Updates the pose of the robot
     def fused_pose_cb(self, pose_stamped):
         #extract x and y pos of robot
         x = pose_stamped.pose.position.x
@@ -63,13 +69,14 @@ class PathFollower:
 
 
     # External functions
+        
     def is_following(self):
         return self.following
 
+    # The command to follow the path, needs to be continuously called
     def follow(self):
         if not self.following:
             return
-        
         
         #check euclidean distance
         dist = self.euchlidean_distance(self.curr_pos, self.next_pos)
@@ -104,12 +111,12 @@ class PathFollower:
             self.state.data = 1
             self.state_pub.publish(self.state)
 
-            self.speed.data = .5
+            self.speed.data = self.DRIVE_SPEED
             self.speed_pub.publish(self.speed)
 
         #icc turning condition
         elif (self.state.data == 3 and abs(delta_heading) < self.ICC_TURN) or (abs(delta_heading) < self.ICC_TURN - self.ICC_HYST):
-            #ask Ian for this proof, Hes right.
+            # ask Ian for this proof
             r_icc = dist / (2*sin(delta_heading))
             r_icc *= self.ICC_SCALE_FACTOR
 
@@ -120,7 +127,7 @@ class PathFollower:
             icc.data = r_icc
             self.icc_pub.publish(icc)
 
-            self.speed.data = .5
+            self.speed.data = self.DRIVE_SPEED
             self.speed_pub.publish(self.speed)
 
         #point turning condition
@@ -129,14 +136,14 @@ class PathFollower:
             self.state.data = 2
             self.state_pub.publish(self.state)
 
-            self.speed.data = -.25
+            self.speed.data = -self.DRIVE_SPEED
             self.speed_pub.publish(self.speed)
         #positive
         else:
             self.state.data = 2
             self.state_pub.publish(self.state)
 
-            self.speed.data = .25
+            self.speed.data = self.DRIVE_SPEED
             self.speed_pub.publish(self.speed)
 
     # helper functions
@@ -178,6 +185,7 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         if(follower.is_following()):
             follower.follow()
+            rospy.sleep(.1)
         else:
             rospy.sleep(.125)
 

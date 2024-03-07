@@ -3,7 +3,7 @@ import rospy
 from queue import PriorityQueue
 from std_msgs.msg import Float32, Int32
 from nav_msgs.msg import OccupancyGrid, Path, GridCells
-from geometry_msgs.msg import PoseStamped, Pose, Point
+from geometry_msgs.msg import PoseStamped, Pose, Point, PointStamped
 
 
 class PathFinder:
@@ -11,19 +11,20 @@ class PathFinder:
     goal = (0,0)
     occupancy_grid:OccupancyGrid = OccupancyGrid()
     current_pose = (1,1)
+    ready_for_path = False
 
     def __init__(self):
         #subscribers
         self.goal_sub = rospy.Subscriber('/move_base_simple/goal', PoseStamped, self.nav_goal_cb)
         self.map_sub = rospy.Subscriber('/robot/map', OccupancyGrid, self.new_map_cb)
         self.fused_pose_sub = rospy.Subscriber('/jetson/filtered_pose', PoseStamped, self.fused_pose_cb)
+        self.clicked_point_sub = rospy.Subscriber('/clicked_point', PointStamped, self.new_obstacle_cb)
 
         #publishers
         self.path_pub = rospy.Publisher('/jetson/nav_path', Path, queue_size = 1)
         # self.cells_pub = rospy.Publisher('/a_star_debug', GridCells, queue_size = 10)
 
-
-
+        # prevents a div 0 error if map isn't updated in time
         self.occupancy_grid.info.resolution = 1
     
 
@@ -34,21 +35,38 @@ class PathFinder:
 
         self.goal = (int(point.x / resolution), int(point.y / resolution))
 
-        if self.is_drivable(self.goal):
-            print("drivable")
-            path = self.a_star()
-            if path is not None:
-                self.path_pub.publish(path)
-            else:
-                print("no path")
-
-        else:
-            print("not drivable")
+        #sets the generate path flag to true, will generate when a new map is available
+        self.ready_for_path = True
+    
+    def new_obstacle_cb(self, message):
+        print("new obstacle")
+        
+        #sets the generate path flag to true, will generate when a new map is available
+        self.ready_for_path = True
 
     def new_map_cb(self, grid:OccupancyGrid):
+        # update internal map
         self.occupancy_grid = grid
+
+        #Check if a path needs to be generated, and generates one
+        if self.ready_for_path:
+            if self.is_drivable(self.goal):
+                print("drivable")
+                path = self.a_star()
+                if path is None:
+                    print("no path")
+                    path = Path()
+
+            else:
+                print("not drivable")
+                path = Path()
+            self.path_pub.publish(path)
+            
+            self.ready_for_path = False
+
     
     def fused_pose_cb(self, pose:PoseStamped):
+        # Updates internal pose data
         point = pose.pose.position
         resolution = self.occupancy_grid.info.resolution
 
@@ -68,6 +86,7 @@ class PathFinder:
             return True
         return False
     
+    #neighbors_of_8 will return all adjacent drivable cells, unless position is undrivable, in which case it will return all adjacent cells on the map
     def neighbors_of_8(self, position):
         x = position[0]
         y = position[1]
@@ -83,11 +102,14 @@ class PathFinder:
         
         return neighbors
     
+    # Euchlid_dist returns the eeuchlidean distance between 2 points
     def euchlid_dist(self, start, end):
         return sqrt((start[0] - end[0]) **2 + (start[1] - end[1])**2)
 
+    # Plans a pathe from self.current_pose to self.goal_pose
     def a_star(self):
 
+        # gridCells stuff
         # gc = GridCells()
         # gc.cell_width = .08
         # gc.cell_height = .08
@@ -120,29 +142,38 @@ class PathFinder:
                 next_pos = (next[0], next[1])
                 next_dir = (next[2], next[3])
 
+                # gridCells stuff
                 # point = Point()
                 # point.x = next_pos[0] * .08
                 # point.y = next_pos[1] * .08
                 # gc.cells.append(point)
                 # self.cells_pub.publish(gc)
 
+                # calculate cost to reach this cell
                 new_cost = cost_to[current] + self.euchlid_dist(current, next_pos)
 
                 # punish paths that turn
                 if(next_dir != current_dir):
                     new_cost += .5
                 
+                
                 if next_pos not in cost_to or new_cost < cost_to[next_pos]:
+                    #add/update a cell in frontier
                     cost_to[next_pos] = new_cost
                     dir_to[next_pos] = next_dir
                     
+                    # If cell is drivable, use distance to goal as herustic
                     if self.is_drivable(next_pos):
                         heuristic = self.euchlid_dist(next_pos, self.goal)
+
+                    # If cell is non-drivable, make herustic really big and constant so the algorithm does dijkstras until it escapes
                     else:
                         heuristic = 1000
                     
+                    
                     priority = new_cost + heuristic
                     
+
                     frontier.put((priority, next_pos))
                     came_from[next_pos] = current
         
@@ -153,6 +184,7 @@ class PathFinder:
         
         try:
             while current != self.current_pose:
+                # convert cell location to pose in world frame
                 pose = PoseStamped()
 
                 resolution = self.occupancy_grid.info.resolution
@@ -164,7 +196,7 @@ class PathFinder:
                 current = came_from[current]
             
             return path
-        except KeyError:
+        except KeyError: # if  the path fails reconstruction, I.E. there is no path
             return None
 
 
