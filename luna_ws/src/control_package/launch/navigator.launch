@@ -6,12 +6,6 @@
     name="listener" 
     output="screen"
   />
-  <node
-    pkg="control_package"
-    type="keyboard_control.py"
-    name="keyboard_control" 
-    output="screen"
-  />
   <node 
     type="rviz" 
     name="rviz" 
