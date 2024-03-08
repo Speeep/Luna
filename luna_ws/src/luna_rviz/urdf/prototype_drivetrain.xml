@@ -7,7 +7,7 @@
      <visual>
       <origin rpy="0 0 0" xyz="0 0 .2286"/>
        <geometry>
-         <mesh filename="package://modeling_package/meshes/prototype_drivetrain.stl"/>
+         <mesh filename="package://luna_rviz/meshes/prototype_drivetrain.stl"/>
        </geometry>
        <material name="white"/>
      </visual>

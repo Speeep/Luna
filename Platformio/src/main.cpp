@@ -98,12 +98,12 @@ void setup()
 
 void loop()
 {
-  nh.spinOnce();
-
   currentMillis = millis();
 
   // Drivetrain gets looped every 10 milliseconds
   if (currentMillis - previousMillis >= DRIVETRAIN_INTERVAL) {
+
+    nh.spinOnce();
 
     previousMillis = currentMillis;
 
