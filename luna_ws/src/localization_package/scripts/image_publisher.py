@@ -65,6 +65,7 @@ def main():
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
     servo_error_publisher = rospy.Publisher('/localizer/error', Float32, queue_size=10)
     tvec_publisher = rospy.Publisher('/tvec', Float32MultiArray, queue_size=10)
+    aruco_data_pub = rospy.Publisher('/jetson/aruco_data', Float32MultiArray, queue_size=10)
     aruco_broadcaster = tf2_ros.StaticTransformBroadcaster()
 
     bridge = CvBridge()
@@ -153,6 +154,10 @@ def main():
                     static_transformStamped.transform.rotation.z = quat[2]
                     static_transformStamped.transform.rotation.w = quat[3]
 
+                    aruco_data = Float32MultiArray()
+                    aruco_data.data = [avg_xw, avg_yw, theta]
+                    aruco_data_pub.publish(aruco_data)
+
                     aruco_broadcaster.sendTransform(static_transformStamped)
 
                     cv.polylines(
@@ -184,6 +189,8 @@ def main():
             image_publisher.publish(image_message)
             
         rate.sleep()
+
+    cam.release()
 
 if __name__ == '__main__':
     try:

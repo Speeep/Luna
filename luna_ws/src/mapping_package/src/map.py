@@ -6,7 +6,6 @@ from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import TransformStamped, PointStamped
 from std_msgs.msg import Float32MultiArray, Bool
 
-
 class Map_Node:
     # Grid Cell Size
     GRID_CELL_SIZE_M = 0.08
@@ -20,11 +19,9 @@ class Map_Node:
     # initialize grid with -1 (unknown)
     grid = numpy.ndarray((height, width), buffer=numpy.zeros((width, height), dtype=numpy.int),dtype=numpy.int)
 
-
     # TF Broadcaster
     tf_broadcaster = tf.TransformBroadcaster()
     
-
     def __init__(self):
         # initialize node
         rospy.init_node('map')
@@ -49,8 +46,6 @@ class Map_Node:
         self.obstacle_sub = rospy.Subscriber('/map/obstacle', Float32MultiArray, self.set_obstacle_cb)
         self.click_sub = rospy.Subscriber('/clicked_point', PointStamped, self.clicked_point_cb)
 
-            
-
         for i in range(self.width):
             self.grid[0][i] = 100
             self.grid[self.height-1][i] = 100
@@ -58,8 +53,6 @@ class Map_Node:
         for i in range(self.height):
             self.grid[i][0] = 100
             self.grid[i][self.width-1] = 100
-
-
 
     def set_obstacle_cb(self, obstacle_msg):
         data = obstacle_msg.data
@@ -74,7 +67,6 @@ class Map_Node:
         y = click_msg.point.y
         grid_x, grid_y = self.world_to_grid(x, y)
         self.set_obstacle(x=grid_x, y=grid_y, radius=0.0)
-
 
     def set_obstacle(self, x, y, radius): # size in m
         # x = int(x)
@@ -112,10 +104,8 @@ class Map_Node:
                         self.grid[i, j] = 10
                         new_obstacle = True
         
-        
         self.change_pub.publish(new_obstacle)
         
-
     def world_to_grid(self, x, y):
 
         # Grid cell indices for (x, y) point
@@ -141,9 +131,6 @@ class Map_Node:
             "world"
         )
         
-
-    
-
     
 
 # main function

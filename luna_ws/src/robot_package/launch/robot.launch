@@ -25,4 +25,16 @@
     name="tf_solver" 
     output="screen"
   />
+  <node
+    pkg="depth_imaging_package"
+    type="depth_publisher.py"
+    name="depth_publisher" 
+    output="screen"
+  />
+  <node
+    pkg="depth_imaging_package"
+    type="obstacle_localizer.py"
+    name="obstacle_localizer" 
+    output="screen"
+  />
 </launch> 

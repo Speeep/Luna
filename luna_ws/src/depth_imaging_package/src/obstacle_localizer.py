@@ -1,99 +1,83 @@
 import rospy
 from std_msgs.msg import Float32MultiArray, Float32
+from geometry_msgs.msg import PoseStamped, Pose, Point
+import tf.transformations
 import numpy as np
 from math import cos, sin, sqrt, pi
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
-WEBCAM_HEIGHT = 1.17 # 117 cm
+# Define global variables
 
-aruco_theta = 0
-webcam_theta = 0
-x = 0
-y = 0
+REALSENSE_OFFSET_X = 0.125
+REALSENSE_OFFSET_Y = 0.215
+REALSENSE_OFFSET_Z = 1.08
 
-realsense_2_webcam_tf = np.array([
-    [cos(webcam_theta - 1.5708), (sqrt(2)/2)*sin(webcam_theta - 1.5708), -(sqrt(2)/2)*sin(webcam_theta - 1.5708), -(0.0876*sin(webcam_theta - 1.5708))],
-    [sin(webcam_theta - 1.5708), -(sqrt(2)/2)*cos(webcam_theta - 1.5708), (sqrt(2)/2)*cos(webcam_theta - 1.5708), 0.0876*cos(webcam_theta - 1.5708)],
-    [0, -sqrt(2)/2, -sqrt(2)/2, -0.0691],
-    [0, 0, 0, 1]
-])
+CORRECTION_FACTOR_X = -0.20
+CORRECTION_FACTOR_Y = -0.155
 
-def world_2_webcam(webcam_2_world_theta, x, y, webcam_height):
-    translate = np.array([
-        [1, 0, 0, -x],
-        [0, 1, 0, -y],
-        [0, 0, 1, -webcam_height],
-        [0, 0, 0, 1]
-    ])
-    rotate = np.array([
-        [cos(webcam_2_world_theta), -sin(webcam_2_world_theta), 0, 0],
-        [sin(webcam_2_world_theta), cos(webcam_2_world_theta), 0, 0],
-        [0, 0, 1, 0],
-        [0, 0, 0, 1]
-    ])
-    return rotate @ translate
+robot_pose = [0, 0, 0]
+obstacle_location_realsense = [0, 0, 0, 0]
 
-def webcam_2_world(webcam_2_world_theta, x, y, WEBCAM_HEIGHT):
-    return np.linalg.inv(world_2_webcam(webcam_2_world_theta, x, y, WEBCAM_HEIGHT))
+def update_robot_pose(data):
+    global robot_pose
+    pose_x = data.pose.position.x
+    pose_y = data.pose.position.y
+    quat = data.pose.orientation
+    roll, pitch, yaw = tf.transformations.euler_from_quaternion([quat.x, quat.y, quat.z, quat.w])
+    robot_pose = [pose_x, pose_y, yaw]
 
-obstacle_location_realsense = [
-    [0],
-    [0],
-    [0],
-    [1]
-]
-
+# Define callback functions
 def update_obstacle_pose(data):
-    obstacle_location_realsense[0][0] = data.data[0]
-    obstacle_location_realsense[1][0] = data.data[1]
-    obstacle_location_realsense[2][0] = data.data[2]
-    owf = np.matmul(realsense_2_webcam_tf, obstacle_location_realsense)
-    obstacle_location_webcam = np.array([owf[0][0], owf[1][0], owf[2][0], 1])
+    global robot_pose, obstacle_location_realsense, REALSENSE_OFFSET_X, REALSENSE_OFFSET_Y, REALSENSE_OFFSET_Z, CORRECTION_FACTOR_X, CORRECTION_FACTOR_Y
+    obstacle_location_realsense = data.data
+    rad_m = obstacle_location_realsense[3]
 
-    # print(f"obstacle_location_webcam: {obstacle_location_webcam}")
+    if robot_pose[0] != 0.0 and robot_pose[1] != 0.0:
 
-    # Solve for the theta value to rotate about z axis for world to webcam tf
-    if aruco_theta > 0:
-        webcam_2_world_theta = pi + aruco_theta
-    elif aruco_theta < 0:
-        webcam_2_world_theta = pi - aruco_theta
-    else:
-        webcam_2_world_theta = pi
+        point_realsense = np.array([obstacle_location_realsense[2], -obstacle_location_realsense[0], -obstacle_location_realsense[1], 1])
 
-    webcam_2_world_tf = webcam_2_world(webcam_2_world_theta, x, y, WEBCAM_HEIGHT)
+        realsense_to_robot_tf = np.array([
+            [0.707,     0,      0.707,      REALSENSE_OFFSET_X],
+            [0,         1,      0,          REALSENSE_OFFSET_Y],
+            [-0.707,    0,      0.707,      REALSENSE_OFFSET_Z],
+            [0,         0,      0,          1]
+        ])
 
-    # print("Webcam 2 World TF")
-    # print(webcam_2_world_tf)
+        point_robot = np.dot(realsense_to_robot_tf, point_realsense)
 
-    # print(f'X: {x}, Y: {y}, Theta: {aruco_theta}')
+        point_robot[0] += CORRECTION_FACTOR_X
+        point_robot[1] += CORRECTION_FACTOR_Y
 
-    obstacle_location_world = np.dot(webcam_2_world_tf, obstacle_location_webcam)
-    obstacle_location_world = np.round(obstacle_location_world, 3)
+        robot_to_world_tf = np.array([
+            [cos(robot_pose[2]),        -sin(robot_pose[2]),    0,          robot_pose[0]],
+            [sin(robot_pose[2]),        cos(robot_pose[2]),     0,          robot_pose[1]],
+            [0,                         0,                      1,          0],
+            [0,                         0,                      0,          1]
+        ])
 
-    print(f"Obstacle Location in World Frame: {obstacle_location_world[0:3]}")
+        point_world = np.dot(robot_to_world_tf, point_robot)
 
-def update_webcam_theta(data):
-    global webcam_theta
-    webcam_theta = data.data
+        # print("X: " + str(robot_pose[0]) + "        Y: " + str(robot_pose[1]) + "       Yaw: " + str(robot_pose[2]))
+        # print("Point X: " + str(point_world[0]) + "        Point Y: " + str(point_world[1]))
 
-def update_aruco_data(data):
-    global x, y, aruco_theta
-    x = data.data[0] * 0.01 # Convert cm to m
-    y = data.data[1] * 0.01 # Convert cm to m
-    aruco_theta = data.data[2]
-    # print(f'ARUCO DATA X: {x}, Y: {y}, Theta: {aruco_theta}')
+        obstacle = Float32MultiArray()
+        obstacle.data = [point_world[0], point_world[1], rad_m]
 
-def obstacle_localizer():
-    while not rospy.is_shutdown():
+        obstacle_pub.publish(obstacle)
 
-        rospy.init_node('obstacle_localizer', anonymous=True)
+# Initialize ROS node
+rospy.init_node('obstacle_localizer', anonymous=True)
 
-        rospy.Subscriber('/realsense/depth/obstacle', Float32MultiArray, update_obstacle_pose)
-        rospy.Subscriber('magnetic_pos', Float32, update_webcam_theta)
-        rospy.Subscriber('aruco_data', Float32MultiArray, update_aruco_data)
+# Initialize publishers and subscribers
+obstacle_pub = rospy.Publisher('/map/obstacle', Float32MultiArray, queue_size=10)
+rospy.Subscriber('/realsense/depth/obstacle', Float32MultiArray, update_obstacle_pose)
+rospy.Subscriber('/jetson/filtered_pose', PoseStamped, update_robot_pose)
 
-        rospy.spin()
+# Define timer callback function
+def timer_callback(event):
+    pass  # Do nothing here as publishing is handled in the update_obstacle_pose callback
 
-if __name__ == '__main__':
-    obstacle_localizer()
+# Create a timer with a callback function that triggers publishing
+timer = rospy.Timer(rospy.Duration(0.1), timer_callback)
+
+# Spin ROS node
+rospy.spin()

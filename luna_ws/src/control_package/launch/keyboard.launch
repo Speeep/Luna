@@ -48,5 +48,4 @@
     name="path_follower"
     output="screen"
   />
-
 </launch> 
