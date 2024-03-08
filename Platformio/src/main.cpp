@@ -48,11 +48,9 @@ void drivetrainSwitchStateCallback(const std_msgs::Int32 &driveStateMsg) {
   drivetrain.setState(drivetrainState);
 }
 
-// TODO: Delete after testing ICCs
+
 void drivetrainICCallback(const std_msgs::Float32 &driveICCMsg) {
-  float iccStep = driveICCMsg.data;
-  float newIcc = icc + iccStep;
-  icc = newIcc;
+  float icc = driveICCMsg.data;
   drivetrain.setYICC(icc);
 }
 
@@ -72,7 +70,7 @@ void localizerEnableCallback(const std_msgs::Bool &localizerEnableMsg) {
 
 ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Int32> driveStateSub("/drivetrain/state", &drivetrainSwitchStateCallback);
-ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc_step", &drivetrainICCallback);
+ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICCallback);
 ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
 ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
 
