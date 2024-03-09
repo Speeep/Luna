@@ -13,6 +13,7 @@ class PathFollower:
     following = False
     next_pos = (0,0)
     next_index = 1
+    index = 0
 
     
     # set up outputs
