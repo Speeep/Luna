@@ -84,8 +84,6 @@ def main():
         # Capture an image from the camera
         ret, frame = cam.read()
 
-        print('here')
-
         if ret:
 
             # BGR 2 Gray
@@ -99,8 +97,6 @@ def main():
             # Detect ArUco markers in the frame.
             marker_corners, ids, _ = aruco.detectMarkers(gray_frame, dictionary)
             height, width, channels = frame.shape
-
-            print("getting here")
 
             # Draw detected markers on the frame.
             if ids is not None:
@@ -187,8 +183,7 @@ def main():
                     servo_error_publisher.publish(servo_error)
 
             else: 
-                print("getting all the way here")
-                servo_error_publisher.publish(0.0001)
+                servo_error_publisher.publish(0.0)
 
             # Convert the OpenCV image to a ROS Image message
             scaled_image = cv.resize(frame, (0, 0), fx=0.25, fy=0.25)
