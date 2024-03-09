@@ -112,7 +112,8 @@ void loop()
     localizer.loop();
 
     if (drivetrain.isEnabled()) {
-      String drivetrainWheel0Speed = String("ICC: ") + String(icc) + String("    Right Wheelpod Angle Setpoint: ") + String(drivetrain.getRightWheelpodAngleSetpoint());
+      //String drivetrainWheel0Speed = String("ICC: ") + String(icc) + String("    Right Wheelpod Angle Setpoint: ") + String(drivetrain.getRightWheelpodAngleSetpoint());
+      String drivetrainWheel0Speed = String("Localizer Angle: ") + String(localizer.getAngle());
       String ianOutputString = drivetrainWheel0Speed;
       ianOutputMsg.data = ianOutputString.c_str();
       ianOutputPub.publish(&ianOutputMsg);
