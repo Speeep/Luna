@@ -13,6 +13,7 @@ class PathFollower:
     following = False
     next_pos = (0,0)
     next_index = 1
+    index = 0
 
     
     # set up outputs
@@ -36,6 +37,7 @@ class PathFollower:
         # subscribers
         self.path_sub = rospy.Subscriber('/jetson/nav_path', Path, self.path_cb)
         self.fused_pose_sub = rospy.Subscriber('/jetson/filtered_pose', PoseStamped, self.fused_pose_cb)
+        self.e_stop_sub = rospy.Subscriber('/robot/e_stop', Bool, self.e_stop_cb)
 
         # publishers
         self.state_pub = rospy.Publisher('/drivetrain/state', Int32, queue_size = 10)
@@ -48,10 +50,13 @@ class PathFollower:
     # callback functions
     
     # disables path following TODO: Implement this with KBL
-    def e_stop(self, message):
-        self.following = False
-        self.state.data = 0
-        self.state_pub.publish(self.state)
+    def e_stop_cb(self, message:Bool):
+        if(message.data):
+            self.following = False
+            self.state.data = 0
+            self.state_pub.publish(self.state)
+        else:
+            self.following = True
 
 
     # Receives a path and starts following it

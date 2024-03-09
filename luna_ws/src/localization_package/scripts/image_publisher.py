@@ -63,7 +63,7 @@ def calculate_centroid(points):
 def main():
     rospy.init_node('image_publisher')
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
-    servo_error_publisher = rospy.Publisher('/localizer/error', Float32, queue_size=10)
+    servo_error_publisher = rospy.Publisher('/localizer/raw_error', Float32, queue_size=10)
     tvec_publisher = rospy.Publisher('/tvec', Float32MultiArray, queue_size=10)
     aruco_data_pub = rospy.Publisher('/jetson/aruco_data', Float32MultiArray, queue_size=10)
     aruco_broadcaster = tf2_ros.StaticTransformBroadcaster()
@@ -181,7 +181,7 @@ def main():
                     servo_error_publisher.publish(servo_error)
 
             else: 
-                servo_error_publisher.publish(0)
+                servo_error_publisher.publish(0.0)
 
             # Convert the OpenCV image to a ROS Image message
             scaled_image = cv.resize(frame, (0, 0), fx=0.25, fy=0.25)

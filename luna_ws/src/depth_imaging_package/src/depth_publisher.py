@@ -182,8 +182,8 @@ def main():
                                     obstacle_msg.data = [x0, y0, z0, rad_m]
                                     obstacle_pub.publish(obstacle_msg)
 
-                cv2.imshow("Color Frame", color_frame_np)
-                cv2.waitKey(1)
+                # cv2.imshow("Color Frame", color_frame_np)
+                # cv2.waitKey(1)
 
                 # # Apply temporal smoothing
                 # depth_buffer.append(depth_data)
