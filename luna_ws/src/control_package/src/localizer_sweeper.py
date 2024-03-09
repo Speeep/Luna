@@ -35,6 +35,8 @@ def main():
         # Only if the localizer is enabled
         if (localizer_enable):
 
+            print("localizer is enabled")
+
             # Use localizer to search for the marker
             if (localizer_error == 0.0):
                 localizer_error = 1000.0

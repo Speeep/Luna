@@ -181,7 +181,7 @@ def main():
                     servo_error_publisher.publish(servo_error)
 
             else: 
-                servo_error_publisher.publish(0)
+                servo_error_publisher.publish(0.0001)
 
             # Convert the OpenCV image to a ROS Image message
             scaled_image = cv.resize(frame, (0, 0), fx=0.25, fy=0.25)
