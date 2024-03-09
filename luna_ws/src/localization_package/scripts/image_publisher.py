@@ -30,8 +30,8 @@ dictionary = aruco.getPredefinedDictionary(cv.aruco.DICT_5X5_1000)
 
 xws = []
 yws = []
-AVERAGING_FILTER_SIZE = 50
-ARUCO_TARGET_THRESHOLD = 100
+AVERAGING_FILTER_SIZE = 30
+ARUCO_TARGET_THRESHOLD = 20
 
 # Angle of the localizer turret, used in the transformation matrix to go from webcam to robot pose
 localizer_angle = 0.0
