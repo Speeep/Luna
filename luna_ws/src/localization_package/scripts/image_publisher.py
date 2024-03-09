@@ -31,6 +31,7 @@ dictionary = aruco.getPredefinedDictionary(cv.aruco.DICT_5X5_1000)
 xws = []
 yws = []
 AVERAGING_FILTER_SIZE = 50
+ARUCO_TARGET_THRESHOLD = 100
 
 # Angle of the localizer turret, used in the transformation matrix to go from webcam to robot pose
 localizer_angle = 0.0
@@ -99,66 +100,16 @@ def main():
             # Draw detected markers on the frame.
             if ids is not None:
 
-                # Find the index of the marker with ID 42
-                index_42 = np.where(ids == 256)[0]
+                # Find the index of the marker with ID 256
+                index_256 = np.where(ids == 256)[0]
 
-                if len(index_42) > 0:
-                    i = index_42[0]  # Use the first occurrence of marker with ID 42
+                if len(index_256) > 0:
+                    i = index_256[0]  # Use the first occurrence of marker with ID 256
 
                     # Calculate Rotation and Translation for the selected marker
                     rVec, tVec, _ = aruco.estimatePoseSingleMarkers(
                         [marker_corners[i]], MARKER_SIZE, camera_matrix, dist
                     )
-
-                    # Convert rotation vector to rotation matrix using Rodrigues' rotation formula
-                    rotation_matrix, _ = cv.Rodrigues(rVec)
-
-                    # Extract the yaw from the rotation matrix
-                    theta = np.arctan2(-rotation_matrix[2, 0], np.sqrt(rotation_matrix[2, 1]**2 + rotation_matrix[2, 2]**2))
-
-                    # Extract x, y, and z from the translation vector
-                    x, y, z = tVec[0][0][0], tVec[0][0][1], tVec[0][0][2]
-                    tvec_msg = Float32MultiArray()
-                    tvec_msg.data = [x, y, z]
-                    tvec_publisher.publish(tvec_msg)
-
-                    distance = round(np.sqrt(x**2 + y**2 + z**2), 1)
-
-                    xw = round((z * cos(theta) - x * sin(theta)), 1)
-                    yw = round((x * cos(theta) - z * sin(theta)), 1) * -1
-
-                    if len(xws) >= AVERAGING_FILTER_SIZE:
-                        xws.pop(0)
-
-                    if len(yws) >= AVERAGING_FILTER_SIZE:
-                        yws.pop(0)
-
-                    xws.append(xw)
-                    yws.append(yw)
-
-                    # Take the avg, round, and convert to meters
-                    avg_xw = round(sum(xws) / len(xws), 1) / 100
-                    avg_yw = round(sum(yws) / len(yws), 1) / 100
-
-                    # Publish as a transformStamped msg
-                    static_transformStamped = geometry_msgs.msg.TransformStamped()
-                    static_transformStamped.header.stamp = rospy.Time.now()
-                    static_transformStamped.header.frame_id = "aruco"
-                    static_transformStamped.child_frame_id = "webcamTurned"
-                    static_transformStamped.transform.translation.x = float(avg_xw)
-                    static_transformStamped.transform.translation.y = float(avg_yw)
-                    static_transformStamped.transform.translation.z = float(0.0)
-                    quat = tf.transformations.quaternion_from_euler(float(0.0),float(0.0),float(3.1415 + theta))
-                    static_transformStamped.transform.rotation.x = quat[0]
-                    static_transformStamped.transform.rotation.y = quat[1]
-                    static_transformStamped.transform.rotation.z = quat[2]
-                    static_transformStamped.transform.rotation.w = quat[3]
-
-                    aruco_data = Float32MultiArray()
-                    aruco_data.data = [avg_xw, avg_yw, theta]
-                    aruco_data_pub.publish(aruco_data)
-
-                    aruco_broadcaster.sendTransform(static_transformStamped)
 
                     cv.polylines(
                         frame, [marker_corners[i].astype(np.int32)], True, YELLOW, 4, cv.LINE_AA
@@ -167,18 +118,71 @@ def main():
                     corners = marker_corners[i].reshape(4, 2)
                     corners = corners.astype(int)
 
-                    # Draw the pose of the marker
-                    point = cv.drawFrameAxes(frame, camera_matrix, dist, rVec[0], tVec[0], 4, 4)
-
-                    # Define the starting and ending points of the line
-                    start_point = (frame.shape[1] // 2, 0)
-                    end_point = (frame.shape[1] // 2, frame.shape[0])
-                    RED = (0, 0, 255)
-                    cv.line(frame, start_point, end_point, RED, 1)
-
                     centroid = calculate_centroid(corners)
                     servo_error = int((width//2) - centroid[0])
                     servo_error_publisher.publish(servo_error)
+
+                    if abs(servo_error) < ARUCO_TARGET_THRESHOLD:
+                        # Convert rotation vector to rotation matrix using Rodrigues' rotation formula
+                        rotation_matrix, _ = cv.Rodrigues(rVec)
+
+                        # Extract the yaw from the rotation matrix
+                        theta = np.arctan2(-rotation_matrix[2, 0], np.sqrt(rotation_matrix[2, 1]**2 + rotation_matrix[2, 2]**2))
+
+                        # Extract x, y, and z from the translation vector
+                        x, y, z = tVec[0][0][0], tVec[0][0][1], tVec[0][0][2]
+                        tvec_msg = Float32MultiArray()
+                        tvec_msg.data = [x, y, z]
+                        tvec_publisher.publish(tvec_msg)
+
+                        distance = round(np.sqrt(x**2 + y**2 + z**2), 1)
+
+                        xw = round((z * cos(theta) - x * sin(theta)), 1)
+                        yw = round((x * cos(theta) - z * sin(theta)), 1) * -1
+
+                        if len(xws) >= AVERAGING_FILTER_SIZE:
+                            xws.pop(0)
+
+                        if len(yws) >= AVERAGING_FILTER_SIZE:
+                            yws.pop(0)
+
+                        xws.append(xw)
+                        yws.append(yw)
+
+                        # Take the avg, round, and convert to meters
+                        avg_xw = round(sum(xws) / len(xws), 1) / 100
+                        avg_yw = round(sum(yws) / len(yws), 1) / 100
+
+                        # Publish as a transformStamped msg
+                        static_transformStamped = geometry_msgs.msg.TransformStamped()
+                        static_transformStamped.header.stamp = rospy.Time.now()
+                        static_transformStamped.header.frame_id = "aruco"
+                        static_transformStamped.child_frame_id = "webcamTurned"
+                        static_transformStamped.transform.translation.x = float(avg_xw)
+                        static_transformStamped.transform.translation.y = float(avg_yw)
+                        static_transformStamped.transform.translation.z = float(0.0)
+                        quat = tf.transformations.quaternion_from_euler(float(0.0),float(0.0),float(3.1415 + theta))
+                        static_transformStamped.transform.rotation.x = quat[0]
+                        static_transformStamped.transform.rotation.y = quat[1]
+                        static_transformStamped.transform.rotation.z = quat[2]
+                        static_transformStamped.transform.rotation.w = quat[3]
+
+                        aruco_data = Float32MultiArray()
+                        aruco_data.data = [avg_xw, avg_yw, theta]
+                        aruco_data_pub.publish(aruco_data)
+
+                        aruco_broadcaster.sendTransform(static_transformStamped)
+
+                        # Draw the pose of the marker
+                        point = cv.drawFrameAxes(frame, camera_matrix, dist, rVec[0], tVec[0], 4, 4)
+
+                        # Define the starting and ending points of the line
+                        start_point = (frame.shape[1] // 2, 0)
+                        end_point = (frame.shape[1] // 2, frame.shape[0])
+                        RED = (0, 0, 255)
+                        cv.line(frame, start_point, end_point, RED, 1)
+                    else:
+                        print("aruco out of center of frame")
 
             else: 
                 servo_error_publisher.publish(0.0)
