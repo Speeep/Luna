@@ -5,7 +5,7 @@ from std_msgs.msg import Float32, Bool
 # Robot variables
 localizer_error = 0.0
 localizer_enable = False
-iterator = 0
+
 
 def update_localizer_error_cb(localizer_error_msg):
     global localizer_error
@@ -26,6 +26,7 @@ def main():
     rospy.Subscriber('/localizer/raw_error', Float32, update_localizer_error_cb)
     rospy.Subscriber('/localizer/enable', Bool, update_localizer_enable_cb)
 
+    iterator = 0
 
     rate = rospy.Rate(5)
 
