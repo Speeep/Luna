@@ -5,6 +5,7 @@ from std_msgs.msg import Float32, Bool
 # Robot variables
 localizer_error = 0.0
 localizer_enable = False
+iterator = 0
 
 def update_localizer_error_cb(localizer_error_msg):
     global localizer_error
@@ -26,7 +27,7 @@ def main():
     rospy.Subscriber('/localizer/enable', Bool, update_localizer_enable_cb)
 
 
-    rate = rospy.Rate(1)
+    rate = rospy.Rate(5)
 
     while not rospy.is_shutdown():
 
@@ -37,11 +38,14 @@ def main():
 
             print("localizer is enabled")
 
+            iterator += 1
+
             # Use localizer to search for the marker
             if (localizer_error == 0.0):
-                localizer_error = 1000.0
-            elif (localizer_error == 1000.0):
-                localizer_error = 0.0
+                if(iterator < 5):
+                    localizer_error = 1000.0
+                else:
+                    iterator = 0
             localizer_error_pub.publish(localizer_error)
         else: 
             localizer_error_pub.publish(0.0)

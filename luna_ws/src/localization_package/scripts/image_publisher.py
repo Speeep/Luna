@@ -73,8 +73,6 @@ def main():
     # Define Camera to Use
     cam = cv.VideoCapture(0)
 
-    print('there')
-
     # Define green color
     YELLOW = (0, 255, 255)
 
