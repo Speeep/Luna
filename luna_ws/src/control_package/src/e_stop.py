@@ -13,10 +13,14 @@ class KeyControlNode:
         self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
         self.listener.start()
 
+
+        self.enable_localizer = Bool()
+
         # Initialize variables to track key states
         self.key_states = {
             'q': False,
             'e': False,
+            'l': False
         }
 
         # Create a timer to check key presses periodically
@@ -24,6 +28,8 @@ class KeyControlNode:
 
         # Localizer Enable
         self.e_stop = False
+
+        self.localizer_enable_pub = rospy.Publisher('/localizer/enable', Bool, queue_size=10)
 
     def on_press(self, key):
         try:
@@ -51,6 +57,9 @@ class KeyControlNode:
             self.e_stop = False
             self.e_stop_pub.publish(self.e_stop)
             print("cycle start")
+        elif self.key_states['l']:
+            self.enable_localizer.data = True
+            self.localizer_enable_pub.publish(self.enable_localizer)
         
 
         

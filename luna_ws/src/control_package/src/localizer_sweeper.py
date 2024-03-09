@@ -16,13 +16,13 @@ def update_localizer_enable_cb(localizer_enable_msg):
 
 def main():
     global localizer_error, localizer_enable, drivetrain_enable, localizer_angle
-    rospy.init_node('keyboard_control', anonymous=True)
+    rospy.init_node('localizer_sweeper', anonymous=True)
 
     # Define publishers for different key presses
     localizer_error_pub = rospy.Publisher('/localizer/error', Float32, queue_size=10)
 
     # Subscribers for Autonomous Routine
-    rospy.Subscriber('/localizer/error', Float32, update_localizer_error_cb)
+    rospy.Subscriber('/localizer/raw_error', Float32, update_localizer_error_cb)
     rospy.Subscriber('/localizer/enable', Bool, update_localizer_enable_cb)
 
 
