@@ -112,7 +112,10 @@ if __name__ == '__main__':
             # Check if the new transform is the same as the last one
             if aruco_2_webcam_turned == last_transform:
                 rate.sleep()
+                print('They are the same!!')
                 continue
+
+            print('They are not the same....')
 
             last_transform = aruco_2_webcam_turned
 
