@@ -50,12 +50,25 @@ def update_localization_estimate_cb(localization_estimate_msg):
     localization_estimate = [x, y, theta]
     last_localization_time = rospy.Time.now()
 
+    delta_x = (localization_estimate[0] - pose[0]) * alpha
+    delta_y = (localization_estimate[1] - pose[1]) * alpha
+
+    delta_theta = localization_estimate[2] - pose[2]
+
+    #constrain delta theta
+    if(delta_theta > 3.14159):
+        delta_theta -= 2 * 3.14159
+    if(delta_theta < -3.14159):
+        delta_theta += 2 * 3.14159
+    
+    delta_theta *= alpha
+
    
     # Async Complementary Filter Here
     fused_pose = (
-        ((alpha * localization_estimate[0]) + (beta * pose[0])),
-        ((alpha * localization_estimate[1]) + (beta * pose[1])),
-        ((alpha * localization_estimate[2]) + (beta * pose[2]))
+        pose[0] + delta_x,
+        pose[1] + delta_y,
+        pose[2] + delta_theta
     )
 
     pose = fused_pose
