@@ -14,12 +14,16 @@ class Map_Node:
 
     CELL_PADDING = 6
 
+    MAP_WIDTH = 5.3
+
+    MAP_HEIGHT = 3.8
+
     # Initialize occupancy grid message
     map_msg = OccupancyGrid()
     rviz_map_msg = OccupancyGrid()
 
-    width = int(6.88 / GRID_CELL_SIZE_M) # 86
-    height = int(5 / GRID_CELL_SIZE_M) # 62
+    width = int(MAP_WIDTH / GRID_CELL_SIZE_M) # 86
+    height = int(MAP_HEIGHT / GRID_CELL_SIZE_M) # 62
 
     # initialize grid with -1 (unknown)
     obstacle_grid = numpy.ndarray((height, width), buffer=numpy.zeros((width, height), dtype=numpy.int),dtype=numpy.int)
@@ -55,9 +59,6 @@ class Map_Node:
         self.rviz_map_msg.info.origin.position.x = 0.0
         self.rviz_map_msg.info.origin.position.y = 0.0
 
-
-
-
         # Publishers
         self.occ_pub = rospy.Publisher("/robot/map", OccupancyGrid, queue_size = 10)
         self.rviz_pub = rospy.Publisher("/robot/rviz_map", OccupancyGrid, queue_size = 10)
@@ -74,7 +75,6 @@ class Map_Node:
         for i in range(self.height):
             self.pad_cell(i, 0)
             self.pad_cell(i, self.width-1)
-
 
     # callback functions
             
