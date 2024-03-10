@@ -50,8 +50,8 @@ def update_localization_estimate_cb(localization_estimate_msg):
     localization_estimate = [x, y, theta]
     last_localization_time = rospy.Time.now()
 
-    delta_x = localization_estimate[0] - pose[0] * alpha
-    delta_y = localization_estimate[1] - pose[1] * alpha
+    delta_x = (localization_estimate[0] - pose[0]) * alpha
+    delta_y = (localization_estimate[1] - pose[1]) * alpha
 
     delta_theta = localization_estimate[2] - pose[2]
 
