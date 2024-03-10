@@ -28,10 +28,16 @@ MARKER_SIZE = 88 # Centimeters TODO: Change if we make marker bigger
 # Load the ArUco dictionary
 dictionary = aruco.getPredefinedDictionary(cv.aruco.DICT_5X5_1000)
 
+# Averaging Filter
 xws = []
 yws = []
 AVERAGING_FILTER_SIZE = 30
+
 ARUCO_TARGET_THRESHOLD = 80
+
+# Falied Readings
+failed_readings = 0
+MAX_ALLOWED_FAILED_READINGS = 10
 
 # Angle of the localizer turret, used in the transformation matrix to go from webcam to robot pose
 localizer_angle = 0.0
@@ -83,6 +89,12 @@ def main():
         ret, frame = cam.read()
 
         if ret:
+
+            if failed_readings > MAX_ALLOWED_FAILED_READINGS:
+
+                # Empty Avg Xs and Ys
+                xws = []
+                yws = []
 
             # BGR 2 Gray
             gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
@@ -171,8 +183,8 @@ def main():
                         end_point = (frame.shape[1] // 2, frame.shape[0])
                         RED = (0, 0, 255)
                         cv.line(frame, start_point, end_point, RED, 1)
-                    else:
-                        print("aruco out of center of frame")
+
+                        failed_readings = 0
 
             else: 
                 servo_error_publisher.publish(0.0)
@@ -181,7 +193,8 @@ def main():
             scaled_image = cv.resize(frame, (0, 0), fx=0.25, fy=0.25)
             image_message = bridge.cv2_to_imgmsg(scaled_image, "bgr8")
             image_publisher.publish(image_message)
-            
+
+        failed_readings += 1
         rate.sleep()
 
     cam.release()
