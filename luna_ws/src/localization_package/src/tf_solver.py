@@ -62,6 +62,9 @@ if __name__ == '__main__':
 
     localizer_angle = 0.0
 
+    # Define last_transform to be none
+    last_transform = None
+
     tfBuffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tfBuffer)
 
@@ -112,10 +115,7 @@ if __name__ == '__main__':
             # Check if the new transform is the same as the last one
             if aruco_2_webcam_turned == last_transform:
                 rate.sleep()
-                print('They are the same!!')
                 continue
-
-            print('They are not the same....')
 
             last_transform = aruco_2_webcam_turned
 
