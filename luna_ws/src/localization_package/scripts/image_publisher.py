@@ -64,6 +64,7 @@ def calculate_centroid(points):
 
 
 def main():
+    global xws, yws
     rospy.init_node('image_publisher')
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
     servo_error_publisher = rospy.Publisher('/localizer/raw_error', Float32, queue_size=10)
