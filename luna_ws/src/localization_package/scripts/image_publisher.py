@@ -177,8 +177,6 @@ def main():
                         static_transformStamped.transform.rotation.z = quat[2]
                         static_transformStamped.transform.rotation.w = quat[3]
 
-                        print('Avg X: ' + str(avg_xw) + '      Avg Y: ' + str(avg_yw) + '     Theta: ' + str(3.1415 + theta))
-
                         aruco_broadcaster.sendTransform(static_transformStamped)
 
                         # Define the starting and ending points of the line
