@@ -66,7 +66,6 @@ def main():
     image_publisher = rospy.Publisher('camera_image_topic', Image, queue_size=10)
     servo_error_publisher = rospy.Publisher('/localizer/raw_error', Float32, queue_size=10)
     tvec_publisher = rospy.Publisher('/tvec', Float32MultiArray, queue_size=10)
-    aruco_data_pub = rospy.Publisher('/jetson/aruco_data', Float32MultiArray, queue_size=10)
     aruco_broadcaster = tf2_ros.StaticTransformBroadcaster()
 
     bridge = CvBridge()
@@ -135,8 +134,6 @@ def main():
                         tvec_msg.data = [x, y, z]
                         tvec_publisher.publish(tvec_msg)
 
-                        distance = round(np.sqrt(x**2 + y**2 + z**2), 1)
-
                         xw = round((z * cos(theta) - x * sin(theta)), 1)
                         yw = round((x * cos(theta) - z * sin(theta)), 1) * -1
 
@@ -167,14 +164,7 @@ def main():
                         static_transformStamped.transform.rotation.z = quat[2]
                         static_transformStamped.transform.rotation.w = quat[3]
 
-                        aruco_data = Float32MultiArray()
-                        aruco_data.data = [avg_xw, avg_yw, theta]
-                        aruco_data_pub.publish(aruco_data)
-
                         aruco_broadcaster.sendTransform(static_transformStamped)
-
-                        # Draw the pose of the marker
-                        point = cv.drawFrameAxes(frame, camera_matrix, dist, rVec[0], tVec[0], 4, 4)
 
                         # Define the starting and ending points of the line
                         start_point = (frame.shape[1] // 2, 0)
