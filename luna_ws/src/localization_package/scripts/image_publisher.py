@@ -35,10 +35,6 @@ AVERAGING_FILTER_SIZE = 30
 
 ARUCO_TARGET_THRESHOLD = 80
 
-# Falied Readings
-failed_readings = 0
-MAX_ALLOWED_FAILED_READINGS = 10
-
 # Angle of the localizer turret, used in the transformation matrix to go from webcam to robot pose
 localizer_angle = 0.0
 
@@ -75,6 +71,10 @@ def main():
     aruco_broadcaster = tf2_ros.StaticTransformBroadcaster()
 
     bridge = CvBridge()
+
+    # Falied Readings
+    failed_readings = 0
+    MAX_ALLOWED_FAILED_READINGS = 10
 
     # Define Camera to Use
     cam = cv.VideoCapture(0)
