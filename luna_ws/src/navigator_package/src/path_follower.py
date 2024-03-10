@@ -30,6 +30,7 @@ class PathFollower:
     FINAL_PATH_LEN = 3
     ICC_HYST = .3 #hysteresis for transition from point to ICC turn
     DRIVE_SPEED = .75
+    TURN_SPEED = .375
 
 
 
@@ -154,14 +155,14 @@ class PathFollower:
             self.state.data = 2
             self.state_pub.publish(self.state)
 
-            self.speed.data = -self.DRIVE_SPEED
+            self.speed.data = -self.TURN_SPEED
             self.speed_pub.publish(self.speed)
         #positive
         else:
             self.state.data = 2
             self.state_pub.publish(self.state)
 
-            self.speed.data = self.DRIVE_SPEED
+            self.speed.data = self.TURN_SPEED
             self.speed_pub.publish(self.speed)
 
     # helper functions
