@@ -7,17 +7,27 @@ from geometry_msgs.msg import TransformStamped, PointStamped
 from std_msgs.msg import Float32MultiArray, Bool
 
 class Map_Node:
-    # Grid Cell Size
+    # Constants
     GRID_CELL_SIZE_M = 0.08
+
+    MIN_OCCURANCES = 10
+
+    CELL_PADDING = 6
+
+    MAP_WIDTH = 5.3
+
+    MAP_HEIGHT = 3.8
 
     # Initialize occupancy grid message
     map_msg = OccupancyGrid()
+    rviz_map_msg = OccupancyGrid()
 
-    width = int(6.88 / GRID_CELL_SIZE_M) # 86
-    height = int(5 / GRID_CELL_SIZE_M) # 62
+    width = int(MAP_WIDTH / GRID_CELL_SIZE_M) # 86
+    height = int(MAP_HEIGHT / GRID_CELL_SIZE_M) # 62
 
     # initialize grid with -1 (unknown)
-    grid = numpy.ndarray((height, width), buffer=numpy.zeros((width, height), dtype=numpy.int),dtype=numpy.int)
+    obstacle_grid = numpy.ndarray((height, width), buffer=numpy.zeros((width, height), dtype=numpy.int),dtype=numpy.int)
+    driveable_grid = numpy.ndarray((height, width), buffer=numpy.zeros((width, height), dtype=numpy.int),dtype=numpy.int)
 
     # TF Broadcaster
     tf_broadcaster = tf.TransformBroadcaster()
@@ -26,7 +36,8 @@ class Map_Node:
         # initialize node
         rospy.init_node('map')
 
-        self.grid.fill(int(0))
+        self.obstacle_grid.fill(int(0))
+        self.driveable_grid.fill(int(0))
 
         # fill map_msg with the parameters
         self.map_msg.info.resolution = self.GRID_CELL_SIZE_M
@@ -38,8 +49,19 @@ class Map_Node:
         self.map_msg.info.origin.position.x = 0.0
         self.map_msg.info.origin.position.y = 0.0
 
+        # fill rviz_map_msg with the parameters
+        self.rviz_map_msg.info.resolution = self.GRID_CELL_SIZE_M
+        self.rviz_map_msg.info.width = self.width
+        self.rviz_map_msg.info.height = self.height
+        self.rviz_map_msg.data = [0] * (self.width * self.height)
+        self.rviz_map_msg.header.frame_id = 'map'
+        # set rviz_map origin [meters]
+        self.rviz_map_msg.info.origin.position.x = 0.0
+        self.rviz_map_msg.info.origin.position.y = 0.0
+
         # Publishers
         self.occ_pub = rospy.Publisher("/robot/map", OccupancyGrid, queue_size = 10)
+        self.rviz_pub = rospy.Publisher("/robot/rviz_map", OccupancyGrid, queue_size = 10)
         self.change_pub = rospy.Publisher("robot/map_change", Bool, queue_size = 3)
 
         # Subscribers
@@ -47,18 +69,21 @@ class Map_Node:
         self.click_sub = rospy.Subscriber('/clicked_point', PointStamped, self.clicked_point_cb)
 
         for i in range(self.width):
-            self.grid[0][i] = 100
-            self.grid[self.height-1][i] = 100
+            self.pad_cell(0,i)
+            self.pad_cell(self.height-1, i)
 
         for i in range(self.height):
-            self.grid[i][0] = 100
-            self.grid[i][self.width-1] = 100
+            self.pad_cell(i, 0)
+            self.pad_cell(i, self.width-1)
 
+    # callback functions
+            
     def set_obstacle_cb(self, obstacle_msg):
         data = obstacle_msg.data
         x = data[0]
         y = data[1]
         radius = data[2]
+
         grid_x, grid_y = self.world_to_grid(x, y)
         self.set_obstacle(x=grid_x, y=grid_y, radius=radius)
 
@@ -66,21 +91,45 @@ class Map_Node:
         x = click_msg.point.x
         y = click_msg.point.y
         grid_x, grid_y = self.world_to_grid(x, y)
-        self.set_obstacle(x=grid_x, y=grid_y, radius=0.0)
+
+        self.obstacle_grid[grid_x][grid_y] = self.MIN_OCCURANCES + 1
+        self.pad_cell(grid_x, grid_y)
+
+    # takes grid cell dimensions
+    def pad_cell(self, x, y):
+        
+        new_obstacle = False
+        # Loop through the cells within the obstacle radius around the specified coordinate
+        for i in range(x - self.CELL_PADDING, x + self.CELL_PADDING + 1):
+            for j in range(y - self.CELL_PADDING, y + self.CELL_PADDING + 1):
+
+                # Calculate the distance between the current cell and the center (x, y)
+                distance = math.sqrt((i - x)**2 + (j - y)**2)
+
+                # Check if the current cell is within the radius of the circle
+                if distance <= self.CELL_PADDING:
+
+                    # Check if the current cell is within the grid boundaries
+                    if 0 <= i < len(self.driveable_grid) and 0 <= j < len(self.driveable_grid[0]):
+
+                        # If the cell is within the circle, set its value to 10
+                        if(self.driveable_grid[i][j] < 10):
+                            new_obstacle = True
+                            self.driveable_grid[i][j] = 10
+
+        self.change_pub.publish(new_obstacle)
+
 
     def set_obstacle(self, x, y, radius): # size in m
-        # x = int(x)
-        # y = int(y)
-        # grid[x, y] = 100
-        rad = math.ceil(radius // self.GRID_CELL_SIZE_M)
-        padding = 4  # Padding thickness
+        
+        rad = math.floor(radius // self.GRID_CELL_SIZE_M)
 
         #this is a flag to tell if the drivable space is changed
         new_obstacle = False
         
         # Loop through the cells within the obstacle radius around the specified coordinate
-        for i in range(x - rad - padding, x + rad + padding + 1):
-            for j in range(y - rad - padding, y + rad + padding + 1):
+        for i in range(x - rad, x + rad + 1):
+            for j in range(y - rad, y + rad + 1):
 
                 # Calculate the distance between the current cell and the center (x, y)
                 distance = math.sqrt((i - x)**2 + (j - y)**2)
@@ -89,22 +138,22 @@ class Map_Node:
                 if distance <= rad:
 
                     # Check if the current cell is within the grid boundaries
-                    if 0 <= i < len(self.grid) and 0 <= j < len(self.grid[0]):
+                    if 0 <= i < len(self.obstacle_grid) and 0 <= j < len(self.obstacle_grid[0]):
 
                         # If the cell is within the circle, set its value to 100
-                        if(self.grid[i, j] < 10):
-                            new_obstacle = True
+                        if(self.obstacle_grid[i][j] < self.MIN_OCCURANCES):
+                            self.obstacle_grid[i][j] += 1
                         
-                        self.grid[i, j] = 100
+                        elif self.obstacle_grid[i][j] == self.MIN_OCCURANCES:
+                            self.pad_cell(i, j)
+                            self.obstacle_grid[i][j] += 1
+                        
+    def forget_potential_obstacles(self):
 
-                # If the cell is within the padding area (outside the circle but within the padding thickness),
-                # set its value to 1
-                elif distance <= rad + padding:
-                    if self.grid[i, j] < 10:
-                        self.grid[i, j] = 10
-                        new_obstacle = True
-        
-        self.change_pub.publish(new_obstacle)
+        for x in range(len(self.obstacle_grid)):
+            for y in range(len(self.obstacle_grid[0])):
+                if(0 < self.obstacle_grid[x][y] < self.MIN_OCCURANCES):
+                    self.obstacle_grid[x][y] -= 1
         
     def world_to_grid(self, x, y):
 
@@ -117,10 +166,14 @@ class Map_Node:
         
         # stamp current ros time to the message
         self.map_msg.header.stamp = rospy.Time.now()
+        self.rviz_map_msg.header.stamp = rospy.Time.now()
         # build ros map message and publish
         for i in range(self.width*self.height):
-            self.map_msg.data[i] = self.grid.flat[i]
+            self.map_msg.data[i] = self.driveable_grid.flat[i]
+            self.rviz_map_msg.data[i] = int(self.driveable_grid.flat[i] - 100 * (self.obstacle_grid.flat[i] / self.MIN_OCCURANCES))
+
         self.occ_pub.publish(self.map_msg)
+        self.rviz_pub.publish(self.rviz_map_msg)
 
         # Publish TF transform between "map" and "world" frame
         self.tf_broadcaster.sendTransform(
@@ -131,8 +184,6 @@ class Map_Node:
             "world"
         )
         
-    
-
 # main function
 if __name__ == '__main__':
     # Map update rate (defaulted to 5 Hz)
@@ -140,7 +191,15 @@ if __name__ == '__main__':
 
     mapNode = Map_Node()
     loop_rate = rospy.Rate(rate)
+
+    iterator = 0
+
     while not rospy.is_shutdown():
         loop_rate.sleep()
         mapNode.publish_map()
 
+        iterator += 1
+
+        if iterator > 8:
+            mapNode.forget_potential_obstacles()
+            iterator = 0

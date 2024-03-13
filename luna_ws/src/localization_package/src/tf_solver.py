@@ -62,6 +62,9 @@ if __name__ == '__main__':
 
     localizer_angle = 0.0
 
+    # Define last_transform to be none
+    last_transform = None
+
     tfBuffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tfBuffer)
 
@@ -71,7 +74,7 @@ if __name__ == '__main__':
     world_2_aruco.child_frame_id = "aruco"
     world_2_aruco.header.stamp = rospy.Time.now()
     world_2_aruco.transform.translation.x = 0.0
-    world_2_aruco.transform.translation.y = 1.5
+    world_2_aruco.transform.translation.y = 0.63
     world_2_aruco.transform.translation.z = 0.0
     world_2_aruco.transform.rotation.x = 0.0
     world_2_aruco.transform.rotation.y = 0.0
@@ -108,64 +111,72 @@ if __name__ == '__main__':
         try:
             # Define tf between Aruco Marker and Webcam
             aruco_2_webcam_turned = tfBuffer.lookup_transform("aruco", "webcamTurned", rospy.Time())
+
+            # Check if the new transform is the same as the last one
+            if aruco_2_webcam_turned == last_transform:
+                rate.sleep()
+                continue
+
+            last_transform = aruco_2_webcam_turned
+
+            # Define tf between WebcamTurned and Webcam
+            webcam_turned_2_webcam = TransformStamped()
+            webcam_turned_2_webcam.header.frame_id = "webcamTurned"
+            webcam_turned_2_webcam.child_frame_id = "webcam"
+            webcam_turned_2_webcam.header.stamp = rospy.Time.now()
+            webcam_turned_2_webcam.transform.translation.x = 0.0
+            webcam_turned_2_webcam.transform.translation.y = 0.0
+            webcam_turned_2_webcam.transform.translation.z = 0.0
+            quat = tf.transformations.quaternion_from_euler(float(0.0),float(0.0),float(localizer_angle))
+            webcam_turned_2_webcam.transform.rotation.x = quat[0]
+            webcam_turned_2_webcam.transform.rotation.y = quat[1]
+            webcam_turned_2_webcam.transform.rotation.z = quat[2]
+            webcam_turned_2_webcam.transform.rotation.w = quat[3]
+
+            # Sequentially apply the transforms to robot_pose in the following order
+            world_2_webcam_turned = multiply_transforms(world_2_aruco, aruco_2_webcam_turned)
+            world_2_webcam = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
+            
+            rotation = [
+                world_2_webcam.transform.rotation.x,
+                world_2_webcam.transform.rotation.y,
+                world_2_webcam.transform.rotation.z,
+                world_2_webcam.transform.rotation.w
+            ]
+            eulers = tf.transformations.euler_from_quaternion(rotation)
+            z_rotation = eulers[2]
+
+            x_adj = l_magic * math.cos(z_rotation + theta_magic)
+            y_adj = l_magic * math.sin(z_rotation + theta_magic)
+
+            # Define tf between webcam and robot
+            webcam_2_robot = TransformStamped()
+            webcam_2_robot.header.frame_id = "webcam"
+            webcam_2_robot.child_frame_id = "robot_unfused"
+            webcam_2_robot.header.stamp = rospy.Time.now()
+            webcam_2_robot.transform.translation.x = x_adj
+            webcam_2_robot.transform.translation.y = y_adj
+            webcam_2_robot.transform.translation.z = 0.0
+            webcam_2_robot.transform.rotation.x = 0.0
+            webcam_2_robot.transform.rotation.y = 0.0
+            webcam_2_robot.transform.rotation.z = 0.0
+            webcam_2_robot.transform.rotation.w = 1.0
+
+            world_2_robot = multiply_transforms(world_2_webcam, webcam_2_robot)
+
+            robot_pose_final = tf2_geometry_msgs.do_transform_pose(robot_pose, world_2_robot)
+
+            # Publish the final Robot Pose
+            pose_pub.publish(robot_pose_final)
+
+            broadcaster.sendTransform(world_2_aruco)
+            broadcaster.sendTransform(aruco_2_webcam_turned)
+            broadcaster.sendTransform(webcam_turned_2_webcam)
+            broadcaster.sendTransform(webcam_2_robot)
+            broadcaster.sendTransform(world_2_robot)
+
+            rate.sleep()
+
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             rate.sleep()
             continue
-
-        # Define tf between WebcamTurned and Webcam
-        webcam_turned_2_webcam = TransformStamped()
-        webcam_turned_2_webcam.header.frame_id = "webcamTurned"
-        webcam_turned_2_webcam.child_frame_id = "webcam"
-        webcam_turned_2_webcam.header.stamp = rospy.Time.now()
-        webcam_turned_2_webcam.transform.translation.x = 0.0
-        webcam_turned_2_webcam.transform.translation.y = 0.0
-        webcam_turned_2_webcam.transform.translation.z = 0.0
-        quat = tf.transformations.quaternion_from_euler(float(0.0),float(0.0),float(localizer_angle))
-        webcam_turned_2_webcam.transform.rotation.x = quat[0]
-        webcam_turned_2_webcam.transform.rotation.y = quat[1]
-        webcam_turned_2_webcam.transform.rotation.z = quat[2]
-        webcam_turned_2_webcam.transform.rotation.w = quat[3]
-
-        # Sequentially apply the transforms to robot_pose in the following order
-        world_2_webcam_turned = multiply_transforms(world_2_aruco, aruco_2_webcam_turned)
-        world_2_webcam = multiply_transforms(world_2_webcam_turned, webcam_turned_2_webcam)
-        
-        rotation = [
-            world_2_webcam.transform.rotation.x,
-            world_2_webcam.transform.rotation.y,
-            world_2_webcam.transform.rotation.z,
-            world_2_webcam.transform.rotation.w
-        ]
-        eulers = tf.transformations.euler_from_quaternion(rotation)
-        z_rotation = eulers[2]
-
-        x_adj = l_magic * math.cos(z_rotation + theta_magic)
-        y_adj = l_magic * math.sin(z_rotation + theta_magic)
-
-        # Define tf between webcam and robot
-        webcam_2_robot = TransformStamped()
-        webcam_2_robot.header.frame_id = "webcam"
-        webcam_2_robot.child_frame_id = "robot_unfused"
-        webcam_2_robot.header.stamp = rospy.Time.now()
-        webcam_2_robot.transform.translation.x = x_adj
-        webcam_2_robot.transform.translation.y = y_adj
-        webcam_2_robot.transform.translation.z = 0.0
-        webcam_2_robot.transform.rotation.x = 0.0
-        webcam_2_robot.transform.rotation.y = 0.0
-        webcam_2_robot.transform.rotation.z = 0.0
-        webcam_2_robot.transform.rotation.w = 1.0
-
-        world_2_robot = multiply_transforms(world_2_webcam, webcam_2_robot)
-
-        robot_pose_final = tf2_geometry_msgs.do_transform_pose(robot_pose, world_2_robot)
-
-        # Publish the final Robot Pose
-        pose_pub.publish(robot_pose_final)
-
-        broadcaster.sendTransform(world_2_aruco)
-        broadcaster.sendTransform(aruco_2_webcam_turned)
-        broadcaster.sendTransform(webcam_turned_2_webcam)
-        broadcaster.sendTransform(webcam_2_robot)
-        broadcaster.sendTransform(world_2_robot)
-
-        rate.sleep()

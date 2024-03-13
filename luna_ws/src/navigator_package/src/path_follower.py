@@ -13,6 +13,8 @@ class PathFollower:
     following = False
     next_pos = (0,0)
     next_index = 1
+    index = 0
+    goal_pos = (0,0)
 
     
     # set up outputs
@@ -28,6 +30,7 @@ class PathFollower:
     FINAL_PATH_LEN = 3
     ICC_HYST = .3 #hysteresis for transition from point to ICC turn
     DRIVE_SPEED = .75
+    TURN_SPEED = .375
 
 
 
@@ -36,6 +39,7 @@ class PathFollower:
         # subscribers
         self.path_sub = rospy.Subscriber('/jetson/nav_path', Path, self.path_cb)
         self.fused_pose_sub = rospy.Subscriber('/jetson/filtered_pose', PoseStamped, self.fused_pose_cb)
+        self.e_stop_sub = rospy.Subscriber('/robot/e_stop', Bool, self.e_stop_cb)
 
         # publishers
         self.state_pub = rospy.Publisher('/drivetrain/state', Int32, queue_size = 10)
@@ -48,10 +52,13 @@ class PathFollower:
     # callback functions
     
     # disables path following TODO: Implement this with KBL
-    def e_stop(self, message):
-        self.following = False
-        self.state.data = 0
-        self.state_pub.publish(self.state)
+    def e_stop_cb(self, message:Bool):
+        if(message.data):
+            self.following = False
+            self.state.data = 0
+            self.state_pub.publish(self.state)
+        else:
+            self.following = True
 
 
     # Receives a path and starts following it
@@ -60,6 +67,8 @@ class PathFollower:
         self.following = True
         self.index = len(path.poses) - 1
         self.extract_next_pos()
+        # final_pos = path.poses[0]
+        # self.goal_pos = (final_pos.pose.position.x, final_pos.pose.position.y)
 
     # Updates the pose of the robot
     def fused_pose_cb(self, pose_stamped):
@@ -85,6 +94,9 @@ class PathFollower:
         if not self.following:
             return
         
+        #dist_2_goal = self.euchlidean_distance(self.curr_pos, )
+
+
         #check euclidean distance
         dist = self.euchlidean_distance(self.curr_pos, self.next_pos)
         
@@ -143,14 +155,14 @@ class PathFollower:
             self.state.data = 2
             self.state_pub.publish(self.state)
 
-            self.speed.data = -self.DRIVE_SPEED
+            self.speed.data = -self.TURN_SPEED
             self.speed_pub.publish(self.speed)
         #positive
         else:
             self.state.data = 2
             self.state_pub.publish(self.state)
 
-            self.speed.data = self.DRIVE_SPEED
+            self.speed.data = self.TURN_SPEED
             self.speed_pub.publish(self.speed)
 
     # helper functions
@@ -165,10 +177,13 @@ class PathFollower:
 
         #if we are at the end of the path, stop following and disable DT
         if self.index < 0:
+            print("path done")
             self.following = False
             state = Int32()
-            state.data = 0
+            state.data = 1
             self.state_pub.publish(state)
+            self.speed.data = 0
+            self.speed_pub.publish(self.speed)
             return
 
         #extract next pose

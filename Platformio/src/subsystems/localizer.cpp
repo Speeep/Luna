@@ -10,7 +10,7 @@ Localizer::Localizer(){}
 
 void Localizer::init() {
     turnMotor.init(LOCALIZER_L_PWM_PIN, LOCALIZER_R_PWM_PIN);
-    encoder.init(LOCALIZER_ENCODER_ID, MULTIPLEXER_1_ID, LOCALIZER_ENCODER_START_ANGLE);
+    encoder.init(LOCALIZER_ENCODER_ID, MULTIPLEXER_0_ID, LOCALIZER_ENCODER_START_ANGLE);
     enabled = false;
     angle = 0.0;
     lastAngle = 0.0;

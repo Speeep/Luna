@@ -37,4 +37,10 @@
     name="obstacle_localizer" 
     output="screen"
   />
+  <node
+    pkg="control_package"
+    type="localizer_sweeper.py"
+    name="localizer_sweeper" 
+    output="screen"
+  />
 </launch> 
