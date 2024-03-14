@@ -15,6 +15,7 @@ class PathFollower:
     next_index = 1
     index = 0
     goal_pos = (0,0)
+    prev_icc = 0
 
     
     # set up outputs
@@ -27,10 +28,13 @@ class PathFollower:
     ICC_SCALE_FACTOR = .9 #makes turns tighter than necessary to avoid runaway oscilation
     NORMAL_LOOK_AHEAD = .25
     FINAL_LOOK_AHEAD = .0625
-    FINAL_PATH_LEN = 3
-    ICC_HYST = .3 #hysteresis for transition from point to ICC turn
+    FINAL_PATH_LEN = 2
+    TURN_HYST = .3 #hysteresis for transition from point to ICC turn
     DRIVE_SPEED = .75
     TURN_SPEED = .375
+    HALF_DT_WIDTH = .5334 / 2
+    ICC_HYST = .05
+    
 
 
 
@@ -134,10 +138,23 @@ class PathFollower:
             self.speed_pub.publish(self.speed)
 
         #icc turning condition
-        elif (self.state.data == 3 and abs(delta_heading) < self.ICC_TURN) or (abs(delta_heading) < self.ICC_TURN - self.ICC_HYST):
+        elif (self.state.data == 3 and abs(delta_heading) < self.ICC_TURN) or (abs(delta_heading) < self.ICC_TURN - self.TURN_HYST):
             # ask Ian for this proof
             r_icc = dist / (2*sin(delta_heading))
             r_icc *= self.ICC_SCALE_FACTOR
+
+            if abs(abs(r_icc) - self.HALF_DT_WIDTH) < self.ICC_HYST:
+                if r_icc > 0:
+                    if self.prev_icc > self.HALF_DT_WIDTH:
+                        r_icc = self.HALF_DT_WIDTH + self.ICC_HYST
+                    else:
+                        r_icc = self.HALF_DT_WIDTH - self.ICC_HYST
+                else:
+                    if self.prev_icc > - self.HALF_DT_WIDTH:
+                        r_icc = - self.HALF_DT_WIDTH + self.ICC_HYST
+                    else:
+                        r_icc = - self.HALF_DT_WIDTH - self.ICC_HYST
+
 
             self.state.data = 3
             self.state_pub.publish(self.state)
@@ -145,6 +162,7 @@ class PathFollower:
             icc = Float32()
             icc.data = r_icc
             self.icc_pub.publish(icc)
+            self.prev_icc = r_icc
 
             self.speed.data = self.DRIVE_SPEED
             self.speed_pub.publish(self.speed)
