@@ -33,6 +33,7 @@ class PathFollower:
     DRIVE_SPEED = .75
     TURN_SPEED = .375
     HALF_DT_WIDTH = .5334 / 2
+    ICC_HYST = .05
     
 
 
@@ -140,20 +141,20 @@ class PathFollower:
             self.speed_pub.publish(self.speed)
         
         #icc turning condition
-        elif ((self.state.data == 3 and abs(delta_heading) < self.ICC_TURN) or (abs(delta_heading) < self.ICC_TURN - self.TURN_HYST)) and abs(r_icc) > self.HALF_DT_WIDTH + .05:
+        elif ((self.state.data == 3 and abs(delta_heading) < self.ICC_TURN) or (abs(delta_heading) < self.ICC_TURN - self.TURN_HYST)): # and abs(r_icc) > self.HALF_DT_WIDTH + .05
 
             #if we are in hysteresis band, place ICC on the edge of the hysteresis band closest to the previous ICC
-            # if abs(abs(r_icc) - self.HALF_DT_WIDTH) < self.ICC_HYST:
-            #     if r_icc > 0:
-            #         if self.prev_icc > self.HALF_DT_WIDTH:
-            #             r_icc = self.HALF_DT_WIDTH + self.ICC_HYST
-            #         else:
-            #             r_icc = self.HALF_DT_WIDTH - self.ICC_HYST
-            #     else:
-            #         if self.prev_icc > - self.HALF_DT_WIDTH:
-            #             r_icc = - self.HALF_DT_WIDTH + self.ICC_HYST
-            #         else:
-            #             r_icc = - self.HALF_DT_WIDTH - self.ICC_HYST
+            if abs(abs(r_icc) - self.HALF_DT_WIDTH) < self.ICC_HYST:
+                if r_icc > 0:
+                    if self.prev_icc > self.HALF_DT_WIDTH:
+                        r_icc = self.HALF_DT_WIDTH + self.ICC_HYST
+                    else:
+                        r_icc = self.HALF_DT_WIDTH - self.ICC_HYST
+                else:
+                    if self.prev_icc > - self.HALF_DT_WIDTH:
+                        r_icc = - self.HALF_DT_WIDTH + self.ICC_HYST
+                    else:
+                        r_icc = - self.HALF_DT_WIDTH - self.ICC_HYST
 
 
             self.state.data = 3
