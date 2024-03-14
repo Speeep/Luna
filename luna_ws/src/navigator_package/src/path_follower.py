@@ -33,7 +33,7 @@ class PathFollower:
     DRIVE_SPEED = .75
     TURN_SPEED = .375
     HALF_DT_WIDTH = .5334 / 2
-    ICC_HYST = .05
+    ICC_HYST = .05 # 5cm
     
 
 
@@ -143,6 +143,7 @@ class PathFollower:
             r_icc = dist / (2*sin(delta_heading))
             r_icc *= self.ICC_SCALE_FACTOR
 
+            #if we are in hysteresis band, place ICC on the edge of the hysteresis band closest to the previous ICC
             if abs(abs(r_icc) - self.HALF_DT_WIDTH) < self.ICC_HYST:
                 if r_icc > 0:
                     if self.prev_icc > self.HALF_DT_WIDTH:
