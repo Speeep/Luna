@@ -12,7 +12,7 @@ class Map_Node:
 
     MIN_OCCURANCES = 10
 
-    CELL_PADDING = 6
+    CELL_PADDING = 5
 
     MAP_WIDTH = 5.3
 
@@ -171,6 +171,10 @@ class Map_Node:
         for i in range(self.width*self.height):
             self.map_msg.data[i] = self.driveable_grid.flat[i]
             self.rviz_map_msg.data[i] = int(self.driveable_grid.flat[i] - 100 * (self.obstacle_grid.flat[i] / self.MIN_OCCURANCES))
+
+        for i in range(self.width*self.height):
+            if self.rviz_map_msg.data[i] == 0:
+                self.rviz_map_msg.data[i] = 99
 
         self.occ_pub.publish(self.map_msg)
         self.rviz_pub.publish(self.rviz_map_msg)
