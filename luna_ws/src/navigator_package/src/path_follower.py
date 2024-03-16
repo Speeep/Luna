@@ -140,7 +140,7 @@ class PathFollower:
             self.speed_pub.publish(self.speed)
 
         #icc turning condition
-        elif abs(delta_heading) < self.ICC_TURN and ((self.state.data == 3 and abs(r_icc) > self.HALF_DT_WIDTH) or abs(r_icc) > self.HALF_DT_WIDTH + self.ICC_HYST):
+        elif abs(delta_heading) < self.ICC_TURN and ((self.state.data == 3 and abs(r_icc) > self.HALF_DT_WIDTH + .05) or abs(r_icc) > self.HALF_DT_WIDTH + self.ICC_HYST):
 
             self.state.data = 3
             self.state_pub.publish(self.state)
