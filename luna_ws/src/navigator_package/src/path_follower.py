@@ -24,16 +24,15 @@ class PathFollower:
 
     #constants
     DRIVE_STRAIGHT = .015 #max delta heading to drive staright
-    ICC_TURN = .6 #max delta heading to use ICC turn
+    ICC_TURN = 1 # max delta heading to use ICC turn, makes sure robot point turns if goal is behind it
     ICC_SCALE_FACTOR = .9 #makes turns tighter than necessary to avoid runaway oscilation
     NORMAL_LOOK_AHEAD = .25
     FINAL_LOOK_AHEAD = .0625
     FINAL_PATH_LEN = 2
-    TURN_HYST = .3 #hysteresis for transition from point to ICC turn
     DRIVE_SPEED = .75
     TURN_SPEED = .375
     HALF_DT_WIDTH = .5334 / 2
-    ICC_HYST = .05
+    ICC_HYST = .1 # 10cm
     
 
 
@@ -139,23 +138,9 @@ class PathFollower:
 
             self.speed.data = self.DRIVE_SPEED
             self.speed_pub.publish(self.speed)
-        
+
         #icc turning condition
-        elif ((self.state.data == 3 and abs(delta_heading) < self.ICC_TURN) or (abs(delta_heading) < self.ICC_TURN - self.TURN_HYST)): # and abs(r_icc) > self.HALF_DT_WIDTH + .05
-
-            #if we are in hysteresis band, place ICC on the edge of the hysteresis band closest to the previous ICC
-            if abs(abs(r_icc) - self.HALF_DT_WIDTH) < self.ICC_HYST:
-                if r_icc > 0:
-                    if self.prev_icc > self.HALF_DT_WIDTH:
-                        r_icc = self.HALF_DT_WIDTH + self.ICC_HYST
-                    else:
-                        r_icc = self.HALF_DT_WIDTH - self.ICC_HYST
-                else:
-                    if self.prev_icc > - self.HALF_DT_WIDTH:
-                        r_icc = - self.HALF_DT_WIDTH + self.ICC_HYST
-                    else:
-                        r_icc = - self.HALF_DT_WIDTH - self.ICC_HYST
-
+        elif abs(delta_heading) < self.ICC_TURN and ((self.state.data == 3 and abs(r_icc) > self.HALF_DT_WIDTH) or abs(r_icc) > self.HALF_DT_WIDTH + self.ICC_HYST):
 
             self.state.data = 3
             self.state_pub.publish(self.state)
