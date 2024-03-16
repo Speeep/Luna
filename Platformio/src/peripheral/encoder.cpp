@@ -39,19 +39,20 @@ float Encoder::getAngle()
   }
 
   // Encoder things
-  // 7:0 - low
+
+  // 7:0 - low byte
   Wire.beginTransmission(0x36);
   Wire.write(0x0D);
+
   if (Wire.endTransmission() != 0)
   {
-    Serial.println("Error starting transmission to the sensor");
     return radAngle;
   }
 
   Wire.requestFrom(0x36, 1);
+
   if (Wire.available() == 0)
   {
-    Serial.println("Error receiving data from the sensor");
     return radAngle;
   }
   lowbyte = Wire.read();
@@ -61,14 +62,12 @@ float Encoder::getAngle()
   Wire.write(0x0C);
   if (Wire.endTransmission() != 0)
   {
-    Serial.println("Error starting transmission to the sensor");
     return radAngle;
   }
 
   Wire.requestFrom(0x36, 1);
   if (Wire.available() == 0)
   {
-    Serial.println("Error receiving data from the sensor");
     return radAngle;
   }
   highbyte = Wire.read();
@@ -78,7 +77,8 @@ float Encoder::getAngle()
 
   if ((static_cast<float>(rawAngle) * BYTES_2_RAD - startAngle) == 0.0) {
     return radAngle;
-  } else {
+  } 
+  else {
     radAngle = static_cast<float>(rawAngle) * BYTES_2_RAD - startAngle;
 
     if (radAngle < 0.0)
