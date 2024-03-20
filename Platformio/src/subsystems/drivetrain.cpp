@@ -98,7 +98,6 @@ void Drivetrain::loop() {
     if (state != DISABLED) {
         left_turn_motor.setEffort(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
         right_turn_motor.setEffort(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
-
     }
 }
 
