@@ -68,7 +68,7 @@ void Deposit::loop() {
 
     // Accumulate error and constrain
     errorI += error;
-    errorI = constrain(errors, -MAX_DEPOSIT_ERRORS, MAX_DEPOSIT_ERRORS);
+    errorI = constrain(errorI, -MAX_DEPOSIT_ERRORS, MAX_DEPOSIT_ERRORS);
 
     // If enabled, control the motors, else cut current to the motors
     if (enabled) {

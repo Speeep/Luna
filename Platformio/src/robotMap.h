@@ -13,6 +13,9 @@
 #define DEPOSIT_L_PWM_PIN 10
 #define DEPOSIT_R_PWM_PIN 11
 
+#define INTAKE_L_PWM_PIN 12
+#define INTAKE_R_PWM_PIN 13
+
 
 // MCP2515 Pinout
 #define MCP_INT 2 // Brown Wire
