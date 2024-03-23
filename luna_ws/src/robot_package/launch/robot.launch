@@ -8,12 +8,12 @@
     <param name="baud" value="$(arg baud)" />
   </node>
   <!-- Publishes Logitech Webcam Images For Display on Laptop -->
-  <node
+  <!-- <node
     pkg="localization_package"
     type="image_publisher.py"
     name="image_publisher" 
     output="screen"
-  />
+  /> -->
   <!-- Localizes Robot with Fiducial Tracking and Odometry -->
   <!-- <node
     pkg="localization_package"
