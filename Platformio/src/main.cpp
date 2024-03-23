@@ -21,8 +21,8 @@ ros::Publisher localizerAnglePub("/jetson/localizer_angle", &localizerAngle);
 std_msgs::Float32MultiArray poseStep;
 ros::Publisher poseStepPub("/jetson/pose_step", &poseStep);
 
-Drivetrain drivetrain;
-Localizer localizer;
+// Drivetrain drivetrain;
+// Localizer localizer;
 
 int driveSpeed = 0;
 bool drivetrainEnable = false;
@@ -39,33 +39,33 @@ static unsigned long previousMillis = 0;
 unsigned long currentMillis = millis();
 
 void drivetrainSpeedCallback(const std_msgs::Float32 &driveSpeedMsg) {
-  float driveSpeed = driveSpeedMsg.data;
-  drivetrain.setDriveSpeed(driveSpeed);
+  // float driveSpeed = driveSpeedMsg.data;
+  // drivetrain.setDriveSpeed(driveSpeed);
 }
 
 void drivetrainSwitchStateCallback(const std_msgs::Int32 &driveStateMsg) {
-  int drivetrainState = driveStateMsg.data;
-  drivetrain.setState(drivetrainState);
+  // int drivetrainState = driveStateMsg.data;
+  // drivetrain.setState(drivetrainState);
 }
 
 
 void drivetrainICCallback(const std_msgs::Float32 &driveICCMsg) {
-  float icc = driveICCMsg.data;
-  drivetrain.setYICC(icc);
+  // float icc = driveICCMsg.data;
+  // drivetrain.setYICC(icc);
 }
 
 void localizerErrorCallback(const std_msgs::Float32 &localizerErrorMsg) {
-  localizer.setError(localizerErrorMsg.data);
+  // localizer.setError(localizerErrorMsg.data);
 }
 
 void localizerEnableCallback(const std_msgs::Bool &localizerEnableMsg) {
-  localizerEnable = localizerEnableMsg.data;
+  // localizerEnable = localizerEnableMsg.data;
 
-  if (localizerEnable == true) {
-    localizer.enable();
-  } else {
-    localizer.disable();
-  }
+  // if (localizerEnable == true) {
+  //   localizer.enable();
+  // } else {
+  //   localizer.disable();
+  // }
 }
 
 ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
@@ -78,9 +78,6 @@ ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localiz
 void setup()
 {
   Serial.begin(57600);
-  SPI.begin();
-  Wire.begin();
-  Wire.setClock(800000L);
 
   nh.initNode();
   nh.advertise(ianOutputPub);
@@ -92,52 +89,56 @@ void setup()
   nh.subscribe(driveStateSub);
   nh.subscribe(driveICCSub);
 
-  drivetrain.init();
-  localizer.init();
+  // drivetrain.init();
+  // localizer.init();
+
+  SPI.begin();
+  Wire.begin();
+  Wire.setClock(800000L);
 }
 
 void loop()
 {
-  currentMillis = millis();
+  // currentMillis = millis();
 
-  // Drivetrain gets looped every 10 milliseconds
-  if (currentMillis - previousMillis >= DRIVETRAIN_INTERVAL) {
+  // // Drivetrain gets looped every 10 milliseconds
+  // if (currentMillis - previousMillis >= DRIVETRAIN_INTERVAL) {
 
-    nh.spinOnce();
+  //   nh.spinOnce();
 
-    previousMillis = currentMillis;
+  //   previousMillis = currentMillis;
 
-    drivetrain.loop();
+  //   drivetrain.loop();
 
-    localizer.loop();
+  //   localizer.loop();
 
-    if (drivetrain.isEnabled()) {
-      String ianOutputString = String("Left Angle: ") + String(drivetrain.getLeftWheelpodAngle()) + String("         Right Angle: ") + String(drivetrain.getRightWheelpodAngle());
-      ianOutputMsg.data = ianOutputString.c_str();
-      ianOutputPub.publish(&ianOutputMsg);
-    }
+  //   if (drivetrain.isEnabled()) {
+  //     String ianOutputString = String("Left Angle: ") + String(drivetrain.getLeftWheelpodAngle()) + String("         Right Angle: ") + String(drivetrain.getRightWheelpodAngle());
+  //     ianOutputMsg.data = ianOutputString.c_str();
+  //     ianOutputPub.publish(&ianOutputMsg);
+  //   }
 
-    // Regardless of whether the localizer is enabled, return the correct angle
-    localizerAngle.data = localizer.getAngle();
-    localizerAnglePub.publish(&localizerAngle);
+  //   // Regardless of whether the localizer is enabled, return the correct angle
+  //   localizerAngle.data = localizer.getAngle();
+  //   localizerAnglePub.publish(&localizerAngle);
 
 
-    //update Odom
-    odomIterator ++;
-    if(odomIterator >= ODOM_FREQUENCY){
+  //   //update Odom
+  //   odomIterator ++;
+  //   if(odomIterator >= ODOM_FREQUENCY){
 
-      drivetrain.stepOdom();
+  //     drivetrain.stepOdom();
 
-      poseStepVals[0] = drivetrain.getPoseStepX();
-      poseStepVals[1] = drivetrain.getPoseStepY();
-      poseStepVals[2] = drivetrain.getPoseStepTheta();
+  //     poseStepVals[0] = drivetrain.getPoseStepX();
+  //     poseStepVals[1] = drivetrain.getPoseStepY();
+  //     poseStepVals[2] = drivetrain.getPoseStepTheta();
 
-      std_msgs::Float32MultiArray stepMsg;
-      stepMsg.data_length = 3;
-      stepMsg.data = poseStepVals;
-      poseStepPub.publish(&stepMsg);
+  //     std_msgs::Float32MultiArray stepMsg;
+  //     stepMsg.data_length = 3;
+  //     stepMsg.data = poseStepVals;
+  //     poseStepPub.publish(&stepMsg);
 
-      odomIterator = 0;
-    }
-  }
+  //     odomIterator = 0;
+  //   }
+  // }
 }

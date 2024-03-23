@@ -15,33 +15,33 @@
     output="screen"
   />
   <!-- Localizes Robot with Fiducial Tracking and Odometry -->
-  <node
+  <!-- <node
     pkg="localization_package"
     type="localization_filter.py"
     name="localization_filter" 
     output="screen"
-  />
+  /> -->
   <!-- Handles math for Localization Transforms -->
-  <node
+  <!-- <node
     pkg="localization_package"
     type="tf_solver.py"
     name="tf_solver" 
     output="screen"
-  />
+  /> -->
   <!-- Detects Obstacles using Realsense Depth Camera -->
-  <node
+  <!-- <node
     pkg="depth_imaging_package"
     type="depth_publisher.py"
     name="depth_publisher" 
     output="screen"
-  />
+  /> -->
   <!-- Localizes Obstacles that are Detected -->
-  <node
+  <!-- <node
     pkg="depth_imaging_package"
     type="obstacle_localizer.py"
     name="obstacle_localizer" 
     output="screen"
-  />
+  /> -->
   <!-- Handles Control of Logitech Camera Sweeper -->
   <!-- <node
     pkg="control_package"
