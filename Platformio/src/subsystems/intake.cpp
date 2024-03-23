@@ -14,7 +14,7 @@ Intake::Intake(){
     depthSetpoint = 0;
     speed = 0;
 
-    isEnabled = false;
+    enabled = false;
 
 }
 
@@ -22,16 +22,16 @@ void Intake::init(){
 
 }
 
-void Intake::enable(){
-    isEnabled = true;
+void Intake::enable() {
+    enabled = true;
 }
 
-void Intake::disable(){
-    isEnabled = false;
+void Intake::disable() {
+    enabled = false;
 }
 
-bool Intake::isEnabled(){
-    return isEnabled;
+bool Intake::isEnabled() {
+    return enabled;
 }
 
 void Intake::setDepthSetpoint(float depth){
@@ -46,9 +46,8 @@ float Intake::getDepthSetpoint(){
     return depthSetpoint;
 }
 
-void Intake::setSpeed(){
-    this.speed = speed;
-
+void Intake::setSpeed(float newSpeed){
+    speed = newSpeed;
 }
 
 float Intake::getSpeed(){

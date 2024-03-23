@@ -4,10 +4,11 @@
 #include "../robotMap.h"
 #include "./peripheral/HBridge.h"
 #include "./peripheral/encoder.h"
+
 class Deposit {
     public:
 
-        Localizer();
+        Deposit();
 
         void init();
 

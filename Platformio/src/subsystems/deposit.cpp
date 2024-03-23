@@ -9,7 +9,7 @@
 Deposit::Deposit(){}
 
 void Deposit::init() {
-    turnMotor.init(DEPOSIT_L_PWM_PIN, DEPOSIT_R_PWM_PIN);
+    depositMotor.init(DEPOSIT_L_PWM_PIN, DEPOSIT_R_PWM_PIN);
     encoder.init(DEPOSIT_ENCODER_ID, MULTIPLEXER_1_ID, 0.0);
     enabled = false;
     angle = 0.0;
@@ -34,8 +34,8 @@ float Deposit::getAngle() {
     return angle;
 }
 
-void Deposit::setOpen(bool open){
-    this.open = open;
+void Deposit::setOpen(bool newOpen){
+    open = newOpen;
 }
 
 bool Deposit::isOpen(){
@@ -44,13 +44,13 @@ bool Deposit::isOpen(){
 
 bool Deposit::isInPosition(){
     if(open){
-        if(getAngle >= DEPOSIT_OPEN_ANGLE){
+        if(getAngle() >= DEPOSIT_OPEN_ANGLE){
             return true;
         }
         return false;
     }
     else{
-        if(getAngle <= DEPOSIT_CLOSED_ANGLE){
+        if(getAngle() <= DEPOSIT_CLOSED_ANGLE){
             return true;
         }
         return false;
@@ -72,7 +72,7 @@ void Deposit::loop() {
 
     // If enabled, control the motors, else cut current to the motors
     if (enabled) {
-        depositMotor.setEffort(int((error * Deposit_MOTOR_KP) + (errorI * DEPOSIT_MOTOR_KI)));
+        depositMotor.setEffort(int((error * DEPOSIT_MOTOR_KP) + (errorI * DEPOSIT_MOTOR_KI)));
     }
     else{
         depositMotor.setEffort(0);

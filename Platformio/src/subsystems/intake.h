@@ -40,6 +40,6 @@ class Intake{
         float depth;
         float speed;
 
-        bool isEnabled;
+        bool enabled;
 
 };
