@@ -14,7 +14,7 @@
 #define DEPOSIT_R_PWM_PIN 11
 
 #define INTAKE_L_PWM_PIN 12
-#define INTAKE_R_PWM_PIN 13
+#define INTAKE_R_PWM_PIN 7
 
 
 // MCP2515 Pinout
