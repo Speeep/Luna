@@ -111,11 +111,11 @@ void loop()
     // localizer.loop();
 
     // if (drivetrain.isEnabled()) {
-    String ianOutputString = String("Back Right Speed: ") + String(drivetrain.getSpeed(2)) + String("         Front Right Speed: ") + String(drivetrain.getSpeed(3));
+    String ianOutputString = String("Back Left Speed: ") + String(drivetrain.getSpeed(1)) + String("         Front Left Speed: ") + String(drivetrain.getSpeed(0));
     ianOutputMsg.data = ianOutputString.c_str();
     ianOutputPub.publish(&ianOutputMsg);
     // }
-    
+
     // Regardless of whether the localizer is enabled, return the correct angle
     // localizerAngle.data = localizer.getAngle();
     // localizerAnglePub.publish(&localizerAngle);
