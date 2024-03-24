@@ -7,7 +7,7 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 #include "./subsystems/drivetrain.h"
-#include "./subsystems/localizer.h"
+// #include "./subsystems/localizer.h"
 #include <std_msgs/Float32MultiArray.h>
 
 ros::NodeHandle nh;
@@ -15,19 +15,19 @@ ros::NodeHandle nh;
 std_msgs::String ianOutputMsg;
 ros::Publisher ianOutputPub("/listener/ian_output", &ianOutputMsg);
 
-std_msgs::Float32 localizerAngle;
-ros::Publisher localizerAnglePub("/jetson/localizer_angle", &localizerAngle);
+// std_msgs::Float32 localizerAngle;
+// ros::Publisher localizerAnglePub("/jetson/localizer_angle", &localizerAngle);
 
 std_msgs::Float32MultiArray poseStep;
 ros::Publisher poseStepPub("/jetson/pose_step", &poseStep);
 
 Drivetrain drivetrain;
-Localizer localizer;
+// Localizer localizer;
 
 int driveSpeed = 0;
 bool drivetrainEnable = false;
 bool drivetrainAngle = false;
-bool localizerEnable = false;
+// bool localizerEnable = false;
 
 float poseStepVals[3] = { 0.0, 0.0, 0.0};
 
@@ -54,41 +54,41 @@ void drivetrainICCallback(const std_msgs::Float32 &driveICCMsg) {
   drivetrain.setYICC(icc);
 }
 
-void localizerErrorCallback(const std_msgs::Float32 &localizerErrorMsg) {
-  localizer.setError(localizerErrorMsg.data);
-}
+// void localizerErrorCallback(const std_msgs::Float32 &localizerErrorMsg) {
+//   localizer.setError(localizerErrorMsg.data);
+// }
 
-void localizerEnableCallback(const std_msgs::Bool &localizerEnableMsg) {
-  localizerEnable = localizerEnableMsg.data;
+// void localizerEnableCallback(const std_msgs::Bool &localizerEnableMsg) {
+//   localizerEnable = localizerEnableMsg.data;
 
-  if (localizerEnable == true) {
-    localizer.enable();
-  } else {
-    localizer.disable();
-  }
-}
+//   if (localizerEnable == true) {
+//     localizer.enable();
+//   } else {
+//     localizer.disable();
+//   }
+// }
 
 ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Int32> driveStateSub("/drivetrain/state", &drivetrainSwitchStateCallback);
 ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICCallback);
-ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
-ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
+// ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
+// ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
 
 
 void setup()
 {
   nh.initNode();
   nh.advertise(ianOutputPub);
-  nh.advertise(localizerAnglePub);
+  // nh.advertise(localizerAnglePub);
   nh.advertise(poseStepPub);
   nh.subscribe(driveSpeedSub);
-  nh.subscribe(localizerErrorSub);
-  nh.subscribe(localizerEnableSub);
+  // nh.subscribe(localizerErrorSub);
+  // nh.subscribe(localizerEnableSub);
   nh.subscribe(driveStateSub);
   nh.subscribe(driveICCSub);
 
   drivetrain.init();
-  localizer.init();
+  // localizer.init();
 
   SPI.begin();
   Wire.begin();
@@ -110,11 +110,11 @@ void loop()
 
     // localizer.loop();
 
-    if (drivetrain.isEnabled()) {
-      String ianOutputString = String("Left Angle: ") + String(drivetrain.getLeftWheelpodAngle()) + String("         Right Angle: ") + String(drivetrain.getRightWheelpodAngle());
-      ianOutputMsg.data = ianOutputString.c_str();
-      ianOutputPub.publish(&ianOutputMsg);
-    }
+    // if (drivetrain.isEnabled()) {
+    String ianOutputString = String("Left Angle: ") + String(drivetrain.getLeftWheelpodAngle()) + String("         Right Angle: ") + String(drivetrain.getRightWheelpodAngle());
+    ianOutputMsg.data = ianOutputString.c_str();
+    ianOutputPub.publish(&ianOutputMsg);
+    // }
 
     // Regardless of whether the localizer is enabled, return the correct angle
     // localizerAngle.data = localizer.getAngle();

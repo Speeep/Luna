@@ -44,7 +44,12 @@
   /> -->
   <!-- Handles Control of Logitech Camera Sweeper -->
   <!-- <node
-    pkg="control_package"
+    pkg="control_package"  <node
+    pkg="localization_package"
+    type="image_publisher.py"
+    name="image_publisher" 
+    output="screen"
+  />
     type="localizer_sweeper.py"
     name="localizer_sweeper" 
     output="screen"
