@@ -8,6 +8,7 @@
 #include <std_msgs/String.h>
 #include "./subsystems/drivetrain.h"
 // #include "./subsystems/localizer.h"
+#include "./subsystems/conveyor.h"
 #include <std_msgs/Float32MultiArray.h>
 
 ros::NodeHandle nh;
@@ -23,6 +24,7 @@ ros::Publisher poseStepPub("/jetson/pose_step", &poseStep);
 
 Drivetrain drivetrain;
 // Localizer localizer;
+Conveyor conveyor;
 
 int driveSpeed = 0;
 bool drivetrainEnable = false;
@@ -89,6 +91,7 @@ void setup()
 
   drivetrain.init();
   // localizer.init();
+  conveyor.init();
 
   SPI.begin();
   Wire.begin();
@@ -110,8 +113,10 @@ void loop()
 
     // localizer.loop();
 
+    conveyor.loop();
+
     // if (drivetrain.isEnabled()) {
-    String ianOutputString = String("Back Left Speed: ") + String(drivetrain.getSpeed(1)) + String("         Front Left Speed: ") + String(drivetrain.getSpeed(0));
+    String ianOutputString = String("Conveyor Speed: ") + String(conveyor.getConveyerSpeed());
     ianOutputMsg.data = ianOutputString.c_str();
     ianOutputPub.publish(&ianOutputMsg);
     // }

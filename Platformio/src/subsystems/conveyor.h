@@ -4,11 +4,11 @@
 #include "../robotMap.h"
 #include "./peripheral/HBridge.h"
 #include "./peripheral/encoder.h"
-#include "./peripheral/CANController.h"
+#include "./peripheral/ConveyorCANController.h"
 
-class Intake{
+class Conveyor{
     public:
-        Intake();
+        Conveyor();
 
         void init();
 
@@ -18,6 +18,8 @@ class Intake{
 
         bool isEnabled();
 
+        void loop();
+
         void setDepthSetpoint(float);
 
         float getDepth();
@@ -26,20 +28,18 @@ class Intake{
 
         void setSpeed(float);
 
-        float getSpeed();
+        float getConveyerSpeed();
 
     private:
         HBridge plungeMotor;
-        Encoder plungeEncoder;
 
         // TODO - Make can_controller static and pull the update motor speeds into main.cpp
-        static CANController can_controller;
-        Encoder speedEncoder;
+        ConveyorCANController can_controller;
 
-        float depthSetpoint;
-        float depth;
-        float speed;
+        // float depthSetpoint;
+        // float depth;
+        // float speed;
 
-        bool enabled;
+        // bool enabled;
 
 };
