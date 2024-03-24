@@ -10,6 +10,8 @@ class KeyControlNode:
 
         self.released = True
 
+        self.plunge_speed = Float32()
+
         self.conveyer_running = False
 
         # Define publishers for different key presses
@@ -47,7 +49,7 @@ class KeyControlNode:
         }
 
         # Create a timer to check key presses periodically
-        self.timer = rospy.Timer(rospy.Duration(0.1), self.check_key_presses)
+        self.timer = rospy.Timer(rospy.Duration(0.2), self.check_key_presses)
 
         # Robot enable
         self.drivetrain_state = 0
@@ -150,18 +152,28 @@ class KeyControlNode:
             self.localizer_error = 0.0
             self.localizer_error_pub.publish(self.localizer_error)
 
+        # Conveyor Spinny Stuff
+        spinny_running = Bool()
         if self.key_states['z']:
             if self.released:
                 self.conveyor_running = not self.conveyor_running
+                spinny_running.data = self.conveyer_running
                 self.released = False
-        self.run_conveyor_pub.publish(self.conveyor_running)
-        
+        self.run_conveyor_pub.publish(spinny_running)
+
+        # Conveyor Plungy Stuff
         if self.key_states['a']:
-            self.plunge_pub.publish(1.0)
+            if self.plunge_speed.data != 1.0:
+                self.plunge_speed.data = 1.0
+                self.plunge_pub.publish(self.plunge_speed)
         elif self.key_states['d']:
-            self.plunge_pub.publish(-1.0)
+            if self.plunge_speed.data != -1.0:
+                self.plunge_speed.data = -1.0
+                self.plunge_pub.publish(self.plunge_speed)
         else:
-            self.plunge_pub.publish(0)
+            if self.plunge_speed.data != 0.0:
+                self.plunge_speed.data = 0.0
+                self.plunge_pub.publish(self.plunge_speed)
 
         if self.key_states['o']:
             self.dump_pub.publish(True)
