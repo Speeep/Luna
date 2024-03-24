@@ -80,12 +80,17 @@ void conveyorBoolCallback(const std_msgs::Bool &conveyorBool) {
   }
 }
 
+void conveyorPlungeCallback(const std_msgs::Float32 &plungeSpeed){
+  conveyor.setPlungeSpeed(plungeSpeed.data);
+}
+
 ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Int32> driveStateSub("/drivetrain/state", &drivetrainSwitchStateCallback);
 ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICCallback);
 // ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
 // ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
 ros::Subscriber<std_msgs::Bool> conveyorSub("/digger/run_conveyor", &conveyorBoolCallback);
+ros::Subscriber<std_msgs::Float32> plungeSub("/digger/plunge", &conveyorPlungeCallback);
 
 
 void setup()
@@ -100,6 +105,7 @@ void setup()
   nh.subscribe(driveStateSub);
   nh.subscribe(driveICCSub);
   nh.subscribe(conveyorSub);
+  nh.subscribe(plungeSub);
 
   drivetrain.init();
   // localizer.init();
@@ -128,7 +134,7 @@ void loop()
     conveyor.loop();
 
     // if (drivetrain.isEnabled()) {
-    String ianOutputString = String("Conveyor Speed: ") + String(conveyor.getConveyerSpeed());
+    String ianOutputString = String("At top ") + String(conveyor.isAtTop()) + "\tAt bottom " + String(conveyor.isAtBot()) + "\t speed " + String(conveyor.getPlungeSpeed());
     ianOutputMsg.data = ianOutputString.c_str();
     ianOutputPub.publish(&ianOutputMsg);
     // }

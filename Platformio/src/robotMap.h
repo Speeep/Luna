@@ -13,8 +13,8 @@
 #define DEPOSIT_L_PWM_PIN 10
 #define DEPOSIT_R_PWM_PIN 11
 
-#define INTAKE_L_PWM_PIN 12
-#define INTAKE_R_PWM_PIN 7
+#define PLUNGE_L_PWM_PIN 12
+#define PLUNGE_R_PWM_PIN 7
 
 
 // MCP2515 Pinout
@@ -96,3 +96,6 @@
 #define ICC_TURN 3
 
 #define ZEB_SPEED 10.24
+
+#define PLUNGE_TOP 43
+#define PLUNGE_BOT 42

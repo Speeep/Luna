@@ -8,6 +8,8 @@ class KeyControlNode:
 
         self.icc = 0
 
+        self.released = True
+
         self.conveyer_running = False
 
         # Define publishers for different key presses
@@ -68,6 +70,7 @@ class KeyControlNode:
 
     def on_release(self, key):
         try:
+            self.released = True
             key_char = key.char
             if key_char in self.key_states:
                 self.key_states[key_char] = False
@@ -148,7 +151,9 @@ class KeyControlNode:
             self.localizer_error_pub.publish(self.localizer_error)
 
         if self.key_states['z']:
-            self.conveyor_running = not self.conveyor_running
+            if self.released:
+                self.conveyor_running = not self.conveyor_running
+                self.released = False
         self.run_conveyor_pub.publish(self.conveyor_running)
         
         if self.key_states['a']:

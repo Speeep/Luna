@@ -18,13 +18,15 @@ class Conveyor{
 
         bool isEnabled();
 
+        bool isAtTop();
+
+        bool isAtBot();
+
         void loop();
 
-        void setDepthSetpoint(float);
+        void setPlungeSpeed(float);
 
-        float getDepth();
-
-        float getDepthSetpoint();
+        float getPlungeSpeed();
 
         void setSpeed(float);
 
@@ -36,9 +38,8 @@ class Conveyor{
         // TODO - Make can_controller static and pull the update motor speeds into main.cpp
         ConveyorCANController can_controller;
 
-        // float depthSetpoint;
-        // float depth;
-        // float speed;
-
         bool enabled;
+
+        float plungeSpeed;
+
 };

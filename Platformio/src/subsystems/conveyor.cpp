@@ -12,11 +12,12 @@ Conveyor::Conveyor(){}
 void Conveyor::init(){
     can_controller.init();
 
-    // plungeMotor.init(INTAKE_L_PWM_PIN, INTAKE_R_PWM_PIN);
+    plungeMotor.init(PLUNGE_L_PWM_PIN, PLUNGE_R_PWM_PIN);
 
-    // depth = 0;
-    // depthSetpoint = 0;
-    // speed = 0;
+    pinMode(PLUNGE_BOT, INPUT_PULLUP);
+    pinMode(PLUNGE_TOP, INPUT_PULLUP);
+
+    plungeSpeed = 0;
 
     enabled = false;
 }
@@ -33,6 +34,14 @@ bool Conveyor::isEnabled() {
     return enabled;
 }
 
+bool Conveyor::isAtTop(){
+    return digitalRead(PLUNGE_TOP) == LOW;
+}
+
+bool Conveyor::isAtBot(){
+    return digitalRead(PLUNGE_BOT) == LOW;
+}
+
 void Conveyor::loop() {
 
     // Always Get Data
@@ -43,19 +52,34 @@ void Conveyor::loop() {
     } else {
         setSpeed(0.0);
     }
+
+    // Positive speed means plunging downwards
+    // signal goes low when a limit is hit
+    if(plungeSpeed > 0 && digitalRead(PLUNGE_BOT) == HIGH){
+        // Run motor to plunge down
+        int effort = 20;
+
+        plungeMotor.setEffort(effort);
+    }
+    else if(plungeSpeed < 0 && digitalRead(PLUNGE_TOP) == HIGH){
+        // Run motor to plunge down
+        int effort = -20;
+
+        plungeMotor.setEffort(effort);
+    }
+    else{
+        plungeMotor.setEffort(0);
+    }
+
 }
 
-// void Conveyor::setDepthSetpoint(float depth){
-//     depthSetpoint = depth;
-// }
+void Conveyor::setPlungeSpeed(float speed){
+    plungeSpeed = speed;
+}
 
-// float Conveyor::getDepth(){
-//     return depth;
-// }
-
-// float Conveyor::getDepthSetpoint(){
-//     return depthSetpoint;
-// }
+float Conveyor::getPlungeSpeed(){
+    return plungeSpeed;
+}
 
 void Conveyor::setSpeed(float newSpeed){
     can_controller.setSpeed(newSpeed);
