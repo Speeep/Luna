@@ -19,6 +19,7 @@ class KeyControlNode:
         self.localizer_enable_pub = rospy.Publisher('/localizer/enable', Bool, queue_size=10)
         self.run_conveyer_pub = rospy.Publisher('/digger/run_conveyer', Bool, queue_size=10)
         self.plunge_pub = rospy.Publisher('/digger/plunge', Float32, queue_size=10)
+        self.dump_pub = rospy.Publisher('/deposit/open', Bool, queue_size=10)
 
         # Create a listener for keyboard events
         self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
@@ -40,6 +41,7 @@ class KeyControlNode:
             'z': False,
             'a': False,
             'd': False,
+            'o': False,
         }
 
         # Create a timer to check key presses periodically
@@ -153,6 +155,11 @@ class KeyControlNode:
             self.plunge_pub.publish(-1.0)
         else:
             self.plunge_pub.publish(0)
+
+        if self.key_states['o']:
+            self.dump_pub.publish(True)
+        else:
+            self.dump_pub.publish(False)
 
 if __name__ == '__main__':
     try:
