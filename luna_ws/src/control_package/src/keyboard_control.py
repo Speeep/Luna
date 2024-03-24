@@ -121,10 +121,6 @@ class KeyControlNode:
             self.localizer_enable = True
             localizer_enable.data = self.localizer_enable
 
-        # TODO Remove after testing
-        self.drivetrain_state = 0
-        self.localizer_enable = False
-
         state.data = self.drivetrain_state
         self.drivetrain_state_pub.publish(state)
         localizer_enable.data = self.localizer_enable
