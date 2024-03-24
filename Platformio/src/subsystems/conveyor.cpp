@@ -17,7 +17,7 @@ void Conveyor::init(){
     pinMode(PLUNGE_BOT, INPUT_PULLUP);
     pinMode(PLUNGE_TOP, INPUT_PULLUP);
 
-    plungeSpeed = 0;
+    plungeSpeed = 0.0;
 
     enabled = false;
 }
