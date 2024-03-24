@@ -70,11 +70,22 @@ void drivetrainICCallback(const std_msgs::Float32 &driveICCMsg) {
 //   }
 // }
 
+void conveyorBoolCallback(const std_msgs::Bool &conveyorBool) {
+  bool on = conveyorBool.data;
+  if(on) {
+    conveyor.enable();
+  }
+  else {
+    conveyor.disable();
+  }
+}
+
 ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Int32> driveStateSub("/drivetrain/state", &drivetrainSwitchStateCallback);
 ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICCallback);
 // ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
 // ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
+ros::Subscriber<std_msgs::Bool> conveyorSub("/digger/run_conveyor", &conveyorBoolCallback);
 
 
 void setup()
@@ -88,6 +99,7 @@ void setup()
   // nh.subscribe(localizerEnableSub);
   nh.subscribe(driveStateSub);
   nh.subscribe(driveICCSub);
+  nh.subscribe(conveyorSub);
 
   drivetrain.init();
   // localizer.init();

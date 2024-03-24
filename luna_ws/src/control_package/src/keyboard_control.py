@@ -17,7 +17,7 @@ class KeyControlNode:
         self.drivetrain_icc_pub = rospy.Publisher('/drivetrain/icc', Float32, queue_size=10)
         self.localizer_error_pub = rospy.Publisher('localizer/error', Float32, queue_size=10)
         self.localizer_enable_pub = rospy.Publisher('/localizer/enable', Bool, queue_size=10)
-        self.run_conveyer_pub = rospy.Publisher('/digger/run_conveyer', Bool, queue_size=10)
+        self.run_conveyor_pub = rospy.Publisher('/digger/run_conveyor', Bool, queue_size=10)
         self.plunge_pub = rospy.Publisher('/digger/plunge', Float32, queue_size=10)
         self.dump_pub = rospy.Publisher('/deposit/open', Bool, queue_size=10)
 
@@ -55,6 +55,8 @@ class KeyControlNode:
 
         # Localizer Angle Setpoint
         self.localizer_error = 0.0
+
+        self.conveyor_running = False
 
     def on_press(self, key):
         try:
@@ -146,8 +148,8 @@ class KeyControlNode:
             self.localizer_error_pub.publish(self.localizer_error)
 
         if self.key_states['z']:
-            self.conveyer_running = not self.conveyer_running
-            self.run_conveyer_pub.publish(self.conveyer_running)
+            self.conveyor_running = not self.conveyor_running
+        self.run_conveyor_pub.publish(self.conveyor_running)
         
         if self.key_states['a']:
             self.plunge_pub.publish(1.0)

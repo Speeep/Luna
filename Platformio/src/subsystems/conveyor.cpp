@@ -18,27 +18,31 @@ void Conveyor::init(){
     // depthSetpoint = 0;
     // speed = 0;
 
-    // enabled = false;
+    enabled = false;
 }
 
-// void Conveyor::enable() {
-//     enabled = true;
-// }
+void Conveyor::enable() {
+    enabled = true;
+}
 
-// void Conveyor::disable() {
-//     enabled = false;
-// }
+void Conveyor::disable() {
+    enabled = false;
+}
 
-// bool Conveyor::isEnabled() {
-//     return enabled;
-// }
+bool Conveyor::isEnabled() {
+    return enabled;
+}
 
 void Conveyor::loop() {
 
     // Always Get Data
     can_controller.updateMotorSpeeds();
 
-    setSpeed(ZEB_SPEED);
+    if (enabled) {
+        setSpeed(ZEB_SPEED);
+    } else {
+        setSpeed(0.0);
+    }
 }
 
 // void Conveyor::setDepthSetpoint(float depth){

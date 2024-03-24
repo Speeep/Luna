@@ -40,6 +40,5 @@ class Conveyor{
         // float depth;
         // float speed;
 
-        // bool enabled;
-
+        bool enabled;
 };
