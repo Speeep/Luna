@@ -13,6 +13,7 @@ void Drivetrain::init() {
     right_turn_motor.init(RIGHT_R_PWM, RIGHT_L_PWM);
     left_wheelpod_encoder.init(LEFT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, LEFT_WHEELPOD_ENCODER_START_ANGLE);
     right_wheelpod_encoder.init(RIGHT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, RIGHT_WHEELPOD_ENCODER_START_ANGLE);
+    can_controller.init();
     leftWheelpodAngleSetpoint = 0.0;
     rightWheelpodAngleSetpoint = 0.0;
     leftWheelpodAngle = 0;
@@ -68,7 +69,7 @@ int Drivetrain::getState() {
 void Drivetrain::loop() {
 
     // Always Get Data
-    // can_controller.updateMotorSpeeds();
+    can_controller.updateMotorSpeeds();
     leftWheelpodAngle = left_wheelpod_encoder.getAngle();
     rightWheelpodAngle = right_wheelpod_encoder.getAngle();
 
@@ -76,7 +77,7 @@ void Drivetrain::loop() {
         case DISABLED:
             setLeftWheelpodAngleSetpoint(0.0);
             setRightWheelpodAngleSetpoint(0.0);
-            setWheelSpeeds(0,0,0,0);
+            can_controller.cutCurrent();
             break;
         case DRIVE_STRAIGHT:
             setLeftWheelpodAngleSetpoint(0.0);
@@ -142,10 +143,7 @@ void Drivetrain::stepOdom(){
 }
 
 void Drivetrain::setWheelSpeeds(float sp0, float sp1, float sp2, float sp3) {
-    can_controller.setSpeed(0, -sp0);
-    can_controller.setSpeed(1, -sp1);
-    can_controller.setSpeed(2,  sp2);
-    can_controller.setSpeed(3,  sp3);
+    can_controller.setSpeed(-sp0, -sp1, sp2, sp3);
 }
 
 void Drivetrain::setWheelSpeeds(float speedL, float speedR){
