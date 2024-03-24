@@ -8,6 +8,8 @@ class KeyControlNode:
 
         self.icc = 0
 
+        self.conveyer_running = False
+
         # Define publishers for different key presses
         self.drivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
         self.drivetrain_state_pub = rospy.Publisher('/drivetrain/state', Int32, queue_size=10)
@@ -15,6 +17,8 @@ class KeyControlNode:
         self.drivetrain_icc_pub = rospy.Publisher('/drivetrain/icc', Float32, queue_size=10)
         self.localizer_error_pub = rospy.Publisher('localizer/error', Float32, queue_size=10)
         self.localizer_enable_pub = rospy.Publisher('/localizer/enable', Bool, queue_size=10)
+        self.run_conveyer_pub = rospy.Publisher('/digger/run_conveyer', Bool, queue_size=10)
+        self.plunge_pub = rospy.Publisher('/digger/plunge', Float32, queue_size=10)
 
         # Create a listener for keyboard events
         self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
@@ -33,6 +37,9 @@ class KeyControlNode:
             '1': False,
             '2': False,
             '3': False,
+            'z': False,
+            'a': False,
+            'd': False,
         }
 
         # Create a timer to check key presses periodically
@@ -135,6 +142,17 @@ class KeyControlNode:
         elif self.key_states['n']:
             self.localizer_error = 0.0
             self.localizer_error_pub.publish(self.localizer_error)
+
+        if self.key_states['z']:
+            self.conveyer_running = not self.conveyer_running
+            self.run_conveyer_pub.publish(self.conveyer_running)
+        
+        if self.key_states['a']:
+            self.plunge_pub.publish(1.0)
+        elif self.key_states['d']:
+            self.plunge_pub.publish(-1.0)
+        else:
+            self.plunge_pub.publish(0)
 
 if __name__ == '__main__':
     try:
