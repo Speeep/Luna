@@ -8,7 +8,7 @@ void CANController::init() {
     mcp2515.setBitrate(CAN_1000KBPS, MCP_8MHZ);
     mcp2515.setNormalMode();
 
-    long lastTime = 0;
+    lastTime = 0;
 
     for (int i = 0; i < 5; i++) {
         prevAngles[i] = 0.0;
