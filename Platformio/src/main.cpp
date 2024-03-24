@@ -9,6 +9,7 @@
 #include "./subsystems/drivetrain.h"
 // #include "./subsystems/localizer.h"
 #include <std_msgs/Float32MultiArray.h>
+#include "./peripheral/CANController.h"
 
 ros::NodeHandle nh;
 
@@ -37,6 +38,8 @@ float icc = 0.0;
 
 static unsigned long previousMillis = 0;
 unsigned long currentMillis = millis();
+
+static CANController can_controller;
 
 void drivetrainSpeedCallback(const std_msgs::Float32 &driveSpeedMsg) {
   float driveSpeed = driveSpeedMsg.data;
@@ -93,6 +96,8 @@ void setup()
   SPI.begin();
   Wire.begin();
   Wire.setClock(800000L);
+  
+  can_controller.init();
 }
 
 void loop()
@@ -101,6 +106,8 @@ void loop()
 
   // Drivetrain gets looped every 10 milliseconds
   if (currentMillis - previousMillis >= DRIVETRAIN_INTERVAL) {
+
+    can_controller.updateMotorSpeeds();
 
     nh.spinOnce();
 

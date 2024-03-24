@@ -19,7 +19,7 @@ public:
 
     void updateMotorSpeeds();
 
-    void setSpeed(float, float, float, float);
+    void setSpeed(int, float);
 
     float getSpeed(int);
 
@@ -37,21 +37,23 @@ private:
     RawEncoder motor1Encoder;
     RawEncoder motor2Encoder;
     RawEncoder motor3Encoder;
+    RawEncoder motor4Encoder;
     MedianFilter mf0;
     MedianFilter mf1;
     MedianFilter mf2;
     MedianFilter mf3;
+    MedianFilter mf4;
     MCP2515 mcp2515;
     long lastTime;
-    float prevAngles[4];
-    float errors[4];
-    float prevErrors[4];
-    float setSpeeds[4];
-    float speeds[4];
-    float realSpeeds[4];
+    float prevAngles[5];
+    float errors[5];
+    float prevErrors[5];
+    float setSpeeds[5];
+    float speeds[5];
+    float realSpeeds[5];
     int filterPosition;
-    float sums[4];
-    int setCurrents[4];
-    float speedSetpoints[4];
-    int displacements[4];
+    float sums[5];
+    int setCurrents[5];
+    float speedSetpoints[5];
+    int displacements[5];
 };

@@ -76,7 +76,7 @@ class Drivetrain {
     HBridge right_turn_motor;
     Encoder left_wheelpod_encoder;
     Encoder right_wheelpod_encoder;
-    CANController can_controller;
+    static CANController can_controller;
     float leftWheelpodAngleSetpoint;
     float rightWheelpodAngleSetpoint;
     float leftWheelpodAngle;
