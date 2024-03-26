@@ -59,11 +59,11 @@ void Conveyor::loop() {
     // signal goes low when a limit is hit
     if(plungeSpeed > 0 && digitalRead(PLUNGE_BOT) == HIGH){
         // Run motor to plunge down
-        effort = 10;
+        effort = 6;
     }
     else if(plungeSpeed < 0 && digitalRead(PLUNGE_TOP) == HIGH){
         // Run motor to plunge down
-        effort = -10;
+        effort = -6;
     }
     else{
         effort = 0;

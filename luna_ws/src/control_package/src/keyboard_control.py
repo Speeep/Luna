@@ -42,6 +42,9 @@ class KeyControlNode:
         self.prev_plunge_speed = 0.0
 
         self.dump_pub = rospy.Publisher('/deposit/open', Bool, queue_size=10)
+        self.deposit_open = Bool()
+        self.prev_open = False
+        self.open = False
 
         # Create a listener for keyboard events
         self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
@@ -167,9 +170,12 @@ class KeyControlNode:
             self.prev_plunge_speed = self.plunge_speed.data
 
         if self.key_states['o']:
-            self.dump_pub.publish(True)
-        else:
-            self.dump_pub.publish(False)
+            self.open = not self.open
+            
+        if self.open != self.prev_open:
+            self.deposit_open.data = self.open
+            self.dump_pub.publish(self.deposit_open)
+            self.prev_open = self.open
 
 if __name__ == '__main__':
     try:

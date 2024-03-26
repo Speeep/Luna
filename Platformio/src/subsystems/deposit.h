@@ -36,7 +36,8 @@ class Deposit {
         float angle;
         bool open;
         float error;
-        float errorI;
+        float setpoint;
+        float effort;
 
 };
 

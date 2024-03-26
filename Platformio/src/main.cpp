@@ -9,6 +9,7 @@
 #include "./subsystems/drivetrain.h"
 // #include "./subsystems/localizer.h"
 #include "./subsystems/conveyor.h"
+#include "./subsystems/deposit.h"
 #include <std_msgs/Float32MultiArray.h>
 
 ros::NodeHandle nh;
@@ -25,6 +26,7 @@ ros::Publisher poseStepPub("/jetson/pose_step", &poseStep);
 Drivetrain drivetrain;
 // Localizer localizer;
 Conveyor conveyor;
+Deposit deposit;
 
 int driveSpeed = 0;
 bool drivetrainEnable = false;
@@ -84,6 +86,10 @@ void conveyorPlungeCallback(const std_msgs::Float32 &plungeSpeed){
   conveyor.setPlungeSpeed(plungeSpeed.data);
 }
 
+void depositOpenCallback(const std_msgs::Bool &depositOpenMsg) {
+  deposit.setOpen(depositOpenMsg.data);
+}
+
 ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Int32> driveStateSub("/drivetrain/state", &drivetrainSwitchStateCallback);
 ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICCallback);
@@ -91,6 +97,7 @@ ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICC
 // ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
 ros::Subscriber<std_msgs::Bool> conveyorSub("/digger/run_conveyor", &conveyorBoolCallback);
 ros::Subscriber<std_msgs::Float32> plungeSub("/digger/plunge", &conveyorPlungeCallback);
+ros::Subscriber<std_msgs::Bool> depositOpen("/deposit/open", &depositOpenCallback);
 
 
 void setup()
@@ -106,10 +113,12 @@ void setup()
   nh.subscribe(driveICCSub);
   nh.subscribe(conveyorSub);
   nh.subscribe(plungeSub);
+  nh.subscribe(depositOpen);
 
   drivetrain.init();
   // localizer.init();
   conveyor.init();
+  deposit.init();
 
   SPI.begin();
   Wire.begin();
@@ -133,11 +142,12 @@ void loop()
 
     conveyor.loop();
 
-    // if (drivetrain.isEnabled()) {
+    deposit.loop();
+
+    // Prints for Plunging
     String ianOutputString = String("At top ") + String(conveyor.isAtTop()) + "\tAt bottom " + String(conveyor.isAtBot()) + "\t speed " + String(conveyor.getPlungeSpeed());
     ianOutputMsg.data = ianOutputString.c_str();
     ianOutputPub.publish(&ianOutputMsg);
-    // }
 
     // Regardless of whether the localizer is enabled, return the correct angle
     // localizerAngle.data = localizer.getAngle();
