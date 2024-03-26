@@ -6,23 +6,41 @@ class KeyControlNode:
     def __init__(self):
         rospy.init_node('keyboard_control', anonymous=True)
 
-        self.icc = 0
 
         self.released = True
 
-        self.plunge_speed = Float32()
 
         self.conveyer_running = False
 
         # Define publishers for different key presses
         self.drivetrain_drive_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
+        self.drive_speed = Float32()
+        self.prev_drive_speed = 0.0
+
         self.drivetrain_state_pub = rospy.Publisher('/drivetrain/state', Int32, queue_size=10)
-        self.drivetrain_icc_step_pub = rospy.Publisher('/drivetrain/icc_step', Float32, queue_size=10)
+        self.drive_state = Int32()
+        self.prev_drive_state = 0
+
         self.drivetrain_icc_pub = rospy.Publisher('/drivetrain/icc', Float32, queue_size=10)
+        self.icc = Float32()
+        self.prev_icc = 0
+
         self.localizer_error_pub = rospy.Publisher('localizer/error', Float32, queue_size=10)
+        self.localizer_error = Float32()
+        self.prev_localizer_error = 0.0
+
         self.localizer_enable_pub = rospy.Publisher('/localizer/enable', Bool, queue_size=10)
+        self.localizer_enable = Bool()
+        self.prev_localizer_enable = False
+
         self.run_conveyor_pub = rospy.Publisher('/digger/run_conveyor', Bool, queue_size=10)
+        self.run_conveyor = Bool()
+        self.prev_run_conveyor = False
+
         self.plunge_pub = rospy.Publisher('/digger/plunge', Float32, queue_size=10)
+        self.plunge_speed = Float32()
+        self.prev_plunge_speed = 0.0
+
         self.dump_pub = rospy.Publisher('/deposit/open', Bool, queue_size=10)
 
         # Create a listener for keyboard events
@@ -43,24 +61,14 @@ class KeyControlNode:
             '2': False,
             '3': False,
             'z': False,
+            'x': False,
             'a': False,
             'd': False,
             'o': False,
         }
 
         # Create a timer to check key presses periodically
-        self.timer = rospy.Timer(rospy.Duration(0.2), self.check_key_presses)
-
-        # Robot enable
-        self.drivetrain_state = 0
-
-        # Localizer Enable
-        self.localizer_enable = False
-
-        # Localizer Angle Setpoint
-        self.localizer_error = 0.0
-
-        self.conveyor_running = False
+        self.timer = rospy.Timer(rospy.Duration(0.1), self.check_key_presses)
 
     def on_press(self, key):
         try:
@@ -82,98 +90,81 @@ class KeyControlNode:
     def check_key_presses(self, event):
         # Keys needed for driving forward and backward
         if self.key_states['w']:
-            drive_speed = Float32()
-            drive_speed.data = 0.6
-            self.drivetrain_drive_pub.publish(drive_speed)
+            self.drive_speed.data = 0.6
         elif self.key_states['s']:
-            drive_speed = Float32()
-            drive_speed.data = -0.6
-            self.drivetrain_drive_pub.publish(drive_speed)
+            self.drive_speed.data = -0.6
         else:
-            drive_speed = Float32()
-            drive_speed.data = 0.0
-            self.drivetrain_drive_pub.publish(drive_speed)
+            self.drive_speed.data = 0.0
+        
+        if self.drive_speed.data != self.prev_drive_speed:
+            self.prev_drive_speed = self.drive_speed.data
+            self.drivetrain_drive_pub.publish(self.drive_speed)
             
         # Keys needed for moving the ICC
         if self.key_states['q']:
-            ICC_step = Float32()
-            ICC_step.data = 0.02
-            self.icc += .02
-            ICC = Float32()
-            ICC.data = self.icc
-            self.drivetrain_icc_step_pub.publish(ICC_step)
-            self.drivetrain_icc_pub.publish(ICC)
+            self.icc.data += .02
         elif self.key_states['e']:
-            ICC_step = Float32()
-            ICC_step.data = -0.02
-            self.icc -= .02
-            ICC = Float32()
-            ICC.data = self.icc
-            self.drivetrain_icc_step_pub.publish(ICC_step)
-            self.drivetrain_icc_pub.publish(ICC)
-        else:
-            ICC_step = Float32()
-            ICC_step.data = 0.0
-            self.drivetrain_icc_step_pub.publish(ICC_step)
+            self.icc.data -= .02
+        
+        if self.icc.data != self.prev_icc:
+            self.prev_icc = self.icc.data
+            self.drivetrain_icc_pub.publish(self.icc)
 
-        # Keys needed for enabling and disabling the robot
-            
-        state = Int32()
-        localizer_enable = Bool()
+        # Keys needed for the primary drie state machine
 
         if self.key_states['0']:
-            self.drivetrain_state = 0
-            self.localizer_enable = False
+            self.drive_state.data = 0
+            self.localizer_enable.data = False
         elif self.key_states['1']:
-            self.drivetrain_state = 1
-            self.localizer_enable = True
-            localizer_enable.data = self.localizer_enable
+            self.drive_state.data = 1
+            self.localizer_enable.data = True
         elif self.key_states['2']:
-            self.drivetrain_state = 2
-            self.localizer_enable = True
-            localizer_enable.data = self.localizer_enable
+            self.drive_state.data = 2
+            self.localizer_enable.data = True
         elif self.key_states['3']:
-            self.drivetrain_state = 3
-            self.localizer_enable = True
-            localizer_enable.data = self.localizer_enable
+            self.drive_state.data = 3
+            self.localizer_enable.data = True
 
-        state.data = self.drivetrain_state
-        self.drivetrain_state_pub.publish(state)
-        localizer_enable.data = self.localizer_enable
-        self.localizer_enable_pub.publish(localizer_enable)
+        if self.drive_state.data != self.prev_drive_state:
+            self.drivetrain_state_pub.publish(self.drive_state)
+            self.prev_drive_state = self.drive_state.data
+        if self.localizer_enable.data != self.prev_localizer_enable:
+            self.prev_localizer_enable = self.localizer_enable.data
+            self.localizer_enable_pub.publish(self.localizer_enable)
 
         if self.key_states['b']:
-            self.localizer_error = 100.0
-            self.localizer_error_pub.publish(self.localizer_error)
+            self.localizer_error.data = 100.0
         elif self.key_states['m']:
-            self.localizer_error = -100.0
+            self.localizer_error.data = -100.0
+        else:
+            self.localizer_error.data = 0.0
+        
+        if self.localizer_error.data != self.prev_localizer_error:
             self.localizer_error_pub.publish(self.localizer_error)
-        elif self.key_states['n']:
-            self.localizer_error = 0.0
-            self.localizer_error_pub.publish(self.localizer_error)
+            self.prev_localizer_error = self.localizer_error.data
+
 
         # Conveyor Spinny Stuff
-        spinny_running = Bool()
         if self.key_states['z']:
-            if self.released:
-                self.conveyor_running = not self.conveyor_running
-                spinny_running.data = self.conveyer_running
-                self.released = False
-        self.run_conveyor_pub.publish(spinny_running)
+            self.run_conveyor.data = True
+        elif self.key_states['x']:
+            self.run_conveyor.data = False
+        
+        if self.run_conveyor.data != self.prev_run_conveyor:
+            self.run_conveyor_pub.publish(self.run_conveyor)
+            self.prev_run_conveyor = self.run_conveyor.data
 
         # Conveyor Plungy Stuff
         if self.key_states['a']:
-            if self.plunge_speed.data != 1.0:
-                self.plunge_speed.data = 1.0
-                self.plunge_pub.publish(self.plunge_speed)
+            self.plunge_speed.data = 1.0
         elif self.key_states['d']:
-            if self.plunge_speed.data != -1.0:
-                self.plunge_speed.data = -1.0
-                self.plunge_pub.publish(self.plunge_speed)
+            self.plunge_speed.data = -1.0
         else:
-            if self.plunge_speed.data != 0.0:
-                self.plunge_speed.data = 0.0
-                self.plunge_pub.publish(self.plunge_speed)
+            self.plunge_speed.data = 0.0
+
+        if self.plunge_speed.data != self.prev_plunge_speed:
+            self.plunge_pub.publish(self.plunge_speed)
+            self.prev_plunge_speed = self.plunge_speed.data
 
         if self.key_states['o']:
             self.dump_pub.publish(True)

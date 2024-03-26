@@ -15,12 +15,12 @@
     output="screen"
   />
   <!-- RVIZ -->
-  <!-- <node 
+  <node 
     type="rviz" 
     name="rviz" 
     pkg="rviz" 
     args="-d $(find luna_rviz)/rviz/luna_config.rviz" 
-  /> -->
+  />
   <!-- Displays Camera Feed to Laptop Screen -->
   <node
     pkg="localization_package"
