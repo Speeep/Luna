@@ -39,6 +39,8 @@ class Conveyor{
         ConveyorCANController can_controller;
 
         bool enabled;
+        int prevEffort;
+        int effort;
 
         float plungeSpeed;
 

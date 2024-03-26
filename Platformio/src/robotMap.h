@@ -13,8 +13,8 @@
 #define DEPOSIT_L_PWM_PIN 10
 #define DEPOSIT_R_PWM_PIN 11
 
-#define PLUNGE_L_PWM_PIN 12
-#define PLUNGE_R_PWM_PIN 7
+#define PLUNGE_L_PWM_PIN 7
+#define PLUNGE_R_PWM_PIN 12
 
 
 // MCP2515 Pinout

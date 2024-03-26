@@ -18,6 +18,8 @@ void Conveyor::init(){
     pinMode(PLUNGE_TOP, INPUT_PULLUP);
 
     plungeSpeed = 0.0;
+    prevEffort = 0;
+    effort = 0;
 
     enabled = false;
 }
@@ -57,18 +59,19 @@ void Conveyor::loop() {
     // signal goes low when a limit is hit
     if(plungeSpeed > 0 && digitalRead(PLUNGE_BOT) == HIGH){
         // Run motor to plunge down
-        int effort = 20;
-
-        plungeMotor.setEffort(effort);
+        effort = 10;
     }
     else if(plungeSpeed < 0 && digitalRead(PLUNGE_TOP) == HIGH){
         // Run motor to plunge down
-        int effort = -20;
-
-        plungeMotor.setEffort(effort);
+        effort = -10;
     }
     else{
-        plungeMotor.setEffort(0);
+        effort = 0;
+    }
+
+    if (effort != prevEffort) {
+        prevEffort = effort;
+        plungeMotor.setEffort(effort);
     }
 
 }
