@@ -30,7 +30,15 @@ void ConveyorCANController::setMotorCurrent() {
     canMsgOut.can_id = 0x1FF;
     canMsgOut.can_dlc = 2;
 
-    int motorCurrent0 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    int motorCurrent0;
+
+    if(setSpeeds[0] > 1) {
+        motorCurrent0 = 3000;
+    } else {
+        motorCurrent0 = 0;
+    }
+
+    // int motorCurrent0 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
 
     canMsgOut.data[0] = (char)(motorCurrent0 / 256);
     canMsgOut.data[1] = (char)(motorCurrent0 % 256);

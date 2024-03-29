@@ -30,8 +30,8 @@
 // Velocity loop PID parameters
 // Increase Ki based on load, fine-tune Kp
 #define BASE_CURRENT 10
-#define SPEED_KP 2500
-#define SPEED_KI 4
+#define SPEED_KP 4000
+#define SPEED_KI 5
 #define SPEED_KD 0
 #define SPEED_SUMCAP 5000
 
