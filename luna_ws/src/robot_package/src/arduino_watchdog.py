@@ -3,9 +3,9 @@ from std_msgs.msg import Int32
 import Jetson.GPIO as GPIO
 import time
 
-class Watchdog:
+class ArduinoWatchdog:
     def __init__(self):
-        rospy.init_node('watchdog', anonymous=True)
+        rospy.init_node('arduino_watchdog', anonymous=True)
 
         # Set up GPIO pin
         self.reset_pin = 2
@@ -16,7 +16,7 @@ class Watchdog:
         self.last_message_time = time.time()
 
         # Subscribe to the Arduino topic
-        rospy.Subscriber("/watchdog", Int32, self.watchdog_cb)
+        rospy.Subscriber("/arduino_watchdog", Int32, self.watchdog_cb)
 
     def watchdog_cb(self, data):
         # Update the last message time
@@ -41,7 +41,7 @@ class Watchdog:
 
 if __name__ == '__main__':
     try:
-        arduino_node = Watchdog()
-        arduino_node.run()
+        watchdog_node = ArduinoWatchdog()
+        watchdog_node.run()
     except rospy.ROSInterruptException:
         pass

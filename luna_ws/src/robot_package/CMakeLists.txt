@@ -206,6 +206,6 @@ include_directories(
 
 catkin_install_python(PROGRAMS 
   src/listener.py
-  src/watchdog.py
+  src/arduino_watchdog.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

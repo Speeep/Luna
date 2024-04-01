@@ -57,8 +57,8 @@
   <!-- Watchdog timer for resetting the Arduino-->
   <node
     pkg="robot_package"
-    type="watchdog.py"
-    name="watchdog"
+    type="arduino_watchdog.py"
+    name="arduino_watchdog"
     output="screen"
   />
 </launch>
