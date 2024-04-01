@@ -34,6 +34,9 @@ class ArduinoWatchdog:
                 # Set GPIO pin back to HIGH
                 GPIO.output(self.reset_pin, GPIO.HIGH)
 
+                # TODO Delete after testing
+                self.last_message_time = time.time() + 10
+
             rate.sleep()
 
 if __name__ == '__main__':
