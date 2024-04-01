@@ -8,7 +8,7 @@ class ArduinoWatchdog:
         rospy.init_node('arduino_watchdog', anonymous=True)
 
         # Set up GPIO pin
-        self.reset_pin = 2
+        self.reset_pin = 18
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.reset_pin, GPIO.OUT)
 
