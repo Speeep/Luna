@@ -28,10 +28,4 @@
     name="image_subscriber" 
     output="screen"
   />
-  <node
-    pkg="control_package"
-    type="watchdog.py"
-    name="watchdog" 
-    output="screen"
-  />
 </launch> 
