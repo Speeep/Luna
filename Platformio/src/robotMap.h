@@ -13,9 +13,7 @@
 #define DEPOSIT_L_PWM_PIN 10
 #define DEPOSIT_R_PWM_PIN 11
 
-#define PLUNGE_L_PWM_PIN 12
-#define PLUNGE_R_PWM_PIN 7
-
+#define PLUNGE_TALON_PWM 7
 
 // MCP2515 Pinout
 #define MCP_INT 2 // Brown Wire
@@ -30,8 +28,8 @@
 // Velocity loop PID parameters
 // Increase Ki based on load, fine-tune Kp
 #define BASE_CURRENT 10
-#define SPEED_KP 4000
-#define SPEED_KI 5
+#define SPEED_KP 6000
+#define SPEED_KI 7
 #define SPEED_KD 0
 #define SPEED_SUMCAP 5000
 
@@ -64,7 +62,7 @@
 #define MULTIPLEXER_0_ID 0 
 #define MULTIPLEXER_1_ID 1
 
-#define MAX_MOTOR_CURRENT 10000
+#define MAX_MOTOR_CURRENT 12000
 
 #define LEFT_TURN_MOTOR_KP 20
 #define RIGHT_TURN_MOTOR_KP 20

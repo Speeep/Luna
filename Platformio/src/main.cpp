@@ -8,7 +8,7 @@
 #include <std_msgs/String.h>
 #include "./subsystems/drivetrain.h"
 // #include "./subsystems/localizer.h"
-#include "./subsystems/conveyor.h"
+// #include "./subsystems/conveyor.h"
 #include "./subsystems/deposit.h"
 #include <std_msgs/Float32MultiArray.h>
 
@@ -25,7 +25,7 @@ ros::Publisher poseStepPub("/jetson/pose_step", &poseStep);
 
 Drivetrain drivetrain;
 // Localizer localizer;
-Conveyor conveyor;
+// Conveyor conveyor;
 Deposit deposit;
 
 int driveSpeed = 0;
@@ -72,19 +72,19 @@ void drivetrainICCallback(const std_msgs::Float32 &driveICCMsg) {
 //   }
 // }
 
-void conveyorBoolCallback(const std_msgs::Bool &conveyorBool) {
-  bool on = conveyorBool.data;
-  if(on) {
-    conveyor.enable();
-  }
-  else {
-    conveyor.disable();
-  }
-}
+// void conveyorBoolCallback(const std_msgs::Bool &conveyorBool) {
+//   bool on = conveyorBool.data;
+//   if(on) {
+//     conveyor.enable();
+//   }
+//   else {
+//     conveyor.disable();
+//   }
+// }
 
-void conveyorPlungeCallback(const std_msgs::Float32 &plungeSpeed){
-  conveyor.setPlungeSpeed(plungeSpeed.data);
-}
+// void conveyorPlungeCallback(const std_msgs::Float32 &plungeSpeed){
+//   conveyor.setPlungeSpeed(plungeSpeed.data);
+// }
 
 void depositOpenCallback(const std_msgs::Bool &depositOpenMsg) {
   deposit.setOpen(depositOpenMsg.data);
@@ -95,8 +95,8 @@ ros::Subscriber<std_msgs::Int32> driveStateSub("/drivetrain/state", &drivetrainS
 ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICCallback);
 // ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
 // ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
-ros::Subscriber<std_msgs::Bool> conveyorSub("/digger/run_conveyor", &conveyorBoolCallback);
-ros::Subscriber<std_msgs::Float32> plungeSub("/digger/plunge", &conveyorPlungeCallback);
+// ros::Subscriber<std_msgs::Bool> conveyorSub("/digger/run_conveyor", &conveyorBoolCallback);
+// ros::Subscriber<std_msgs::Float32> plungeSub("/digger/plunge", &conveyorPlungeCallback);
 ros::Subscriber<std_msgs::Bool> depositOpen("/deposit/open", &depositOpenCallback);
 
 
@@ -111,13 +111,13 @@ void setup()
   // nh.subscribe(localizerEnableSub);
   nh.subscribe(driveStateSub);
   nh.subscribe(driveICCSub);
-  nh.subscribe(conveyorSub);
-  nh.subscribe(plungeSub);
+  // nh.subscribe(conveyorSub);
+  // nh.subscribe(plungeSub);
   nh.subscribe(depositOpen);
 
   drivetrain.init();
   // localizer.init();
-  conveyor.init();
+  // conveyor.init();
   deposit.init();
 
   SPI.begin();
@@ -140,14 +140,14 @@ void loop()
 
     // localizer.loop();
 
-    conveyor.loop();
+    // conveyor.loop();
 
     deposit.loop();
 
-    // Prints for Plunging
-    String ianOutputString = String("At top ") + String(conveyor.isAtTop()) + "\tAt bottom " + String(conveyor.isAtBot()) + "\t speed " + String(conveyor.getPlungeSpeed());
-    ianOutputMsg.data = ianOutputString.c_str();
-    ianOutputPub.publish(&ianOutputMsg);
+    // // Prints for Plunging
+    // String ianOutputString = String("At top ") + String(conveyor.isAtTop()) + "\tAt bottom " + String(conveyor.isAtBot()) + "\t speed " + String(conveyor.getPlungeSpeed());
+    // ianOutputMsg.data = ianOutputString.c_str();
+    // ianOutputPub.publish(&ianOutputMsg);
 
     // Regardless of whether the localizer is enabled, return the correct angle
     // localizerAngle.data = localizer.getAngle();
