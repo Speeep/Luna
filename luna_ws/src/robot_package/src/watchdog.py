@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import rospy
 from std_msgs.msg import Int32
 import Jetson.GPIO as GPIO
@@ -7,7 +5,7 @@ import time
 
 class Watchdog:
     def __init__(self):
-        rospy.init_node('arduino_node', anonymous=True)
+        rospy.init_node('watchdog', anonymous=True)
 
         # Set up GPIO pin
         self.reset_pin = 2
