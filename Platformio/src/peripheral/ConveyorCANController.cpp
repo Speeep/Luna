@@ -21,6 +21,7 @@ void ConveyorCANController::init() {
         setCurrents[i] = 0;
         speedSetpoints[i] = 0.0;
         displacements[i] = 0;
+        motorCurrent0 = 0;
     }
 
     motor0Encoder.init(CONVEYOR_ENCODER_ID, CONVEYOR_MULTIPLEXER_ID);
@@ -29,8 +30,6 @@ void ConveyorCANController::init() {
 void ConveyorCANController::setMotorCurrent() {
     canMsgOut.can_id = 0x1FF;
     canMsgOut.can_dlc = 2;
-
-    int motorCurrent0;
 
     if(setSpeeds[0] > 1) {
         motorCurrent0 = 3000;
@@ -119,4 +118,8 @@ void ConveyorCANController::cutCurrent() {
 
 String ConveyorCANController::getSums() {
     return String(speeds[0]);
+}
+
+int ConveyorCANController::getCurrent() {
+    return motorCurrent0;
 }

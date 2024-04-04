@@ -14,6 +14,7 @@
 #define DEPOSIT_R_PWM_PIN 11
 
 #define PLUNGE_TALON_PWM 7
+#define PLUNGE_MOTOR_EFFORT 30
 
 // MCP2515 Pinout
 #define MCP_INT 2 // Brown Wire

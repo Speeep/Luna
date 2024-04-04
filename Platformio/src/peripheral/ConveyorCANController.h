@@ -29,6 +29,8 @@ public:
 
     String getSums();
 
+    int getCurrent();
+
 private:
     struct can_frame canMsgOut;
     RawEncoder motor0Encoder;
@@ -46,4 +48,5 @@ private:
     int setCurrents[1];
     float speedSetpoints[1];
     int displacements[1];
+    int motorCurrent0;
 };

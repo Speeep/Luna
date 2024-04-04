@@ -2,7 +2,7 @@
 
 #include "Arduino.h"
 #include "../robotMap.h"
-#include "./peripheral/HBridge.h"
+#include "./peripheral/talon.h"
 #include "./peripheral/encoder.h"
 #include "./peripheral/ConveyorCANController.h"
 
@@ -32,8 +32,10 @@ class Conveyor{
 
         float getConveyerSpeed();
 
+        int getConveryorCurrent();
+
     private:
-        HBridge plungeMotor;
+        Talon plungeMotor;
 
         // TODO - Make can_controller static and pull the update motor speeds into main.cpp
         ConveyorCANController can_controller;
