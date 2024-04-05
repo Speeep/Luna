@@ -6,9 +6,7 @@ class KeyControlNode:
     def __init__(self):
         rospy.init_node('keyboard_control', anonymous=True)
 
-
         self.released = True
-
 
         self.conveyer_running = False
 
