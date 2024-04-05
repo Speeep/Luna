@@ -7,7 +7,9 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 #include "./subsystems/drivetrain.h"
-#include "./subsystems/localizer.h"
+// #include "./subsystems/localizer.h"
+#include "./subsystems/conveyor.h"
+#include "./subsystems/deposit.h"
 #include <std_msgs/Float32MultiArray.h>
 
 ros::NodeHandle nh;
@@ -15,19 +17,30 @@ ros::NodeHandle nh;
 std_msgs::String ianOutputMsg;
 ros::Publisher ianOutputPub("/listener/ian_output", &ianOutputMsg);
 
-std_msgs::Float32 localizerAngle;
-ros::Publisher localizerAnglePub("/jetson/localizer_angle", &localizerAngle);
+// std_msgs::Float32 localizerAngle;
+// ros::Publisher localizerAnglePub("/jetson/localizer_angle", &localizerAngle);
 
 std_msgs::Float32MultiArray poseStep;
 ros::Publisher poseStepPub("/jetson/pose_step", &poseStep);
 
+std_msgs::Float32 conveyorSpeedPub;
+ros::Publisher conveyorSpeedPub("/jetson/conveyor_speed", &conveyorSpeedPub);
+
+std_msgs::Bool plungeTopPub;
+ros::Publisher plungeTopPub("/jetson/plunge_top", &plungeTopPub);
+
+std_msgs::Bool plungeBotPub;
+ros::Publisher plungeBotPub("/jetson/plunge_bot", &plungeBotPub);
+
 Drivetrain drivetrain;
-Localizer localizer;
+// Localizer localizer;
+Conveyor conveyor;
+Deposit deposit;
 
 int driveSpeed = 0;
 bool drivetrainEnable = false;
 bool drivetrainAngle = false;
-bool localizerEnable = false;
+// bool localizerEnable = false;
 
 float poseStepVals[3] = { 0.0, 0.0, 0.0};
 
@@ -35,7 +48,8 @@ int odomIterator = 0;
 
 float icc = 0.0;
 
-static unsigned long previousMillis = 0;
+static unsigned long previousDriveMillis = 0;
+static unsigned long previousConveyorMillis = 0;
 unsigned long currentMillis = millis();
 
 void drivetrainSpeedCallback(const std_msgs::Float32 &driveSpeedMsg) {
@@ -54,75 +68,115 @@ void drivetrainICCallback(const std_msgs::Float32 &driveICCMsg) {
   drivetrain.setYICC(icc);
 }
 
-void localizerErrorCallback(const std_msgs::Float32 &localizerErrorMsg) {
-  localizer.setError(localizerErrorMsg.data);
+// void localizerErrorCallback(const std_msgs::Float32 &localizerErrorMsg) {
+//   localizer.setError(localizerErrorMsg.data);
+// }
+
+// void localizerEnableCallback(const std_msgs::Bool &localizerEnableMsg) {
+//   localizerEnable = localizerEnableMsg.data;
+
+//   if (localizerEnable == true) {
+//     localizer.enable();
+//   } else {
+//     localizer.disable();
+//   }
+// }
+
+void conveyorBoolCallback(const std_msgs::Bool &conveyorBool) {
+  bool on = conveyorBool.data;
+  if(on) {
+    conveyor.enable();
+  }
+  else {
+    conveyor.disable();
+  }
 }
 
-void localizerEnableCallback(const std_msgs::Bool &localizerEnableMsg) {
-  localizerEnable = localizerEnableMsg.data;
+void conveyorPlungeCallback(const std_msgs::Float32 &plungeSpeed){
+  conveyor.setPlungeSpeed(plungeSpeed.data);
+}
 
-  if (localizerEnable == true) {
-    localizer.enable();
-  } else {
-    localizer.disable();
-  }
+void depositOpenCallback(const std_msgs::Bool &depositOpenMsg) {
+  deposit.setOpen(depositOpenMsg.data);
 }
 
 ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Int32> driveStateSub("/drivetrain/state", &drivetrainSwitchStateCallback);
 ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICCallback);
-ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
-ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
+// ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
+// ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
+ros::Subscriber<std_msgs::Bool> conveyorSub("/digger/run_conveyor", &conveyorBoolCallback);
+ros::Subscriber<std_msgs::Float32> plungeSub("/digger/plunge", &conveyorPlungeCallback);
+ros::Subscriber<std_msgs::Bool> depositOpen("/deposit/open", &depositOpenCallback);
 
 
 void setup()
 {
-  Serial.begin(57600);
+  nh.initNode();
+  nh.advertise(ianOutputPub);
+  // nh.advertise(localizerAnglePub);
+  nh.advertise(poseStepPub);
+  nh.subscribe(driveSpeedSub);
+  // nh.subscribe(localizerErrorSub);
+  // nh.subscribe(localizerEnableSub);
+  nh.subscribe(driveStateSub);
+  nh.subscribe(driveICCSub);
+  nh.subscribe(conveyorSub);
+  nh.subscribe(plungeSub);
+  nh.subscribe(depositOpen);
+
+  drivetrain.init();
+  // localizer.init();
+  conveyor.init();
+  // deposit.init();
+
   SPI.begin();
   Wire.begin();
   Wire.setClock(800000L);
-
-  nh.initNode();
-  nh.advertise(ianOutputPub);
-  nh.advertise(localizerAnglePub);
-  nh.advertise(poseStepPub);
-  nh.subscribe(driveSpeedSub);
-  nh.subscribe(localizerErrorSub);
-  nh.subscribe(localizerEnableSub);
-  nh.subscribe(driveStateSub);
-  nh.subscribe(driveICCSub);
-
-  drivetrain.init();
-  localizer.init();
 }
 
 void loop()
 {
   currentMillis = millis();
 
+  // conveyor gets looped every 50 ms
+  if(currentMillis - previousConveyorMillis >= CONVEYOR_INTERVAL) {
+    previousConveyorMillis = currentMillis;
+    
+    conveyor.loop();
+
+    
+    // // Prints for Plunging
+    String ianOutputString = String(conveyor.getConveyerSpeed());
+    ianOutputMsg.data = ianOutputString.c_str();
+    ianOutputPub.publish(&ianOutputMsg);
+
+    
+    // deposit.loop();
+
+
+  }
+
   // Drivetrain gets looped every 10 milliseconds
-  if (currentMillis - previousMillis >= DRIVETRAIN_INTERVAL) {
+  if (currentMillis - previousDriveMillis >= DRIVETRAIN_INTERVAL) {
 
     nh.spinOnce();
 
-    previousMillis = currentMillis;
+    previousDriveMillis = currentMillis;
 
     drivetrain.loop();
 
-    localizer.loop();
+    // localizer.loop();
 
-    if (drivetrain.isEnabled()) {
-      String ianOutputString = String("Right Angle: ") + String(drivetrain.getRightWheelpodAngle()) + String("\tRight SetPoint") + String(drivetrain.getRightWheelpodAngleSetpoint());
-      ianOutputMsg.data = ianOutputString.c_str();
-      ianOutputPub.publish(&ianOutputMsg);
-    }
+
+
 
     // Regardless of whether the localizer is enabled, return the correct angle
-    localizerAngle.data = localizer.getAngle();
-    localizerAnglePub.publish(&localizerAngle);
+    // localizerAngle.data = localizer.getAngle();
+    // localizerAnglePub.publish(&localizerAngle);
 
 
-    //update Odom
+    // update Odom
     odomIterator ++;
     if(odomIterator >= ODOM_FREQUENCY){
 

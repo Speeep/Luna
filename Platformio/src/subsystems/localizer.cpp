@@ -50,7 +50,8 @@ float Localizer::getAngle() {
 void Localizer::loop() {
 
     // Always get Data
-    angle = encoder.getAngle();
+    // angle = encoder.getAngle();
+    angle = 0.0;
 
     // Accumulate error and constrain
     errors += error;

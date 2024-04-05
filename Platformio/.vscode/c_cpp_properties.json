@@ -12,6 +12,7 @@
                 "/home/speeep/Development/Luna/Platformio/src",
                 "/home/speeep/Development/Luna/Platformio/lib/mcp2515",
                 "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "/home/speeep/Development/Luna/Platformio/.pio/libdeps/megaatmega2560/Servo/src",
                 "/home/speeep/Development/Luna/Platformio/lib/BasicLinearAlgebra",
                 "/home/speeep/Development/Luna/Platformio/.pio/libdeps/megaatmega2560/MCP2515",
                 "/home/speeep/Development/Luna/Platformio/lib/ros_lib",
@@ -34,6 +35,7 @@
                     "/home/speeep/Development/Luna/Platformio/src",
                     "/home/speeep/Development/Luna/Platformio/lib/mcp2515",
                     "/home/speeep/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "/home/speeep/Development/Luna/Platformio/.pio/libdeps/megaatmega2560/Servo/src",
                     "/home/speeep/Development/Luna/Platformio/lib/BasicLinearAlgebra",
                     "/home/speeep/Development/Luna/Platformio/.pio/libdeps/megaatmega2560/MCP2515",
                     "/home/speeep/Development/Luna/Platformio/lib/ros_lib",
@@ -51,7 +53,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=60113",
+                "PLATFORMIO=60114",
                 "ARDUINO_AVR_MEGA2560",
                 "F_CPU=16000000L",
                 "ARDUINO_ARCH_AVR",
