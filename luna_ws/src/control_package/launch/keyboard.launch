@@ -28,4 +28,11 @@
     name="image_subscriber" 
     output="screen"
   />
+  <!-- Digger Control -->
+  <node 
+    pkg="control_package"
+    type="digger_control.py"
+    name="digger_control" 
+    output="screen"
+  />
 </launch> 
