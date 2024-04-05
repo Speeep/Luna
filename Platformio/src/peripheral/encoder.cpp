@@ -81,7 +81,7 @@ float Encoder::getAngle()
   else {
     radAngle = static_cast<float>(rawAngle) * BYTES_2_RAD - startAngle;
 
-    if (radAngle < 0.0)
+    if (radAngle < -3.14159)
     {
       radAngle += 6.28319;
     }
