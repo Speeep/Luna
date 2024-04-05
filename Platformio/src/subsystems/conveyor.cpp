@@ -37,12 +37,14 @@ bool Conveyor::isEnabled() {
 }
 
 bool Conveyor::isAtTop(){
-    return digitalRead(PLUNGE_TOP) == LOW;
+    return atTop;
 }
 
 bool Conveyor::isAtBot(){
-    return digitalRead(PLUNGE_BOT) == LOW;
+    return atBot;
 }
+
+
 
 void Conveyor::loop() {
 
@@ -55,15 +57,18 @@ void Conveyor::loop() {
         setSpeed(0.0);
     }
 
+    atBot = !digitalRead(PLUNGE_BOT) == HIGH;
+    atTop = !digitalRead(PLUNGE_TOP) == HIGH
+
     // Positive speed means plunging downwards
     // signal goes low when a limit is hit
-    if(plungeSpeed > 0 && digitalRead(PLUNGE_BOT) == HIGH){
+    if(plungeSpeed > 0 && !atBot){
         // Run motor to plunge down
-        effort = -PLUNGE_MOTOR_EFFORT;
+        effort = plungeSpeed;
     }
-    else if(plungeSpeed < 0 && digitalRead(PLUNGE_TOP) == HIGH){
+    else if(plungeSpeed < 0 && !atTop){
         // Run motor to plunge down
-        effort = PLUNGE_MOTOR_EFFORT;
+        effort = plungeSpeed;
     }
     else{
         effort = 0;
@@ -76,7 +81,7 @@ void Conveyor::loop() {
 
 }
 
-void Conveyor::setPlungeSpeed(float speed){
+void Conveyor::setPlungeSpeed(int speed){
     plungeSpeed = speed;
 }
 
@@ -88,7 +93,7 @@ void Conveyor::setSpeed(float newSpeed){
     can_controller.setSpeed(newSpeed);
 }
 
-float Conveyor::getConveyerSpeed(){
+float Conveyor::getConveyorSpeed(){
     return can_controller.getRealSpeed();
 }
 

@@ -23,6 +23,15 @@ ros::Publisher ianOutputPub("/listener/ian_output", &ianOutputMsg);
 std_msgs::Float32MultiArray poseStep;
 ros::Publisher poseStepPub("/jetson/pose_step", &poseStep);
 
+std_msgs::Float32 conveyorSpeed;
+ros::Publisher conveyorSpeedPub("/jetson/conveyor_speed", &conveyorSpeed);
+
+std_msgs::Bool plungeTop;
+ros::Publisher plungeTopPub("/jetson/plunge_top", &plungeTop);
+
+std_msgs::Bool plungeBot;
+ros::Publisher plungeBotPub("/jetson/plunge_bot", &plungeBot);
+
 Drivetrain drivetrain;
 // Localizer localizer;
 Conveyor conveyor;
@@ -39,7 +48,8 @@ int odomIterator = 0;
 
 float icc = 0.0;
 
-static unsigned long previousMillis = 0;
+static unsigned long previousDriveMillis = 0;
+static unsigned long previousConveyorMillis = 0;
 unsigned long currentMillis = millis();
 
 void drivetrainSpeedCallback(const std_msgs::Float32 &driveSpeedMsg) {
@@ -82,7 +92,7 @@ void conveyorBoolCallback(const std_msgs::Bool &conveyorBool) {
   }
 }
 
-void conveyorPlungeCallback(const std_msgs::Float32 &plungeSpeed){
+void conveyorPlungeCallback(const std_msgs::Int32 &plungeSpeed){
   conveyor.setPlungeSpeed(plungeSpeed.data);
 }
 
@@ -96,7 +106,7 @@ ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICC
 // ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
 // ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
 ros::Subscriber<std_msgs::Bool> conveyorSub("/digger/run_conveyor", &conveyorBoolCallback);
-ros::Subscriber<std_msgs::Float32> plungeSub("/digger/plunge", &conveyorPlungeCallback);
+ros::Subscriber<std_msgs::Int32> plungeSub("/digger/plunge", &conveyorPlungeCallback);
 ros::Subscriber<std_msgs::Bool> depositOpen("/deposit/open", &depositOpenCallback);
 
 
@@ -129,25 +139,45 @@ void loop()
 {
   currentMillis = millis();
 
-  // Drivetrain gets looped every 10 milliseconds
-  if (currentMillis - previousMillis >= DRIVETRAIN_INTERVAL) {
-
-    nh.spinOnce();
-
-    previousMillis = currentMillis;
-
-    drivetrain.loop();
-
-    // localizer.loop();
-
+  // Conveyor gets looped every 50 milliseconds
+  if (currentMillis - previousDriveMillis >= CONVEYOR_INTERVAL) {
+    previousConveyorMillis = currentMillis;
+    
     conveyor.loop();
+    
+    plungeBot.data = conveyor.isAtBot();
+    plungeBotPub.publish(plungeBot);
+
+    plungeTop.data = conveyor.isAtTop();
+    plungeTopPub.publish(plungeTop);
+
+    conveyorSpeed.data = conveyor.getConveyorSpeed();
+    conveyorSpeedPub.publish(conveyorSpeed);
+
+
 
     // deposit.loop();
 
     // // Prints for Plunging
-    String ianOutputString = String(conveyor.getConveyerSpeed());
+    String ianOutputString = String(conveyor.getConveyorSpeed());
     ianOutputMsg.data = ianOutputString.c_str();
     ianOutputPub.publish(&ianOutputMsg);
+
+  }
+
+
+  // Drivetrain gets looped every 10 milliseconds
+  if (currentMillis - previousDriveMillis >= DRIVETRAIN_INTERVAL) {
+
+    nh.spinOnce();
+
+    previousDriveMillis = currentMillis;
+
+    drivetrain.loop();
+
+
+    // localizer.loop();
+
 
     // Regardless of whether the localizer is enabled, return the correct angle
     // localizerAngle.data = localizer.getAngle();
