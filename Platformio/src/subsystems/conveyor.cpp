@@ -72,7 +72,7 @@ void Conveyor::loop() {
 
     if (effort != prevEffort) {
         prevEffort = effort;
-        plungeMotor.setEffort(effort);
+        plungeMotor.setEffort12(effort);
     }
 
 }
