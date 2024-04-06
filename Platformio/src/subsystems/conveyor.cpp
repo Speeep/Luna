@@ -51,11 +51,7 @@ void Conveyor::loop() {
     // Always Get Data
     can_controller.updateMotorSpeeds();
 
-    if (enabled) {
-        setSpeed(ZEB_SPEED);
-    } else {
-        setSpeed(0.0);
-    }
+    can_controller.setMotorCurrent(conveyorCurrent);
 
     atBot = !digitalRead(PLUNGE_BOT) == HIGH;
     atTop = !digitalRead(PLUNGE_TOP) == HIGH
@@ -91,6 +87,10 @@ float Conveyor::getPlungeSpeed(){
 
 void Conveyor::setSpeed(float newSpeed){
     can_controller.setSpeed(newSpeed);
+}
+
+void Conveyor::setConveyorCurrent(int current){
+    conveyorCurrent = current;
 }
 
 float Conveyor::getConveyorSpeed(){

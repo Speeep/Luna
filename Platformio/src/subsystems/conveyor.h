@@ -34,6 +34,8 @@ class Conveyor{
 
         int getConveryorCurrent();
 
+        void setConveyorCurrent();
+
     private:
         Talon plungeMotor;
 
@@ -45,6 +47,7 @@ class Conveyor{
         bool atBot;
         int prevEffort;
         int effort;
+        int conveyorCurrent;
 
         int plungeSpeed;
 

@@ -15,6 +15,8 @@ public:
 
     void setMotorCurrent();
 
+    void setMotorCurrent(int);
+
     void speedHandlerPID();
 
     void updateMotorSpeeds();

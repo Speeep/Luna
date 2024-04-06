@@ -82,14 +82,8 @@ void drivetrainICCallback(const std_msgs::Float32 &driveICCMsg) {
 //   }
 // }
 
-void conveyorBoolCallback(const std_msgs::Bool &conveyorBool) {
-  bool on = conveyorBool.data;
-  if(on) {
-    conveyor.enable();
-  }
-  else {
-    conveyor.disable();
-  }
+void conveyorCurrentCallback(const std_msgs::Int32 &conveyorCurrent) {
+  conveyor.setConveyorCurrent(conveyorCurrent.data)
 }
 
 void conveyorPlungeCallback(const std_msgs::Int32 &plungeSpeed){
@@ -105,7 +99,7 @@ ros::Subscriber<std_msgs::Int32> driveStateSub("/drivetrain/state", &drivetrainS
 ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICCallback);
 // ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
 // ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
-ros::Subscriber<std_msgs::Bool> conveyorSub("/digger/run_conveyor", &conveyorBoolCallback);
+ros::Subscriber<std_msgs::Int32> conveyorSub("/digger/conveyor_current", &conveyorCurrentCallback);
 ros::Subscriber<std_msgs::Int32> plungeSub("/digger/plunge", &conveyorPlungeCallback);
 ros::Subscriber<std_msgs::Bool> depositOpen("/deposit/open", &depositOpenCallback);
 
