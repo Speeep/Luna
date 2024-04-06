@@ -24,15 +24,17 @@ class Conveyor{
 
         void loop();
 
-        void setPlungeSpeed(float);
+        void setPlungeSpeed(int);
 
         float getPlungeSpeed();
 
         void setSpeed(float);
 
-        float getConveyerSpeed();
+        float getConveyorSpeed();
 
         int getConveryorCurrent();
+
+        void setConveyorCurrent();
 
     private:
         Talon plungeMotor;
@@ -41,9 +43,12 @@ class Conveyor{
         ConveyorCANController can_controller;
 
         bool enabled;
+        bool atTop;
+        bool atBot;
         int prevEffort;
         int effort;
+        int conveyorCurrent;
 
-        float plungeSpeed;
+        int plungeSpeed;
 
 };

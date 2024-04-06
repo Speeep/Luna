@@ -33,7 +33,30 @@ void ConveyorCANController::setMotorCurrent() {
 
     if(setSpeeds[0] > 1) {
         motorCurrent0 = 3000;
-    } else {
+    } 
+    if(setSpeeds[0] < 1){
+        motorCorrent0 = -1500;
+    }
+    else {
+        motorCurrent0 = 0;
+    }
+
+    // int motorCurrent0 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+
+    canMsgOut.data[0] = (char)(motorCurrent0 / 256);
+    canMsgOut.data[1] = (char)(motorCurrent0 % 256);
+
+    mcp2515.sendMessage(&canMsgOut);
+}
+
+void ConveyorCanController::setMotorCurrent(int current){
+    canMsgOut.can_id = 0x1FF;
+    canMsgOut.can_dlc = 2;
+
+    if(abs(current) > 100) {
+        motorCurrent0 = current;
+    }
+    else {
         motorCurrent0 = 0;
     }
 
@@ -99,7 +122,6 @@ void ConveyorCANController::updateMotorSpeeds() {
 
 void ConveyorCANController::setSpeed(float sp0) {
     setSpeeds[0] = sp0;
-
     speedHandlerPID();
 }
 
@@ -114,10 +136,6 @@ float ConveyorCANController::getRealSpeed() {
 void ConveyorCANController::cutCurrent() {
     setCurrents[0] = 0;
     setMotorCurrent();
-}
-
-String ConveyorCANController::getSums() {
-    return String(speeds[0]);
 }
 
 int ConveyorCANController::getCurrent() {
