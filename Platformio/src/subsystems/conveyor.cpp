@@ -53,12 +53,12 @@ void Conveyor::loop() {
 
     can_controller.setMotorCurrent(conveyorCurrent);
 
-    atBot = !digitalRead(PLUNGE_BOT) == HIGH;
-    atTop = !digitalRead(PLUNGE_TOP) == HIGH
+    atBot = !(digitalRead(PLUNGE_BOT) == HIGH);
+    atTop = !(digitalRead(PLUNGE_TOP) == HIGH);
 
     // Positive speed means plunging downwards
     // signal goes low when a limit is hit
-    if(plungeSpeed > 0 && !atBot){
+    if (plungeSpeed > 0 && !atBot){
         // Run motor to plunge down
         effort = plungeSpeed;
     }

@@ -35,7 +35,7 @@ void ConveyorCANController::setMotorCurrent() {
         motorCurrent0 = 3000;
     } 
     if(setSpeeds[0] < 1){
-        motorCorrent0 = -1500;
+        motorCurrent0 = -1500;
     }
     else {
         motorCurrent0 = 0;
@@ -49,7 +49,7 @@ void ConveyorCANController::setMotorCurrent() {
     mcp2515.sendMessage(&canMsgOut);
 }
 
-void ConveyorCanController::setMotorCurrent(int current){
+void ConveyorCANController::setMotorCurrent(int current){
     canMsgOut.can_id = 0x1FF;
     canMsgOut.can_dlc = 2;
 

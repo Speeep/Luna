@@ -83,7 +83,7 @@ void drivetrainICCallback(const std_msgs::Float32 &driveICCMsg) {
 // }
 
 void conveyorCurrentCallback(const std_msgs::Int32 &conveyorCurrent) {
-  conveyor.setConveyorCurrent(conveyorCurrent.data)
+  conveyor.setConveyorCurrent(conveyorCurrent.data);
 }
 
 void conveyorPlungeCallback(const std_msgs::Int32 &plungeSpeed){
@@ -110,6 +110,9 @@ void setup()
   nh.advertise(ianOutputPub);
   // nh.advertise(localizerAnglePub);
   nh.advertise(poseStepPub);
+  nh.advertise(conveyorSpeedPub);
+  nh.advertise(plungeTopPub);
+  nh.advertise(plungeBotPub);
   nh.subscribe(driveSpeedSub);
   // nh.subscribe(localizerErrorSub);
   // nh.subscribe(localizerEnableSub);
@@ -140,15 +143,13 @@ void loop()
     conveyor.loop();
     
     plungeBot.data = conveyor.isAtBot();
-    plungeBotPub.publish(plungeBot);
+    plungeBotPub.publish(&plungeBot);
 
     plungeTop.data = conveyor.isAtTop();
-    plungeTopPub.publish(plungeTop);
+    plungeTopPub.publish(&plungeTop);
 
     conveyorSpeed.data = conveyor.getConveyorSpeed();
-    conveyorSpeedPub.publish(conveyorSpeed);
-
-
+    conveyorSpeedPub.publish(&conveyorSpeed);
 
     // deposit.loop();
 
