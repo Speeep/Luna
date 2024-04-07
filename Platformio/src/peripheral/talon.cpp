@@ -9,14 +9,20 @@
 
 Talon::Talon() {}
 
-void Talon::init(int PWMpin)
+void Talon::init(int PWMpin, bool reverse)
 {
     attached = false;
     pin = PWMpin;
+    reversed = reverse;
 }
 
 void Talon::setEffort12(int effort)
 {
+    // Reverese effort if reversed flag is set to true
+    if (reversed) {
+        effort = -effort;
+    }
+
     if (effort > 100) {
         effort = 100;
     } else if (effort < -100) {
@@ -39,6 +45,12 @@ void Talon::setEffort12(int effort)
 }
 void Talon::setEffort24(int effort)
 {
+
+    // Reverese effort if reversed flag is set to true
+    if (reversed) {
+        effort = -effort;
+    }
+
     if (effort > 100) {
         effort = 100;
     } else if (effort < -100) {

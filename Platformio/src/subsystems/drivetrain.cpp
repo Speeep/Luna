@@ -9,8 +9,8 @@
 Drivetrain::Drivetrain(){}
 
 void Drivetrain::init() {
-    left_turn_motor.init(LEFT_TURN_PWM);
-    right_turn_motor.init(RIGHT_TURN_PWM);
+    left_turn_motor.init(LEFT_TURN_PWM, true);
+    right_turn_motor.init(RIGHT_TURN_PWM, true);
     left_wheelpod_encoder.init(LEFT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, LEFT_WHEELPOD_ENCODER_START_ANGLE);
     right_wheelpod_encoder.init(RIGHT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, RIGHT_WHEELPOD_ENCODER_START_ANGLE);
     can_controller.init();
@@ -78,6 +78,8 @@ void Drivetrain::loop() {
             setLeftWheelpodAngleSetpoint(0.0);
             setRightWheelpodAngleSetpoint(0.0);
             can_controller.cutCurrent();
+            leftTurnI = 0;
+            rightTurnI = 0;
             break;
         case DRIVE_STRAIGHT:
             setLeftWheelpodAngleSetpoint(0.0);
@@ -96,8 +98,22 @@ void Drivetrain::loop() {
     
     // If enabled, control the steering motors
     if (state != DISABLED) {
-        left_turn_motor.setEffort24(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
-        right_turn_motor.setEffort24(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
+
+        // Calculate Errors
+        left_turn_motor_error = leftWheelpodAngle - leftWheelpodAngleSetpoint;
+        right_turn_motor_error = rightWheelpodAngle - rightWheelpodAngleSetpoint;
+
+        // Integrate Errors
+        leftTurnI += left_turn_motor_error;
+        rightTurnI += right_turn_motor_error;
+
+        // Contrain Errors with Sumcap
+        leftTurnI = constrain(leftTurnI, -TURN_I_SUMCAP, TURN_I_SUMCAP);
+        rightTurnI = constrain(rightTurnI, -TURN_I_SUMCAP, TURN_I_SUMCAP);
+
+        // Turn Motors PI Control
+        left_turn_motor.setEffort24(int((left_turn_motor_error * TURN_MOTOR_KP) + (TURN_MOTOR_KI * leftTurnI)));
+        right_turn_motor.setEffort24(int((right_turn_motor_error * TURN_MOTOR_KP) + (TURN_MOTOR_KI * rightTurnI)));
     }
 }
 

@@ -12,7 +12,7 @@ Conveyor::Conveyor(){}
 void Conveyor::init(){
     can_controller.init();
 
-    plungeMotor.init(PLUNGE_TALON_PWM);
+    plungeMotor.init(PLUNGE_TALON_PWM, true);
 
     pinMode(PLUNGE_BOT, INPUT_PULLUP);
     pinMode(PLUNGE_TOP, INPUT_PULLUP);
@@ -20,6 +20,8 @@ void Conveyor::init(){
     plungeSpeed = 0.0;
     prevEffort = 0;
     effort = 0;
+    atTop = false;
+    atBot = false;
 
     enabled = false;
 }
@@ -56,8 +58,8 @@ void Conveyor::loop() {
     atBot = !(digitalRead(PLUNGE_BOT) == HIGH);
     atTop = !(digitalRead(PLUNGE_TOP) == HIGH);
 
-    // Positive speed means plunging downwards
-    // signal goes low when a limit is hit
+    Positive speed means plunging downwards
+    signal goes low when a limit is hit
     if (plungeSpeed > 0 && !atBot){
         // Run motor to plunge down
         effort = plungeSpeed;

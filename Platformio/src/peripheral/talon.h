@@ -9,7 +9,7 @@ class Talon {
 
   Talon();
 
-  void init(int);
+  void init(int, bool);
 
   void setEffort12(int); // Takes -100-100
 
@@ -19,4 +19,5 @@ class Talon {
     bool attached;
     Servo PWMController;
     int pin;
+    bool reversed;
 };

@@ -49,7 +49,7 @@ int odomIterator = 0;
 float icc = 0.0;
 
 static unsigned long previousDriveMillis = 0;
-// static unsigned long previousConveyorMillis = 0;
+static unsigned long previousConveyorMillis = 0;
 unsigned long currentMillis = millis();
 
 void drivetrainSpeedCallback(const std_msgs::Float32 &driveSpeedMsg) {
@@ -124,7 +124,7 @@ void setup()
 
   drivetrain.init();
   // localizer.init();
-  // conveyor.init();
+  conveyor.init();
   // deposit.init();
 
   SPI.begin();
@@ -136,29 +136,29 @@ void loop()
 {
   currentMillis = millis();
 
-  // // Conveyor gets looped every 50 milliseconds
-  // if (currentMillis - previousDriveMillis >= CONVEYOR_INTERVAL) {
-  //   previousConveyorMillis = currentMillis;
+  // Conveyor gets looped every 50 milliseconds
+  if (currentMillis - previousConveyorMillis >= CONVEYOR_INTERVAL) {
+    previousConveyorMillis = currentMillis;
     
-  //   conveyor.loop();
+    conveyor.loop();
     
-  //   plungeBot.data = conveyor.isAtBot();
-  //   plungeBotPub.publish(&plungeBot);
+    plungeBot.data = conveyor.isAtBot();
+    plungeBotPub.publish(&plungeBot);
 
-  //   plungeTop.data = conveyor.isAtTop();
-  //   plungeTopPub.publish(&plungeTop);
+    plungeTop.data = conveyor.isAtTop();
+    plungeTopPub.publish(&plungeTop);
 
-  //   conveyorSpeed.data = conveyor.getConveyorSpeed();
-  //   conveyorSpeedPub.publish(&conveyorSpeed);
+    conveyorSpeed.data = conveyor.getConveyorSpeed();
+    conveyorSpeedPub.publish(&conveyorSpeed);
 
-  //   // deposit.loop();
+    // deposit.loop();
 
-  //   // // Prints for Plunging
-  //   String ianOutputString = String(conveyor.getConveyorSpeed());
-  //   ianOutputMsg.data = ianOutputString.c_str();
-  //   ianOutputPub.publish(&ianOutputMsg);
+    // // Prints for Plunging
+    String ianOutputString = String(conveyor.getConveyorSpeed());
+    ianOutputMsg.data = ianOutputString.c_str();
+    ianOutputPub.publish(&ianOutputMsg);
 
-  // }
+  }
 
 
   // Drivetrain gets looped every 10 milliseconds

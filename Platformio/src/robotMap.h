@@ -26,8 +26,8 @@
 // Velocity loop PID parameters
 // Increase Ki based on load, fine-tune Kp
 #define BASE_CURRENT 10
-#define SPEED_KP 6000
-#define SPEED_KI 7
+#define SPEED_KP 7800
+#define SPEED_KI 6
 #define SPEED_KD 0
 #define SPEED_SUMCAP 5000
 
@@ -62,8 +62,9 @@
 
 #define MAX_MOTOR_CURRENT 12000
 
-#define LEFT_TURN_MOTOR_KP 20
-#define RIGHT_TURN_MOTOR_KP 20
+#define TURN_MOTOR_KP 33
+#define TURN_MOTOR_KI 0.6
+#define TURN_I_SUMCAP 50
 #define LOCALIZER_MOTOR_KP 0.008
 #define LOCALIZER_MOTOR_KI 0.0005
 #define MAX_LOCALIZER_ERRORS 1000

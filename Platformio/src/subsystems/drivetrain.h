@@ -103,5 +103,8 @@ class Drivetrain {
     double angleFromWheel3;
     int state;
     float yICC;
-
+    float left_turn_motor_error;
+    float right_turn_motor_error;
+    float leftTurnI;
+    float rightTurnI;
 };

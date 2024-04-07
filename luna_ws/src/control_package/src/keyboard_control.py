@@ -33,11 +33,11 @@ class KeyControlNode:
 
         self.run_conveyor_pub = rospy.Publisher('/digger/run_conveyor', Int32, queue_size=10)
         self.run_conveyor = Int32()
-        self.prev_run_conveyor = False
+        self.prev_run_conveyor = 0
 
         self.plunge_pub = rospy.Publisher('/digger/plunge', Int32, queue_size=10)
         self.plunge_speed = Int32()
-        self.prev_plunge_speed = 0.0
+        self.prev_plunge_speed = 0
 
         self.dump_pub = rospy.Publisher('/deposit/open', Bool, queue_size=10)
         self.deposit_open = Bool()
@@ -161,7 +161,7 @@ class KeyControlNode:
         elif self.key_states['d']:
             self.plunge_speed.data = -100
         else:
-            self.plunge_speed.data = 0.0
+            self.plunge_speed.data = 0
 
         if self.plunge_speed.data != self.prev_plunge_speed:
             self.plunge_pub.publish(self.plunge_speed)

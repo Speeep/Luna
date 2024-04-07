@@ -9,7 +9,7 @@
 Deposit::Deposit(){}
 
 void Deposit::init() {
-    depositMotor.init(DEPOSIT_PWM);
+    depositMotor.init(DEPOSIT_PWM, false);
     encoder.init(DEPOSIT_ENCODER_ID, MULTIPLEXER_1_ID, 0.0);
     enabled = true;
     angle = 0.0;

@@ -29,10 +29,10 @@
     output="screen"
   />
   <!-- Digger Control -->
-  <node 
+  <!-- <node 
     pkg="control_package"
     type="digger_control.py"
     name="digger_control" 
     output="screen"
-  />
+  /> -->
 </launch> 
