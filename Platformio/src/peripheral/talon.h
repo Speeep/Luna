@@ -11,7 +11,9 @@ class Talon {
 
   void init(int);
 
-  void setEffort(int effort); // Takes -100-100
+  void setEffort12(int); // Takes -100-100
+
+  void setEffort24(int); // Takes -100-100
 
  private:
     bool attached;

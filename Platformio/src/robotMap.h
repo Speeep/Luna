@@ -1,20 +1,12 @@
 #pragma once
 
-// BTS7960 motor driver constants
-#define RIGHT_R_PWM 3
-#define RIGHT_L_PWM 4
+// Talon pwm motor controller constants
 #define RIGHT_TURN_PWM 3
 
-#define LEFT_R_PWM 5
-#define LEFT_L_PWM 6
 #define LEFT_TURN_PWM 4
 
-#define LOCALIZER_L_PWM_PIN 8
-#define LOCALIZER_R_PWM_PIN 9
 #define LOCALIZER_PWM 5
 
-#define DEPOSIT_L_PWM_PIN 10
-#define DEPOSIT_R_PWM_PIN 11
 #define DEPOSIT_PWM 6
 
 #define PLUNGE_TALON_PWM 7

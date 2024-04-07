@@ -9,8 +9,8 @@
 Drivetrain::Drivetrain(){}
 
 void Drivetrain::init() {
-    left_turn_motor.init(LEFT_R_PWM, LEFT_L_PWM);
-    right_turn_motor.init(RIGHT_R_PWM, RIGHT_L_PWM);
+    left_turn_motor.init(LEFT_TURN_PWM);
+    right_turn_motor.init(RIGHT_TURN_PWM);
     left_wheelpod_encoder.init(LEFT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, LEFT_WHEELPOD_ENCODER_START_ANGLE);
     right_wheelpod_encoder.init(RIGHT_WHEELPOD_ENCODER_ID, MULTIPLEXER_0_ID, RIGHT_WHEELPOD_ENCODER_START_ANGLE);
     can_controller.init();
@@ -96,8 +96,8 @@ void Drivetrain::loop() {
     
     // If enabled, control the steering motors
     if (state != DISABLED) {
-        left_turn_motor.setEffort(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
-        right_turn_motor.setEffort(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
+        left_turn_motor.setEffort24(int((leftWheelpodAngle - leftWheelpodAngleSetpoint) * LEFT_TURN_MOTOR_KP));
+        right_turn_motor.setEffort24(int((rightWheelpodAngle - rightWheelpodAngleSetpoint) * RIGHT_TURN_MOTOR_KP));
     }
 }
 
