@@ -14,6 +14,8 @@ void Talon::init(int PWMpin, bool reverse)
     attached = false;
     pin = PWMpin;
     reversed = reverse;
+    currentEffort = 0;
+    increment = 5;
 }
 
 void Talon::setEffort12(int effort)
@@ -70,4 +72,21 @@ void Talon::setEffort24(int effort)
         effort = (int)map(effort,-100,100,0,180);
         PWMController.write(effort);
     }
+}
+
+void Talon::setEffort12Slow(int targetEffort)
+{    
+
+    // Clamp targetEffort to the -100 to 100 range
+    targetEffort = max(-100, min(100, targetEffort));
+
+    // Calculate the next effort step towards the target
+    if (currentEffort < targetEffort) {
+        currentEffort = min(currentEffort + increment, targetEffort);
+    } else if (currentEffort > targetEffort) {
+        currentEffort = max(currentEffort - increment, targetEffort);
+    }
+
+    // Use setEffort12 to apply the current effort
+    setEffort12(currentEffort);
 }

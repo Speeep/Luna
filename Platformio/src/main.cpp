@@ -136,7 +136,7 @@ void loop()
 {
   currentMillis = millis();
 
-  // Conveyor gets looped every 50 milliseconds
+  // Conveyor gets looped every 10 milliseconds
   if (currentMillis - previousConveyorMillis >= CONVEYOR_INTERVAL) {
     previousConveyorMillis = currentMillis;
     

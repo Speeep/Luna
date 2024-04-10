@@ -15,9 +15,13 @@ class Talon {
 
   void setEffort24(int); // Takes -100-100
 
+  void setEffort12Slow(int); // Takes -100 to 100, for gradual effort increase
+
  private:
     bool attached;
     Servo PWMController;
     int pin;
     bool reversed;
+    int increment;
+    int currentEffort;
 };

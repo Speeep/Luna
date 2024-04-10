@@ -15,24 +15,24 @@
     output="screen"
   />
   <!-- RVIZ -->
-  <node 
+  <!-- <node 
     type="rviz" 
     name="rviz" 
     pkg="rviz" 
     args="-d $(find luna_rviz)/rviz/luna_config.rviz" 
-  />
+  /> -->
   <!-- Displays Camera Feed to Laptop Screen -->
-  <node
+  <!-- <node
     pkg="localization_package"
     type="image_subscriber.py"
     name="image_subscriber" 
     output="screen"
-  />
+  /> -->
   <!-- Digger Control -->
-  <!-- <node 
+  <node 
     pkg="control_package"
     type="digger_control.py"
     name="digger_control" 
     output="screen"
-  /> -->
+  />
 </launch> 

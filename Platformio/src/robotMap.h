@@ -20,7 +20,7 @@
 #define MCP_SCK 52 // Orange Wire
 
 #define DRIVETRAIN_INTERVAL 10
-#define CONVEYOR_INTERVAL 50
+#define CONVEYOR_INTERVAL 10
 #define INTERVAL 5000
 
 // Velocity loop PID parameters

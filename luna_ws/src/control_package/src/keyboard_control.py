@@ -31,7 +31,7 @@ class KeyControlNode:
         self.localizer_enable = Bool()
         self.prev_localizer_enable = False
 
-        self.run_conveyor_pub = rospy.Publisher('/digger/run_conveyor', Int32, queue_size=10)
+        self.run_conveyor_pub = rospy.Publisher('/digger/conveyor_current', Int32, queue_size=10)
         self.run_conveyor = Int32()
         self.prev_run_conveyor = 0
 
@@ -63,6 +63,7 @@ class KeyControlNode:
             '3': False,
             'z': False,
             'x': False,
+            'c': False,
             'a': False,
             'd': False,
             'o': False,
@@ -147,9 +148,11 @@ class KeyControlNode:
 
         # Conveyor Spinny Stuff
         if self.key_states['z']:
-            self.run_conveyor.data = 3000
+            self.run_conveyor.data = 10000
         elif self.key_states['x']:
             self.run_conveyor.data = 0
+        elif self.key_states['c']:
+            self.run_conveyor.data = -10000
         
         if self.run_conveyor.data != self.prev_run_conveyor:
             self.run_conveyor_pub.publish(self.run_conveyor)
@@ -157,9 +160,9 @@ class KeyControlNode:
 
         # Conveyor Plungy Stuff
         if self.key_states['a']:
-            self.plunge_speed.data = 100
+            self.plunge_speed.data = 25
         elif self.key_states['d']:
-            self.plunge_speed.data = -100
+            self.plunge_speed.data = -50
         else:
             self.plunge_speed.data = 0
 
