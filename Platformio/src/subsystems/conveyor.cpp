@@ -72,9 +72,8 @@ void Conveyor::loop() {
         effort = 0;
     }
 
-
-    plungeMotor.setEffort12Slow(effort);
-
+    plungeMotor.setEffort12(effort);
+    // plungeMotor.setEffort12Slow(effort);
 
 }
 

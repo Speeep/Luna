@@ -11,6 +11,7 @@ ZEB_SPEED = 10.24
 UNJAM_ERROR = 9
 UNJAM_DURATION = 0.5
 MIN_SPEED_READINGS = 100
+MIN_PLUNGE_READINGS = 200
 
 class StateMachine:
     def __init__(self):
@@ -22,7 +23,6 @@ class StateMachine:
             'h': 2
         }
 
-        # Create a listener for keyboard events
         self.listener = keyboard.Listener(on_press=self.on_press)
         self.listener.start()
 
@@ -78,8 +78,6 @@ class StateMachine:
 
             # Block other stuff from happening
             if self.jam_time is not None and (current_time - self.jam_time) < UNJAM_DURATION:
-                # print(f"current_time: {current_time}")
-                # print(f"Jam Time: {self.jam_time}")
                 self.num_speed_readings = 0
                 return
 
@@ -89,13 +87,13 @@ class StateMachine:
                 self.run_conveyor_pub.publish(10000)
 
                 # Plunger publish plunge speed as a function of conveyor speed
-                plunger_speed_base = 25
+                plunger_speed_base = 10
                 plunger_speed = self.calculate_plunge_speed(plunger_speed_base)
 
-                if self.num_speed_readings > MIN_SPEED_READINGS:
+                if self.num_speed_readings > MIN_PLUNGE_READINGS:
                     self.plunge_pub.publish(plunger_speed)
                 else:
-                    self.plunge_pub.publish(0)
+                    self.plunge_pub.publish(-35)
 
                 # Unjamming logic
                 if self.error > UNJAM_ERROR and self.num_speed_readings > MIN_SPEED_READINGS:
