@@ -209,7 +209,6 @@ include_directories(
 # catkin_add_nosetests(test)
 
 catkin_install_python(PROGRAMS 
-  src/depth_publisher_generator.py
   src/depth_publisher.py
   src/depth_subscriber.py
   src/contour_subscriber.py
