@@ -36,7 +36,7 @@
     output="screen"
   />
   <node
-    pkg="depth_imaging_pipeline"
+    pkg="depth_imaging_package"
     type="contour_subscriber.py"
     name="contour_subscriber"
     output="screen"
