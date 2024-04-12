@@ -35,4 +35,10 @@
     name="digger_control" 
     output="screen"
   />
+  <node
+    pkg="depth_imaging_pipeline"
+    type="contour_subscriber"
+    name="contour_subscriber.py"
+    output="screen"
+  />
 </launch> 
