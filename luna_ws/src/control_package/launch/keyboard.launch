@@ -37,8 +37,8 @@
   />
   <node
     pkg="depth_imaging_pipeline"
-    type="contour_subscriber"
-    name="contour_subscriber.py"
+    type="contour_subscriber.py"
+    name="contour_subscriber"
     output="screen"
   />
 </launch> 
