@@ -3,6 +3,7 @@
 MedianFilter::MedianFilter() {
     for (int i = 0; i < 5; ++i) {
         values[i] = 0.0f;
+        sorted[i] = 0.0f;
     }
     currentIndex = 0;
 }
@@ -11,14 +12,18 @@ MedianFilter::~MedianFilter() {}
 
 float MedianFilter::filter(float val) {
     values[currentIndex] = val;
-    ++currentIndex;
-    if (currentIndex >= 5)
+    currentIndex++;
+    if (currentIndex >= 5) {
         currentIndex = 0;
+    }
 
-    insertionSort(values, 5);
+    for (int i = 0; i < 5; i++) {
+        sorted[i] = values[i];
+    }
 
-    // Return the median
-    return values[2];
+    insertionSort(sorted, 5);
+
+    return sorted[2];
 }
 
 void MedianFilter::insertionSort(float arr[], int n) {

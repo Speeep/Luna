@@ -29,12 +29,12 @@
     output="screen"
   /> -->
   <!-- Detects Obstacles using Realsense Depth Camera -->
-  <node
+  <!-- <node
     pkg="depth_imaging_package"
     type="depth_publisher.py"
     name="depth_publisher" 
     output="screen"
-  />
+  /> -->
   <!-- Localizes Obstacles that are Detected -->
   <!-- <node
     pkg="depth_imaging_package"

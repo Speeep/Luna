@@ -63,7 +63,7 @@ class KeyControlNode:
             '3': False,
             'z': False,
             'x': False,
-            'c': False,
+            'v': False,
             'a': False,
             'd': False,
             'o': False,
@@ -92,9 +92,9 @@ class KeyControlNode:
     def check_key_presses(self, event):
         # Keys needed for driving forward and backward
         if self.key_states['w']:
-            self.drive_speed.data = 0.6
+            self.drive_speed.data = 1.0
         elif self.key_states['s']:
-            self.drive_speed.data = -0.6
+            self.drive_speed.data = -1.0
         else:
             self.drive_speed.data = 0.0
         
@@ -151,7 +151,7 @@ class KeyControlNode:
             self.run_conveyor.data = 10000
         elif self.key_states['x']:
             self.run_conveyor.data = 0
-        elif self.key_states['c']:
+        elif self.key_states['v']:
             self.run_conveyor.data = -10000
         
         if self.run_conveyor.data != self.prev_run_conveyor:

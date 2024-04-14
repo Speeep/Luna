@@ -125,7 +125,7 @@ void setup()
   drivetrain.init();
   // localizer.init();
   conveyor.init();
-  // deposit.init();
+  deposit.init();
 
   SPI.begin();
   Wire.begin();
@@ -151,13 +151,7 @@ void loop()
     conveyorSpeed.data = conveyor.getConveyorSpeed();
     conveyorSpeedPub.publish(&conveyorSpeed);
 
-    // deposit.loop();
-
-    // // Prints for Plunging
-    String ianOutputString = String(conveyor.getConveyorSpeed());
-    ianOutputMsg.data = ianOutputString.c_str();
-    ianOutputPub.publish(&ianOutputMsg);
-
+    deposit.loop();
   }
 
 
@@ -170,14 +164,12 @@ void loop()
 
     drivetrain.loop();
 
-
     // localizer.loop();
 
-
-    // Regardless of whether the localizer is enabled, return the correct angle
-    // localizerAngle.data = localizer.getAngle();
-    // localizerAnglePub.publish(&localizerAngle);
-
+    // Prints for Drivetrain Speed
+    String ianOutputString = String(drivetrain.getDriveSpeed());
+    ianOutputMsg.data = ianOutputString.c_str();
+    ianOutputPub.publish(&ianOutputMsg);
 
     // update Odom
     odomIterator ++;

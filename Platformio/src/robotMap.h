@@ -1,15 +1,16 @@
 #pragma once
 
 // Talon pwm motor controller constants
-#define RIGHT_TURN_PWM 3
+#define RIGHT_TURN_PWM 3 // WHITE
 
-#define LEFT_TURN_PWM 4
+#define LEFT_TURN_PWM 4 // PURPLE
 
-#define LOCALIZER_PWM 5
+#define LOCALIZER_PWM 6 // 
 
-#define DEPOSIT_PWM 6
+#define DEPOSIT_PWM 5 // BLUE
 
-#define PLUNGE_TALON_PWM 7
+#define PLUNGE_TALON_PWM 7 // GRAY
+
 #define PLUNGE_MOTOR_EFFORT 30
 
 // MCP2515 Pinout
@@ -19,17 +20,17 @@
 #define MCP_SO 50 // Green Wire
 #define MCP_SCK 52 // Orange Wire
 
-#define DRIVETRAIN_INTERVAL 10
+#define DRIVETRAIN_INTERVAL 5
 #define CONVEYOR_INTERVAL 10
 #define INTERVAL 5000
 
 // Velocity loop PID parameters
 // Increase Ki based on load, fine-tune Kp
 #define BASE_CURRENT 10
-#define SPEED_KP 7800
-#define SPEED_KI 6
+#define SPEED_KP 600  // This actually manifests as damping
+#define SPEED_KI 28 // This acts a proportional control, make sure KI * SUMCAP <= 16000
 #define SPEED_KD 0
-#define SPEED_SUMCAP 5000
+#define SPEED_SUMCAP 550
 
 #define POS_KP 0.05
 
