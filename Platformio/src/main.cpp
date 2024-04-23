@@ -97,22 +97,32 @@ void depositOpenCallback(const std_msgs::Bool &depositOpenMsg) {
 ros::Subscriber<std_msgs::Float32> driveSpeedSub("/drivetrain/drive", &drivetrainSpeedCallback);
 ros::Subscriber<std_msgs::Int32> driveStateSub("/drivetrain/state", &drivetrainSwitchStateCallback);
 ros::Subscriber<std_msgs::Float32> driveICCSub("/drivetrain/icc", &drivetrainICCallback);
-// ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
-// ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
 ros::Subscriber<std_msgs::Int32> conveyorSub("/digger/conveyor_current", &conveyorCurrentCallback);
 ros::Subscriber<std_msgs::Int32> plungeSub("/digger/plunge", &conveyorPlungeCallback);
 ros::Subscriber<std_msgs::Bool> depositOpen("/deposit/open", &depositOpenCallback);
 
 
+// ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
+// ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
+
+
 void setup()
 {
   nh.initNode();
+  // nh.getHardware()->setBaud(57600);
+
+  // do{
+  //   nh.initNode();
+  //   delay(500); // Delay to prevent flooding with connection attempts
+  // }while (!nh.connected()); 
+
   nh.advertise(ianOutputPub);
   // nh.advertise(localizerAnglePub);
   nh.advertise(poseStepPub);
   nh.advertise(conveyorSpeedPub);
   nh.advertise(plungeTopPub);
   nh.advertise(plungeBotPub);
+
   nh.subscribe(driveSpeedSub);
   // nh.subscribe(localizerErrorSub);
   // nh.subscribe(localizerEnableSub);
@@ -158,8 +168,6 @@ void loop()
   // Drivetrain gets looped every 10 milliseconds
   if (currentMillis - previousDriveMillis >= DRIVETRAIN_INTERVAL) {
 
-    nh.spinOnce();
-
     previousDriveMillis = currentMillis;
 
     drivetrain.loop();
@@ -189,4 +197,7 @@ void loop()
       odomIterator = 0;
     }
   }
+
+  nh.spinOnce();
+  // delay(500);
 }

@@ -20,17 +20,17 @@
 #define MCP_SO 50 // Green Wire
 #define MCP_SCK 52 // Orange Wire
 
-#define DRIVETRAIN_INTERVAL 5
+#define DRIVETRAIN_INTERVAL 10
 #define CONVEYOR_INTERVAL 10
 #define INTERVAL 5000
 
 // Velocity loop PID parameters
 // Increase Ki based on load, fine-tune Kp
 #define BASE_CURRENT 10
-#define SPEED_KP 600  // This actually manifests as damping
-#define SPEED_KI 32 // This acts a proportional control, make sure KI * SUMCAP <= 16000
+#define SPEED_KP 650  // This actually manifests as damping
+#define SPEED_KI 36 // This acts a proportional control, make sure KI * SUMCAP <= 16000
 #define SPEED_KD 0
-#define SPEED_SUMCAP 500
+#define SPEED_SUMCAP 444
 
 #define POS_KP 0.05
 
