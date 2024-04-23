@@ -1,6 +1,6 @@
 import rospy
 from pynput import keyboard
-from std_msgs.msg import Int32, Float32
+from std_msgs.msg import Int32, Float32, Bool
 import numpy as np
 
 # Constants
@@ -9,9 +9,13 @@ PLUNGE_BASE_EFFORT = 100
 PLUNGE_KP = 10
 ZEB_SPEED = 10.24
 UNJAM_ERROR = 9
-UNJAM_DURATION = 0.5
-MIN_SPEED_READINGS = 100
+UNJAM_DURATION = 0.1
+MIN_SPEED_READINGS = 30
 MIN_PLUNGE_READINGS = 200
+MAX_DRIVE_TIME = 110
+DRIVE_SPEED = 0.05
+MAX_REV_TIME = 2
+REV_SPEED = 1.0
 
 class StateMachine:
     def __init__(self):
@@ -22,6 +26,10 @@ class StateMachine:
             'g': 1,
             'h': 2
         }
+        self.plunge_top = False
+        self.plunge_bot = False
+        self.prev_time = rospy.get_time()
+        self.elapsed_drive_time = 0.0
 
         self.listener = keyboard.Listener(on_press=self.on_press)
         self.listener.start()
@@ -31,10 +39,25 @@ class StateMachine:
 
         # Initialize publishers for conveyor and plunger
         self.run_conveyor_pub = rospy.Publisher('/digger/conveyor_current', Int32, queue_size=10)
+        self.prev_conveyor_current = 0
+
         self.plunge_pub = rospy.Publisher('/digger/plunge', Int32, queue_size=10)
+        self.prev_plunge_speed = 0
+
+        self.drive_speed_pub = rospy.Publisher('/drivetrain/drive', Float32, queue_size=10)
+        self.prev_drive_speed = 0.0
+
+        self.drivetrain_state_pub = rospy.Publisher('/drivetrain/state', Int32, queue_size=10)
+
+        self.dump_pub = rospy.Publisher('/deposit/open', Bool, queue_size=10)
+        self.prev_open = False
 
         # Initialize subscriber for conveyor speed
-        rospy.Subscriber('/jetson/conveyor_speed', Float32, self.conveyor_speed_callback)
+        rospy.Subscriber('/jetson/conveyor_speed', Float32, self.conveyor_speed_cb)
+
+        # Initialize subscriber for detecting when we are fully plunged and retracted
+        rospy.Subscriber('/jetson/plunge_bot', Bool, self.plunge_bot_cb)
+        rospy.Subscriber('/jetson/plunge_top', Bool, self.plunge_top_cb)
 
         # Initialize error variable
         self.error = 0
@@ -55,8 +78,27 @@ class StateMachine:
                     self.current_state = new_state_index
                     self.num_speed_readings = 0
                     self.speed_history = []
+            elif key_char == 'o':
+                self.prev_open = not self.prev_open    
+                self.dump_pub.publish(self.prev_open)
         except AttributeError:
             pass
+
+    def publish_new_drive(self, new_drive_val):
+        if new_drive_val != self.prev_drive_speed:
+            self.drivetrain_state_pub.publish(1)
+            self.drive_speed_pub.publish(new_drive_val)
+            self.prev_drive_speed = new_drive_val
+
+    def publish_new_conveyor(self, new_conveyor_val):
+        if new_conveyor_val != self.prev_conveyor_current:
+            self.run_conveyor_pub.publish(new_conveyor_val)
+            self.prev_conveyor_current = new_conveyor_val
+
+    def publish_new_plunge(self, new_plunge_val):
+        if new_plunge_val != self.prev_plunge_speed:
+            self.plunge_pub.publish(new_plunge_val)
+            self.prev_plunge_speed = new_plunge_val
 
     def loop(self, event):
 
@@ -65,14 +107,13 @@ class StateMachine:
 
         # Check for All Stop case first for safety reasons
         if self.current_state == 2:
-            # Stop Conveyor
-            conveyor_run = False
-            self.run_conveyor_pub.publish(0)
 
-            # Stop Plunger
-            stop_speed = 0
-            self.plunge_pub.publish(stop_speed)
-            self.jam_time = None
+            rospy.loginfo("ALL STOPP!!!!!!!")
+
+            # Stop Drivetrain, Conveyor, and Plunger
+            self.publish_new_drive(0.0)
+            self.publish_new_conveyor(0)
+            self.publish_new_plunge(0)
         
         else:
 
@@ -82,35 +123,98 @@ class StateMachine:
                 return
 
             if self.current_state == 0:  # If state is plunging
+
+                # Drivetrain logic
+                if self.plunge_bot:
+
+                    if self.prev_time is not None:
+                        self.elapsed_drive_time += current_time - self.prev_time
+
+                    # Check to make sure max drive time is not reached
+                    if self.elapsed_drive_time > MAX_DRIVE_TIME:
+
+                        rospy.loginfo("Done driving forward!")
+
+                        # Stop Drivetrain and transition to retracting
+                        self.publish_new_drive(0.0)
+                        self.elapsed_drive_time = 0.0
+                        self.current_state = 1
+                    else:
+                        # Drive Drivetrain
+                        self.publish_new_drive(DRIVE_SPEED)
+                        rospy.loginfo("Driving forwards!")
+                        rospy.loginfo(self.elapsed_drive_time)
+                        
+                else:
+                    # Stop Drivetrain
+                    self.publish_new_drive(0.0)
+                    rospy.loginfo("Plunging!")
+
                 # Conveyor publish set effort and monitor speed
-                conveyor_run = True
-                self.run_conveyor_pub.publish(10000)
+                self.publish_new_conveyor(10000)
 
                 # Plunger publish plunge speed as a function of conveyor speed
                 plunger_speed_base = 10
                 plunger_speed = self.calculate_plunge_speed(plunger_speed_base)
 
                 if self.num_speed_readings > MIN_PLUNGE_READINGS:
-                    self.plunge_pub.publish(plunger_speed)
+                    self.publish_new_plunge(int(plunger_speed))
                 else:
-                    self.plunge_pub.publish(-35)
+                    
+                    # Retract Plunger
+                    self.publish_new_plunge(-35)
+
+                    # Stop Drivetrain
+                    self.publish_new_drive(0.0)
 
                 # Unjamming logic
                 if self.error > UNJAM_ERROR and self.num_speed_readings > MIN_SPEED_READINGS:
-                    self.run_conveyor_pub.publish(-10000)
-                    self.plunge_pub.publish(-35)
+                    # Stop Drivetrain
+                    self.publish_new_drive(0.0)
+
+                    # Reverse Conveyor
+                    self.publish_new_conveyor(-10000)
+                    
+                    # Retract Plunger
+                    self.publish_new_plunge(-25)
+
                     self.num_speed_readings = 0
                     self.jam_time = current_time  # Record the jam start time
 
             elif self.current_state == 1:  # Else if state is retracting
-                # Conveyor set speed to 0.0
-                conveyor_run = False
-                self.run_conveyor_pub.publish(conveyor_run)
+
+                # Drivetrain logic
+                if self.plunge_top:
+
+                    if self.prev_time is not None:
+                        self.elapsed_drive_time += current_time - self.prev_time
+
+                    # Check to make sure max drive time is not reached
+                    if self.elapsed_drive_time > MAX_REV_TIME:
+
+                        rospy.loginfo("Done driving backwards!")
+
+                        # Stop Drivetrain
+                        self.publish_new_drive(0.0)
+
+                    else:
+                        self.publish_new_drive(-REV_SPEED)
+                        rospy.loginfo("Driving backwards!")
+                        rospy.loginfo(self.elapsed_drive_time)
+
+                else:
+                    # Stop Drivetrain
+                    self.publish_new_drive(0.0)
+                    rospy.loginfo("Retracting!!")
+
+                # Stop Conveyor
+                self.publish_new_conveyor(0)
 
                 # Plunger publish constant retract plunge speed
-                retract_speed = -25
-                self.plunge_pub.publish(retract_speed)
+                self.publish_new_plunge(-45)
                 self.jam_time = None
+
+        self.prev_time = current_time
 
     def calculate_plunge_speed(self, base):
         base = int(base)
@@ -123,7 +227,7 @@ class StateMachine:
             return 0
         return speed
 
-    def conveyor_speed_callback(self, msg):
+    def conveyor_speed_cb(self, msg):
 
         self.speed_history.append(msg.data)
         self.num_speed_readings += 1
@@ -137,6 +241,12 @@ class StateMachine:
         
         # Update error using the median speed value
         self.error = ZEB_SPEED - median_speed
+
+    def plunge_top_cb(self, msg):
+        self.plunge_top = msg.data
+
+    def plunge_bot_cb(self, msg):
+        self.plunge_bot = msg.data
 
 if __name__ == '__main__':
     try:
