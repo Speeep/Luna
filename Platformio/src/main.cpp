@@ -167,9 +167,9 @@ void loop()
     // localizer.loop();
 
     // Prints for Drivetrain Speed
-    String ianOutputString = String(drivetrain.getDriveSpeed());
-    ianOutputMsg.data = ianOutputString.c_str();
-    ianOutputPub.publish(&ianOutputMsg);
+    // String ianOutputString = String(drivetrain.getDriveSpeed());
+    // ianOutputMsg.data = ianOutputString.c_str();
+    // ianOutputPub.publish(&ianOutputMsg);
 
     // update Odom
     odomIterator ++;

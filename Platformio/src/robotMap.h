@@ -3,13 +3,13 @@
 // Talon pwm motor controller constants
 #define RIGHT_TURN_PWM 3 // WHITE
 
-#define LEFT_TURN_PWM 4 // PURPLE
+#define LEFT_TURN_PWM 4 // GREEN
 
-#define LOCALIZER_PWM 6 // 
+#define LOCALIZER_PWM 6 // UNATTACHED
 
 #define DEPOSIT_PWM 5 // BLUE
 
-#define PLUNGE_TALON_PWM 7 // GRAY
+#define PLUNGE_TALON_PWM 7 // YELLOW
 
 #define PLUNGE_MOTOR_EFFORT 30
 
@@ -28,9 +28,9 @@
 // Increase Ki based on load, fine-tune Kp
 #define BASE_CURRENT 10
 #define SPEED_KP 600  // This actually manifests as damping
-#define SPEED_KI 28 // This acts a proportional control, make sure KI * SUMCAP <= 16000
+#define SPEED_KI 32 // This acts a proportional control, make sure KI * SUMCAP <= 16000
 #define SPEED_KD 0
-#define SPEED_SUMCAP 550
+#define SPEED_SUMCAP 500
 
 #define POS_KP 0.05
 
