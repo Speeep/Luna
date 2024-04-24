@@ -108,8 +108,9 @@ ros::Subscriber<std_msgs::Bool> depositOpen("/deposit/open", &depositOpenCallbac
 
 void setup()
 {
+  Serial.begin(115200);  // Set baud rate to 115200
+  nh.getHardware()->setBaud(115200);  // Tell rosserial to use the same baud rate
   nh.initNode();
-  // nh.getHardware()->setBaud(57600);
 
   // do{
   //   nh.initNode();
@@ -146,7 +147,7 @@ void loop()
 {
   currentMillis = millis();
 
-  // Conveyor gets looped every 10 milliseconds
+  // Conveyor gets looped every X milliseconds
   if (currentMillis - previousConveyorMillis >= CONVEYOR_INTERVAL) {
     previousConveyorMillis = currentMillis;
     
@@ -165,10 +166,12 @@ void loop()
   }
 
 
-  // Drivetrain gets looped every 10 milliseconds
+  // Drivetrain gets looped every X milliseconds
   if (currentMillis - previousDriveMillis >= DRIVETRAIN_INTERVAL) {
 
     previousDriveMillis = currentMillis;
+
+    nh.spinOnce();
 
     drivetrain.loop();
 
@@ -198,6 +201,4 @@ void loop()
     }
   }
 
-  nh.spinOnce();
-  // delay(500);
 }

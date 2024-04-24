@@ -24,14 +24,14 @@ class StateMachine:
         self.state_names = {
             'f': 0,
             'g': 1,
-            'h': 2
+            'h': 2,
         }
         self.plunge_top = False
         self.plunge_bot = False
         self.prev_time = rospy.get_time()
         self.elapsed_drive_time = 0.0
 
-        self.listener = keyboard.Listener(on_press=self.on_press)
+        self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
         self.listener.start()
 
         # Create a loop to continuously print the current state at 20 Hz
@@ -48,6 +48,7 @@ class StateMachine:
         self.prev_drive_speed = 0.0
 
         self.drivetrain_state_pub = rospy.Publisher('/drivetrain/state', Int32, queue_size=10)
+        self.prev_drive_state = 0
 
         self.dump_pub = rospy.Publisher('/deposit/open', Bool, queue_size=10)
         self.prev_open = False
@@ -81,14 +82,41 @@ class StateMachine:
             elif key_char == 'o':
                 self.prev_open = not self.prev_open    
                 self.dump_pub.publish(self.prev_open)
+            elif self.current_state == 2:
+                if key_char == 'w':
+                    self.publish_new_drive(1.0)
+                elif key_char == 's':
+                    self.publish_new_drive(-1.0)
+                elif key_char == '0':
+                    self.publish_new_drive_state(0)
+                elif key_char == '1':
+                    self.publish_new_drive_state(1)
+                elif key_char == '2':
+                    self.publish_new_drive_state(2)
+                else:
+                    self.publish_new_drive(0.0)
+        except AttributeError:
+            pass
+    def on_release(self, key):
+        try:
+            key_char = key.char
+            if self.current_state == 2:
+                if key_char == 'w':
+                    self.publish_new_drive(0.0)
+                elif key_char == 's':
+                    self.publish_new_drive(0.0)
         except AttributeError:
             pass
 
     def publish_new_drive(self, new_drive_val):
         if new_drive_val != self.prev_drive_speed:
-            self.drivetrain_state_pub.publish(1)
             self.drive_speed_pub.publish(new_drive_val)
             self.prev_drive_speed = new_drive_val
+
+    def publish_new_drive_state(self, new_drive_state_val):
+        if new_drive_state_val != self.prev_drive_state:
+            self.drivetrain_state_pub.publish(new_drive_state_val)
+            self.prev_drive_state = new_drive_state_val
 
     def publish_new_conveyor(self, new_conveyor_val):
         if new_conveyor_val != self.prev_conveyor_current:
@@ -108,10 +136,9 @@ class StateMachine:
         # Check for All Stop case first for safety reasons
         if self.current_state == 2:
 
-            rospy.loginfo("ALL STOPP!!!!!!!")
+            rospy.loginfo("ONLY DRIVETRAIN CTRL")
 
-            # Stop Drivetrain, Conveyor, and Plunger
-            self.publish_new_drive(0.0)
+            # Stop Conveyor and Plunger
             self.publish_new_conveyor(0)
             self.publish_new_plunge(0)
         
@@ -123,6 +150,8 @@ class StateMachine:
                 return
 
             if self.current_state == 0:  # If state is plunging
+
+                self.publish_new_drive_state(1)
 
                 # Drivetrain logic
                 if self.plunge_bot:
@@ -182,6 +211,8 @@ class StateMachine:
                     self.jam_time = current_time  # Record the jam start time
 
             elif self.current_state == 1:  # Else if state is retracting
+
+                self.publish_new_drive_state(1)
 
                 # Drivetrain logic
                 if self.plunge_top:
