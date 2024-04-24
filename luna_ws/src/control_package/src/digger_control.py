@@ -13,18 +13,19 @@ UNJAM_DURATION = 0.1
 MIN_SPEED_READINGS = 30
 MIN_PLUNGE_READINGS = 200
 MAX_DRIVE_TIME = 120
-DRIVE_SPEED = 0.05
+DRIVE_SPEED = 0.15
 MAX_REV_TIME = 4
 REV_SPEED = 1.0
 
 class StateMachine:
     def __init__(self):
-        self.states = ['plunging', 'retracting', 'all stop']
+        self.states = ['plunging', 'retracting', 'all stop', 'keyboard']
         self.current_state = 2
         self.state_names = {
             'f': 0,
             'g': 1,
             'h': 2,
+            'j': 3,
         }
         self.plunge_top = False
         self.plunge_bot = False
@@ -82,7 +83,7 @@ class StateMachine:
             elif key_char == 'o':
                 self.prev_open = not self.prev_open    
                 self.dump_pub.publish(self.prev_open)
-            elif self.current_state == 2:
+            elif self.current_state == 3:
                 if key_char == 'w':
                     self.publish_new_drive(1.0)
                 elif key_char == 's':
@@ -100,7 +101,7 @@ class StateMachine:
     def on_release(self, key):
         try:
             key_char = key.char
-            if self.current_state == 2:
+            if self.current_state == 3:
                 if key_char == 'w':
                     self.publish_new_drive(0.0)
                 elif key_char == 's':
@@ -136,7 +137,17 @@ class StateMachine:
         # Check for All Stop case first for safety reasons
         if self.current_state == 2:
 
-            rospy.loginfo("ONLY DRIVETRAIN CTRL")
+            rospy.loginfo("ALL STOP")
+
+            # Stop Conveyor and Plunger and Drivetrain
+            self.publish_new_conveyor(0)
+            self.publish_new_plunge(0)
+            self.publish_new_drive_state(0)
+            self.publish_new_drive(0)
+
+        elif self.current_state == 3:
+
+            rospy.loginfo("DRIVETRAIN CTRL")
 
             # Stop Conveyor and Plunger
             self.publish_new_conveyor(0)
