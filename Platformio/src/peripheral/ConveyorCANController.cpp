@@ -95,6 +95,8 @@ void ConveyorCANController::updateMotorSpeeds() {
 
     float motor0Angle = motor0Encoder.getRawAngle();
 
+    // float motor0Angle = 0; // TODO REMOVE
+
     long time = millis();
 
     long deltaTime = time - lastTime;
@@ -112,6 +114,8 @@ void ConveyorCANController::updateMotorSpeeds() {
     float motor0Speed = motor0deltaAngle / deltaTime;
 
     realSpeeds[0] = motor0Speed;
+
+    // realSpeeds[0] = 10.0;  // TODO REMOVE
 
     speeds[0] = mf0.filter(motor0Speed);
 

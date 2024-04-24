@@ -3,7 +3,7 @@
 #include "Arduino.h"
 #include <mcp2515.h>
 #include <SPI.h>
-#include "rawEncoder.h"
+#include "masterRawEncoder.h"
 #include "../robotMap.h"
 #include "medianFilter.h"
 
@@ -35,7 +35,7 @@ public:
 
 private:
     struct can_frame canMsgOut;
-    RawEncoder motor0Encoder;
+    RawMasterEncoder motor0Encoder;
     MedianFilter mf0;
     MCP2515 mcp2515;
     long lastTime;

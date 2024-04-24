@@ -20,7 +20,7 @@
 #define MCP_SO 50 // Green Wire
 #define MCP_SCK 52 // Orange Wire
 
-#define DRIVETRAIN_INTERVAL 10
+#define DRIVETRAIN_INTERVAL 5
 #define CONVEYOR_INTERVAL 10
 #define INTERVAL 5000
 

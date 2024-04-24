@@ -1,4 +1,4 @@
-#include <Wire.h>
+#include <I2C.h>
 #include <Arduino.h>
 #include "./robotMap.h"
 #include <ros.h>
@@ -139,8 +139,7 @@ void setup()
   deposit.init();
 
   SPI.begin();
-  Wire.begin();
-  Wire.setClock(800000L);
+  I2c.begin();
 }
 
 void loop()
