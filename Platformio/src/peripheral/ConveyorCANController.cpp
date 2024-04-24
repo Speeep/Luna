@@ -92,6 +92,7 @@ void ConveyorCANController::speedHandlerPID() {
 }
 
 void ConveyorCANController::updateMotorSpeeds() {
+
     float motor0Angle = motor0Encoder.getRawAngle();
 
     long time = millis();

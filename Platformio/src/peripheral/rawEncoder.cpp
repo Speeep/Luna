@@ -18,66 +18,83 @@ void RawEncoder::init(int id, int multiplexerId) {
 
 int RawEncoder::getRawAngle()
 {
-  // Multiplexer things
-  if(multiplexerNumber == 0){
-    Wire.beginTransmission(0x70);
-    Wire.write(1 << encoderNumber);
-    Wire.endTransmission();
-    Wire.beginTransmission(0x71);
-    Wire.write(1 << 7);
-    Wire.endTransmission();
-  }
-  else{
-    Wire.beginTransmission(0x71);
-    Wire.write(1 << encoderNumber);
-    Wire.endTransmission();
-    Wire.beginTransmission(0x70);
-    Wire.write(1 << 7);
-    Wire.endTransmission();
-  }
+    int maxTries = 5; // Maximum number of tries before giving up
+    int attempts = 0;
 
-  // Encoder things
-  // 7:0 - low
-  Wire.beginTransmission(0x36);
-  Wire.write(0x0D);
-  if (Wire.endTransmission() != 0)
-  {
-    Serial.println("Error starting transmission to the sensor");
+    while (attempts < maxTries) {
+        // Multiplexer things
+        if (multiplexerNumber == 0) {
+            Wire.beginTransmission(0x70);
+            Wire.write(1 << encoderNumber);
+            if (Wire.endTransmission() != 0) {
+                attempts++;
+                continue; // Try again
+            }
+
+            Wire.beginTransmission(0x71);
+            Wire.write(1 << 7);
+            if (Wire.endTransmission() != 0) {
+                attempts++;
+                continue; // Try again
+            }
+        } else {
+            Wire.beginTransmission(0x71);
+            Wire.write(1 << encoderNumber);
+            if (Wire.endTransmission() != 0) {
+                attempts++;
+                continue; // Try again
+            }
+
+            Wire.beginTransmission(0x70);
+            Wire.write(1 << 7);
+            if (Wire.endTransmission() != 0) {
+                attempts++;
+                continue; // Try again
+            }
+        }
+
+        // Encoder things
+        // 7:0 - low
+        Wire.beginTransmission(0x36);
+        Wire.write(0x0D);
+        if (Wire.endTransmission() != 0) {
+            attempts++;
+            continue; // Try again
+        }
+
+        Wire.requestFrom(0x36, 1);
+        if (Wire.available() == 0) {
+            attempts++;
+            continue; // Try again
+        }
+        int lowbyte = Wire.read();
+
+        // 11:8 - high
+        Wire.beginTransmission(0x36);
+        Wire.write(0x0C);
+        if (Wire.endTransmission() != 0) {
+            attempts++;
+            continue; // Try again
+        }
+
+        Wire.requestFrom(0x36, 1);
+        if (Wire.available() == 0) {
+            attempts++;
+            continue; // Try again
+        }
+        int highbyte = Wire.read();
+        highbyte <<= 8;
+
+        int rawAngle = (highbyte | lowbyte) & 0x0FFF;
+        if (rawAngle == 0) {
+            attempts++;
+            continue; // Try again
+        } else {
+            lastRawAngle = rawAngle;
+            return rawAngle;
+        }
+    }
+
+    // If all tries fail, return the last known good angle
     return lastRawAngle;
-  }
-
-  Wire.requestFrom(0x36, 1);
-  if (Wire.available() == 0)
-  {
-    Serial.println("Error receiving data from the sensor");
-    return lastRawAngle;
-  }
-  lowbyte = Wire.read();
-
-  // 11:8 - high
-  Wire.beginTransmission(0x36);
-  Wire.write(0x0C);
-  if (Wire.endTransmission() != 0)
-  {
-    Serial.println("Error starting transmission to the sensor");
-    return lastRawAngle;
-  }
-
-  Wire.requestFrom(0x36, 1);
-  if (Wire.available() == 0)
-  {
-    Serial.println("Error receiving data from the sensor");
-    return lastRawAngle;
-  }
-  highbyte = Wire.read();
-  highbyte = highbyte << 8;
-
-  if (((highbyte | lowbyte) & 0x0fff) == 0) {
-    return lastRawAngle;
-  } else {
-    int rawAngle = (highbyte | lowbyte) & 0x0fff;
-    lastRawAngle = rawAngle;
-    return rawAngle;
-  }
-
 }
