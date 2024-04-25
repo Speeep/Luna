@@ -113,7 +113,7 @@ void ConveyorCANController::updateMotorSpeeds() {
 
     float motor0Speed = motor0deltaAngle / deltaTime;
 
-    realSpeeds[0] = motor0Speed;
+    realSpeeds[0] = -motor0Speed;
 
     // realSpeeds[0] = 10.0;  // TODO REMOVE
 
