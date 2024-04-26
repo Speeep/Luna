@@ -23,7 +23,7 @@ public:
 
     void setSpeed(float);
 
-    float getSpeed(int);
+    float getSpeed();
 
     float getRealSpeed();
 
@@ -33,22 +33,29 @@ public:
 
     int getCurrent();
 
+    int getRawAngle();
+
 private:
     struct can_frame canMsgOut;
     RawMasterEncoder motor0Encoder;
     MedianFilter mf0;
     MCP2515 mcp2515;
     long lastTime;
-    float prevAngles[1];
-    float errors[1];
-    float prevErrors[1];
-    float setSpeeds[1];
-    float speeds[1];
-    float realSpeeds[1];
+    int prevAngle;
+    float error;
+    float prevError;
+    float speedSet;
+    float speed;
+    float realSpeed;
     int filterPosition;
-    float sums[1];
-    int setCurrents[1];
-    float speedSetpoints[1];
-    int displacements[1];
+    float sum;
+    int setCurrent;
+    float speedSetpoint;
+    int displacement;
     int motorCurrent0;
+    int motor0Angle;
+    int motor0deltaAngle;
+    long time;
+    long deltaTime;
+    float motor0Speed;
 };

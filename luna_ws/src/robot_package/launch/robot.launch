@@ -7,6 +7,13 @@
     <param name="port" value="$(arg port)" />
     <param name="baud" value="$(arg baud)" />
   </node>
+  <!-- Watchdog Node for Arduino -->
+  <node 
+    pkg="control_package" 
+    type="watchdog_node.py" 
+    name="watchdog_node" 
+    output="screen">
+  </node>
   <!-- Publishes Logitech Webcam Images For Display on Laptop -->
   <!-- <node
     pkg="localization_package"
@@ -52,13 +59,6 @@
   />
     type="localizer_sweeper.py"
     name="localizer_sweeper" 
-    output="screen"
-  /> -->
-  <!-- Watchdog timer for resetting the Arduino-->
-  <!-- <node
-    pkg="robot_package"
-    type="arduino_watchdog.py"
-    name="arduino_watchdog"
     output="screen"
   /> -->
 </launch>

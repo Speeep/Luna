@@ -32,6 +32,9 @@ ros::Publisher plungeTopPub("/jetson/plunge_top", &plungeTop);
 std_msgs::Bool plungeBot;
 ros::Publisher plungeBotPub("/jetson/plunge_bot", &plungeBot);
 
+std_msgs::Bool watchdogBool;
+ros::Publisher watchdogBoolPub("/watchdog_bool", &watchdogBool);
+
 Drivetrain drivetrain;
 // Localizer localizer;
 Conveyor conveyor;
@@ -50,6 +53,7 @@ float icc = 0.0;
 
 static unsigned long previousDriveMillis = 0;
 static unsigned long previousConveyorMillis = 0;
+static unsigned long previousWatchdogMillis = 0;
 unsigned long currentMillis = millis();
 
 void drivetrainSpeedCallback(const std_msgs::Float32 &driveSpeedMsg) {
@@ -123,6 +127,7 @@ void setup()
   nh.advertise(conveyorSpeedPub);
   nh.advertise(plungeTopPub);
   nh.advertise(plungeBotPub);
+  nh.advertise(watchdogBoolPub);
 
   nh.subscribe(driveSpeedSub);
   // nh.subscribe(localizerErrorSub);
@@ -140,13 +145,23 @@ void setup()
 
   SPI.begin();
   I2c.begin();
+
+  // Set watchdog bool to true
+  watchdogBool.data = true;
 }
 
 void loop()
 {
   currentMillis = millis();
 
-  // Conveyor gets looped every X milliseconds
+  // Arudino Watchdog TImer gets published every quarter second
+  if (currentMillis - previousWatchdogMillis >= WATCHDOG_INTERVAL) {
+    previousWatchdogMillis = currentMillis;
+
+    watchdogBoolPub.publish(&watchdogBool);
+  }
+
+  // Conveyor gets looped every 10 milliseconds
   if (currentMillis - previousConveyorMillis >= CONVEYOR_INTERVAL) {
     previousConveyorMillis = currentMillis;
     

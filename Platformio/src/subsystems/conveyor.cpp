@@ -100,3 +100,7 @@ float Conveyor::getConveyorSpeed(){
 int Conveyor::getConveryorCurrent(){
     return can_controller.getCurrent();
 }
+
+float Conveyor::getRawAngle(){
+    return float(can_controller.getRawAngle());
+}

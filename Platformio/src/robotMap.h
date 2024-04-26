@@ -99,3 +99,5 @@
 
 #define PLUNGE_TOP 43
 #define PLUNGE_BOT 42
+
+#define WATCHDOG_INTERVAL 250

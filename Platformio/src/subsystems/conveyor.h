@@ -36,6 +36,8 @@ class Conveyor{
 
         void setConveyorCurrent(int);
 
+        float getRawAngle();
+
     private:
         Talon plungeMotor;
 

@@ -5,17 +5,21 @@ import numpy as np
 
 # Constants
 DIGGER_UPDATE_HZ = 20
-PLUNGE_BASE_EFFORT = 100
+PLUNGE_BASE_EFFORT = 7
 PLUNGE_KP = 10
 ZEB_SPEED = 10.24
 UNJAM_ERROR = 9
 UNJAM_DURATION = 0.1
-MIN_SPEED_READINGS = 30
+MIN_SPEED_READINGS = 100
 MIN_PLUNGE_READINGS = 200
 MAX_DRIVE_TIME = 120
 DRIVE_SPEED = 0.15
 MAX_REV_TIME = 4
 REV_SPEED = 1.0
+CONVEYOR_MAX_EFFORT = 9000
+CONVEYOR_REVERSE_EFFORT = -9000
+PLUNGER_RETRACT_SPEED = -35
+PLUNGER_RETRACT_SPEED_FAST = -45
 
 class StateMachine:
     def __init__(self):
@@ -158,6 +162,8 @@ class StateMachine:
             # Block other stuff from happening
             if self.jam_time is not None and (current_time - self.jam_time) < UNJAM_DURATION:
                 self.num_speed_readings = 0
+                self.error = 0
+                rospy.logwarn("JAMMED! UNJAMMING...")
                 return
 
             if self.current_state == 0:  # If state is plunging
@@ -191,20 +197,20 @@ class StateMachine:
                     rospy.loginfo("Plunging!")
 
                 # Conveyor publish set effort and monitor speed
-                self.publish_new_conveyor(10000)
+                self.publish_new_conveyor(CONVEYOR_MAX_EFFORT)
 
                 # Plunger publish plunge speed as a function of conveyor speed
-                plunger_speed_base = 10
-                plunger_speed = self.calculate_plunge_speed(plunger_speed_base)
+                plunger_speed = self.calculate_plunge_speed(PLUNGE_BASE_EFFORT)
 
+                # If conveyor has had time to speed up or detect further jam
                 if self.num_speed_readings > MIN_PLUNGE_READINGS:
+
+                    # Run Plunger
                     self.publish_new_plunge(int(plunger_speed))
                 else:
                     
-                    # Retract Plunger
+                    # Retract Plunger and Stop Drivetrain
                     self.publish_new_plunge(-35)
-
-                    # Stop Drivetrain
                     self.publish_new_drive(0.0)
 
                 # Unjamming logic
@@ -213,7 +219,7 @@ class StateMachine:
                     self.publish_new_drive(0.0)
 
                     # Reverse Conveyor
-                    self.publish_new_conveyor(-10000)
+                    self.publish_new_conveyor(CONVEYOR_REVERSE_EFFORT)
                     
                     # Retract Plunger
                     self.publish_new_plunge(-25)
