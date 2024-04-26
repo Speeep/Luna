@@ -15,7 +15,6 @@ def watchdog():
     rospy.init_node('rosserial_watchdog')
     rospy.Subscriber("/watchdog_bool", Bool, callback)
     rate = rospy.Rate(3)  # check 3 times every second
-    # wait_rate = rospy.Rate(0.2)
     sleep(5)
     last_time_received = rospy.get_time()
 
@@ -26,14 +25,10 @@ def watchdog():
         if rospy.get_time() - last_time_received > 1:  # 1 second without update
             rospy.logerr("No updates from rosserial_python, restarting node!")
             subprocess.call(["rosnode", "kill", "/serial_node"])
-            # rospy.loginfo("Relaunching Ros Serial Arduino Node")
             subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
-            # rospy.loginfo("Done relaunching Arduino Node!")
-            sleep(5) # Sleep to let the node relaunch
+            sleep(8) # Sleep to let the node relaunch
             last_time_received = rospy.get_time() # Reset time to prevent auto retriggers
         rate.sleep()
-
-    rospy.logwarn("OH SHIT OH FUCK WE BROKE OUT OF THE WHILE LOOP!!!!")
 
 if __name__ == '__main__':
     try:
