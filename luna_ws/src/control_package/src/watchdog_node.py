@@ -15,6 +15,9 @@ def watchdog():
     rate = rospy.Rate(3)  # check 3 times every second
     sleep(10)
     while not rospy.is_shutdown():
+
+        print(rospy.get_time() - last_time_received)
+
         if rospy.get_time() - last_time_received > 1:  # 1 second without update
             print("No updates from rosserial_python, restarting node...")
             subprocess.call(["rosnode", "kill", "/serial_node"])
