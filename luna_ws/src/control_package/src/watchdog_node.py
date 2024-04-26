@@ -11,6 +11,7 @@ def callback(data):
 def watchdog():
     rospy.init_node('rosserial_watchdog')
     rospy.Subscriber("/watchdog_bool", Bool, callback)
+    last_time_received = rospy.get_time()
     rate = rospy.Rate(3)  # check 3 times every second
     sleep(10)
     while not rospy.is_shutdown():
@@ -23,7 +24,6 @@ def watchdog():
         rate.sleep()
 
 if __name__ == '__main__':
-    last_time_received = rospy.get_time()
     try:
         watchdog()
     except rospy.ROSInterruptException:
