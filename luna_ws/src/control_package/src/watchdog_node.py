@@ -27,11 +27,13 @@ def watchdog():
             rospy.logwarn("No updates from rosserial_python, restarting node!")
             subprocess.call(["rosnode", "kill", "/serial_node"])
             rospy.loginfo("Relaunching Ros Serial Arduino Node")
-            subprocess.call(["roslaunch", "robot_package", "serial_node.launch"])
+            subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
             rospy.loginfo("Done relaunching Arduino Node!")
             wait_rate.sleep() # Sleep to let the node relaunch
             last_time_received = rospy.get_time() # Reset time to prevent auto retriggers
         rate.sleep()
+
+    rospy.logwarn("OH SHIT OH FUCK WE BROKE OUT OF THE WHILE LOOP!!!!")
 
 if __name__ == '__main__':
     try:
