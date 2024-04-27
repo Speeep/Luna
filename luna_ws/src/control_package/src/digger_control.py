@@ -113,15 +113,15 @@ class StateMachine:
         except AttributeError:
             pass
 
-    def publish_new_drive(self, new_drive_val):
-        if new_drive_val != self.prev_drive_speed:
-            self.drive_speed_pub.publish(new_drive_val)
-            self.prev_drive_speed = new_drive_val
-
     def publish_new_drive_state(self, new_drive_state_val):
         if new_drive_state_val != self.prev_drive_state:
             self.drivetrain_state_pub.publish(new_drive_state_val)
             self.prev_drive_state = new_drive_state_val
+
+    def publish_new_drive(self, new_drive_val):
+        if new_drive_val != self.prev_drive_speed:
+            self.drive_speed_pub.publish(new_drive_val)
+            self.prev_drive_speed = new_drive_val
 
     def publish_new_conveyor(self, new_conveyor_val):
         if new_conveyor_val != self.prev_conveyor_current:
@@ -183,10 +183,12 @@ class StateMachine:
 
                         # Stop Drivetrain and transition to retracting
                         self.publish_new_drive(0.0)
+                        self.publish_new_drive_state(0)
                         self.elapsed_drive_time = 0.0
                         self.current_state = 1
                     else:
                         # Drive Drivetrain
+                        self.publish_new_drive_state(1)
                         self.publish_new_drive(DRIVE_SPEED)
                         rospy.loginfo("Driving forwards!")
                         rospy.loginfo(self.elapsed_drive_time)
@@ -194,6 +196,7 @@ class StateMachine:
                 else:
                     # Stop Drivetrain
                     self.publish_new_drive(0.0)
+                    self.publish_new_drive_state(0)
                     rospy.loginfo("Plunging!")
 
                 # Conveyor publish set effort and monitor speed
