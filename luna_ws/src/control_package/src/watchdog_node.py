@@ -13,6 +13,7 @@ recent_setpoint = 0
 def watchdog_callback(data):
     global last_time_received
     last_time_received = rospy.get_time()
+    rospy.loginfo("Data received from Arduino!")
 
 def setpoint_callback(setpoint):
     global recent_setpoint
