@@ -24,9 +24,9 @@ def speed_callback(speed):
     current_time = rospy.get_time()
     
     # If recent setpoint is close to 0, then set last fast speed to now
-    if recent_setpoint < 1000:
+    if abs(recent_setpoint) < 1000:
         last_fast_speed = current_time
-    elif speed.data > FAST_SPEED:
+    elif abs(speed.data) > FAST_SPEED:
         last_fast_speed = current_time
 
     # If long time since last fast time, reset arduino
