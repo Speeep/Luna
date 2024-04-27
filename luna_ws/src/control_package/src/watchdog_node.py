@@ -33,12 +33,13 @@ def speed_callback(speed):
         rospy.logerr("Weird conveyor speed from arduino, restarting node!")
         subprocess.call(["rosnode", "kill", "/serial_node"])
         subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
-        sleep(5) # Sleep to let the node relaunch
-        last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
-        last_time_received = rospy.get_time() # Reset to prevent auto retriggers
+        for i in range(20):
+            last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
+            last_time_received = rospy.get_time() # Reset to prevent auto retriggers
+            sleep(0.25)
 
 def watchdog():
-    global last_time_received
+    global last_time_received, last_fast_speed
     rospy.init_node('rosserial_watchdog')
     rospy.Subscriber("/watchdog_bool", Bool, watchdog_callback)
     rospy.Subscriber("/digger/conveyor_current", Int32, setpoint_callback)
@@ -55,8 +56,10 @@ def watchdog():
             rospy.logerr("No updates from rosserial_python, restarting node!")
             subprocess.call(["rosnode", "kill", "/serial_node"])
             subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
-            sleep(8) # Sleep to let the node relaunch
-            last_time_received = rospy.get_time() # Reset time to prevent auto retriggers
+            for i in range(20):
+                last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
+                last_time_received = rospy.get_time() # Reset to prevent auto retriggers
+                sleep(0.25)
         rate.sleep()
 
 if __name__ == '__main__':
