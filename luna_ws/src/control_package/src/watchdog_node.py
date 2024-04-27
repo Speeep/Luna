@@ -29,11 +29,11 @@ def speed_callback(speed):
         last_fast_speed = current_time
 
     # If long time since last fast time, reset arduino
-    if current_time - last_fast_speed > 5:
+    if current_time - last_fast_speed > 3:
         rospy.logerr("Weird conveyor speed from arduino, restarting node!")
         subprocess.call(["rosnode", "kill", "/serial_node"])
         subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
-        for i in range(40):
+        for i in range(32):
             last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
             last_time_received = rospy.get_time() # Reset to prevent auto retriggers
             sleep(0.25)
@@ -56,7 +56,7 @@ def watchdog():
             rospy.logerr("No updates from rosserial_python, restarting node!")
             subprocess.call(["rosnode", "kill", "/serial_node"])
             subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
-            for i in range(40):
+            for i in range(32):
                 last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
                 last_time_received = rospy.get_time() # Reset to prevent auto retriggers
                 sleep(0.25)
