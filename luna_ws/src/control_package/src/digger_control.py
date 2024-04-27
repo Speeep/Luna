@@ -5,11 +5,11 @@ import numpy as np
 
 # Constants
 DIGGER_UPDATE_HZ = 20
-PLUNGE_BASE_EFFORT = 7
-PLUNGE_KP = 10
+PLUNGE_BASE_EFFORT = 6
+PLUNGE_KP = 12
 ZEB_SPEED = 10.24
 UNJAM_ERROR = 9
-UNJAM_DURATION = 0.3
+UNJAM_DURATION = 0.4
 MIN_SPEED_READINGS = 50
 MIN_PLUNGE_READINGS = 200
 MAX_DRIVE_TIME = 100
@@ -225,7 +225,7 @@ class StateMachine:
                     self.publish_new_conveyor(CONVEYOR_REVERSE_EFFORT)
                     
                     # Retract Plunger
-                    self.publish_new_plunge(-25)
+                    self.publish_new_plunge(-15)
 
                     self.num_speed_readings = 0
                     self.jam_time = current_time  # Record the jam start time
@@ -273,9 +273,9 @@ class StateMachine:
         # Ensure that the plunger doesn't go faster than base speed
         if speed > base:
             return base
-        # Ensure that the plunger doesn't go faster than negative base speed
-        elif speed < 0:
-            return 0
+        # Ensure that the plunger doesn't go faster than negative half base speed
+        elif speed < (-base / 2):
+            return -base / 2
         return speed
 
     def conveyor_speed_cb(self, msg):
