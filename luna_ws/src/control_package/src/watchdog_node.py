@@ -13,12 +13,13 @@ recent_setpoint = 0
 last_restart_time = 0
 min_restart_interval = 10  # Minimum interval in seconds between restarts
 
+init_en = False
 
 # Setup GPIO
 GPIO.cleanup()  # Reset all GPIO pins
 GPIO.setmode(GPIO.BOARD)  # BOARD pin-numbering scheme
 GPIO.setup(37, GPIO.OUT)  # Pin 37 as an output
-GPIO.output(37, GPIO.HIGH) # Initially set the pin to HIGH
+GPIO.output(37, GPIO.LOW) # Initially set the pin to HIGH
 
 def restart_node():
     global last_restart_time, last_fast_speed, last_time_received
@@ -41,6 +42,9 @@ def restart_node():
 
 def watchdog_callback(data):
     global last_time_received
+    if not init_en:
+        GPIO.output(37, GPIO.HIGH) # Set the pin to HIGH after receiving first good message
+        init_en = True
     last_time_received = rospy.get_time()
     rospy.loginfo("Data received from Arduino!")
 
