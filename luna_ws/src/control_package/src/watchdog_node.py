@@ -15,6 +15,7 @@ min_restart_interval = 10  # Minimum interval in seconds between restarts
 
 
 # Setup GPIO
+GPIO.cleanup()  # Reset all GPIO pins
 GPIO.setmode(GPIO.BOARD)  # BOARD pin-numbering scheme
 GPIO.setup(37, GPIO.OUT)  # Pin 37 as an output
 GPIO.output(37, GPIO.HIGH) # Initially set the pin to HIGH
@@ -85,5 +86,6 @@ if __name__ == '__main__':
     try:
         watchdog()
     except rospy.ROSInterruptException:
-        GPIO.cleanup()  # Ensure GPIO resources are freed on exit
         pass
+    finally:
+        GPIO.cleanup()  # This ensures all GPIO resources are freed properly
