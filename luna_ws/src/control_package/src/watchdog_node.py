@@ -1,6 +1,7 @@
 import rospy
 from std_msgs.msg import Bool, Float32, Int32
 import subprocess
+import Jetson.GPIO as GPIO
 from time import sleep
 
 FAST_SPEED = 10
@@ -9,6 +10,16 @@ FAST_SPEED = 10
 last_time_received = 0
 last_fast_speed = 0
 recent_setpoint = 0
+
+# Setup GPIO
+GPIO.setmode(GPIO.BOARD)  # BOARD pin-numbering scheme
+GPIO.setup(37, GPIO.OUT)  # Pin 37 as an output
+
+def maintain_gpio_high():
+    # Ensure GPIO pin 37 remains high
+    while not rospy.is_shutdown():
+        GPIO.output(37, GPIO.HIGH)
+        sleep(1)  # Check every second
 
 def watchdog_callback(data):
     global last_time_received
