@@ -27,15 +27,11 @@ def restart_node():
         return
     else:
         last_restart_time = current_time
+        GPIO.output(37, GPIO.LOW)  # Set GPIO pin 37 low
+        rospy.logerr("Restarting Power Systems!")
         subprocess.call(["rosnode", "kill", "/serial_node"])
         subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
         for i in range(32):
-            last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
-            last_time_received = rospy.get_time() # Reset to prevent auto retriggers
-            sleep(0.25)
-        rospy.logerr("Restarting Power Systems!")
-        GPIO.output(37, GPIO.LOW)  # Set GPIO pin 37 low
-        for i in range(12):
             last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
             last_time_received = rospy.get_time() # Reset to prevent auto retriggers
             sleep(0.25)
