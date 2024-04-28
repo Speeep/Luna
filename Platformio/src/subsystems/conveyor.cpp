@@ -22,6 +22,7 @@ void Conveyor::init(){
     effort = 0;
     atTop = false;
     atBot = false;
+    conveyorCurrent = 0;
 
     enabled = false;
 }
@@ -85,9 +86,9 @@ float Conveyor::getPlungeSpeed(){
     return plungeSpeed;
 }
 
-void Conveyor::setSpeed(float newSpeed){
-    can_controller.setSpeed(newSpeed);
-}
+// void Conveyor::setSpeed(float newSpeed){
+//     can_controller.setSpeed(newSpeed);
+// }
 
 void Conveyor::setConveyorCurrent(int current){
     conveyorCurrent = current;

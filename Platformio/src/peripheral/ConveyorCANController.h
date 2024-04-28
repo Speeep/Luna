@@ -13,15 +13,15 @@ public:
 
     void init();
 
-    void setMotorCurrent();
+    // void setMotorCurrent();
 
     void setMotorCurrent(int);
 
-    void speedHandlerPID();
+    // void speedHandlerPID();
 
     void updateMotorSpeeds();
 
-    void setSpeed(float);
+    // void setSpeed(float);
 
     float getSpeed();
 

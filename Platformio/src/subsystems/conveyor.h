@@ -28,7 +28,7 @@ class Conveyor{
 
         float getPlungeSpeed();
 
-        void setSpeed(float);
+        // void setSpeed(float);
 
         float getConveyorSpeed();
 

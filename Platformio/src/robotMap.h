@@ -27,10 +27,10 @@
 // Velocity loop PID parameters
 // Increase Ki based on load, fine-tune Kp
 #define BASE_CURRENT 10
-#define SPEED_KP 700  // This actually manifests as damping
-#define SPEED_KI 40 // This acts a proportional control, make sure KI * SUMCAP <= 16000
+#define SPEED_KP 750  // This actually manifests as damping
+#define SPEED_KI 42 // This acts a proportional control, make sure KI * SUMCAP <= 16000
 #define SPEED_KD 0
-#define SPEED_SUMCAP 400
+#define SPEED_SUMCAP 380
 
 #define POS_KP 0.05
 
