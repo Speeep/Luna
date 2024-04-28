@@ -10,16 +10,37 @@ FAST_SPEED = 10
 last_time_received = 0
 last_fast_speed = 0
 recent_setpoint = 0
+last_restart_time = 0
+min_restart_interval = 10  # Minimum interval in seconds between restarts
+
 
 # Setup GPIO
 GPIO.setmode(GPIO.BOARD)  # BOARD pin-numbering scheme
 GPIO.setup(37, GPIO.OUT)  # Pin 37 as an output
+GPIO.output(37, GPIO.HIGH) # Initially set the pin to HIGH
 
-def maintain_gpio_high():
-    # Ensure GPIO pin 37 remains high
-    while not rospy.is_shutdown():
-        GPIO.output(37, GPIO.HIGH)
-        sleep(1)  # Check every second
+def restart_node():
+    global last_restart_time, last_fast_speed, last_time_received
+    current_time = rospy.get_time()
+    if current_time - last_restart_time < min_restart_interval:
+        rospy.loginfo("Restart requested too soon after last restart.")
+        return
+    else:
+        last_restart_time = current_time
+        subprocess.call(["rosnode", "kill", "/serial_node"])
+        subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
+        for i in range(32):
+            last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
+            last_time_received = rospy.get_time() # Reset to prevent auto retriggers
+            sleep(0.25)
+        rospy.logerr("Restarting Power Systems!")
+        GPIO.output(37, GPIO.LOW)  # Set GPIO pin 37 low
+        for i in range(12):
+            last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
+            last_time_received = rospy.get_time() # Reset to prevent auto retriggers
+            sleep(0.25)
+        GPIO.output(37, GPIO.HIGH)  # Set back to high
+        rospy.logerr("Done Resetting Power!")
 
 def watchdog_callback(data):
     global last_time_received
@@ -43,12 +64,7 @@ def speed_callback(speed):
     # If long time since last fast time, reset arduino
     if current_time - last_fast_speed > 3:
         rospy.logerr("Weird conveyor speed from arduino, restarting node!")
-        subprocess.call(["rosnode", "kill", "/serial_node"])
-        subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
-        for i in range(32):
-            last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
-            last_time_received = rospy.get_time() # Reset to prevent auto retriggers
-            sleep(0.25)
+        restart_node()
 
 def watchdog():
     global last_time_received, last_fast_speed
@@ -66,16 +82,12 @@ def watchdog():
 
         if rospy.get_time() - last_time_received > 1:  # 1 second without update
             rospy.logerr("No updates from rosserial_python, restarting node!")
-            subprocess.call(["rosnode", "kill", "/serial_node"])
-            subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
-            for i in range(32):
-                last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
-                last_time_received = rospy.get_time() # Reset to prevent auto retriggers
-                sleep(0.25)
+            restart_node()
         rate.sleep()
 
 if __name__ == '__main__':
     try:
         watchdog()
     except rospy.ROSInterruptException:
+        GPIO.cleanup()  # Ensure GPIO resources are freed on exit
         pass
