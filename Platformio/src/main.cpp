@@ -7,7 +7,6 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 #include "./subsystems/drivetrain.h"
-// #include "./subsystems/localizer.h"
 #include "./subsystems/conveyor.h"
 #include "./subsystems/deposit.h"
 #include <std_msgs/Float32MultiArray.h>
@@ -16,9 +15,6 @@ ros::NodeHandle nh;
 
 std_msgs::String ianOutputMsg;
 ros::Publisher ianOutputPub("/listener/ian_output", &ianOutputMsg);
-
-// std_msgs::Float32 localizerAngle;
-// ros::Publisher localizerAnglePub("/jetson/localizer_angle", &localizerAngle);
 
 std_msgs::Float32MultiArray poseStep;
 ros::Publisher poseStepPub("/jetson/pose_step", &poseStep);
@@ -36,14 +32,12 @@ std_msgs::Bool watchdogBool;
 ros::Publisher watchdogBoolPub("/watchdog_bool", &watchdogBool);
 
 Drivetrain drivetrain;
-// Localizer localizer;
 Conveyor conveyor;
 Deposit deposit;
 
 int driveSpeed = 0;
 bool drivetrainEnable = false;
 bool drivetrainAngle = false;
-// bool localizerEnable = false;
 
 float poseStepVals[3] = { 0.0, 0.0, 0.0};
 
@@ -72,20 +66,6 @@ void drivetrainICCallback(const std_msgs::Float32 &driveICCMsg) {
   drivetrain.setYICC(icc);
 }
 
-// void localizerErrorCallback(const std_msgs::Float32 &localizerErrorMsg) {
-//   localizer.setError(localizerErrorMsg.data);
-// }
-
-// void localizerEnableCallback(const std_msgs::Bool &localizerEnableMsg) {
-//   localizerEnable = localizerEnableMsg.data;
-
-//   if (localizerEnable == true) {
-//     localizer.enable();
-//   } else {
-//     localizer.disable();
-//   }
-// }
-
 void conveyorCurrentCallback(const std_msgs::Int32 &conveyorCurrent) {
   conveyor.setConveyorCurrent(conveyorCurrent.data);
 }
@@ -105,24 +85,13 @@ ros::Subscriber<std_msgs::Int32> conveyorSub("/digger/conveyor_current", &convey
 ros::Subscriber<std_msgs::Int32> plungeSub("/digger/plunge", &conveyorPlungeCallback);
 ros::Subscriber<std_msgs::Bool> depositOpen("/deposit/open", &depositOpenCallback);
 
-
-// ros::Subscriber<std_msgs::Float32> localizerErrorSub("/localizer/error", &localizerErrorCallback);
-// ros::Subscriber<std_msgs::Bool> localizerEnableSub("/localizer/enable", &localizerEnableCallback);
-
-
 void setup()
 {
   Serial.begin(115200);  // Set baud rate to 115200
   nh.getHardware()->setBaud(115200);  // Tell rosserial to use the same baud rate
   nh.initNode();
 
-  // do{
-  //   nh.initNode();
-  //   delay(500); // Delay to prevent flooding with connection attempts
-  // }while (!nh.connected()); 
-
   nh.advertise(ianOutputPub);
-  // nh.advertise(localizerAnglePub);
   nh.advertise(poseStepPub);
   nh.advertise(conveyorSpeedPub);
   nh.advertise(plungeTopPub);
@@ -130,8 +99,6 @@ void setup()
   nh.advertise(watchdogBoolPub);
 
   nh.subscribe(driveSpeedSub);
-  // nh.subscribe(localizerErrorSub);
-  // nh.subscribe(localizerEnableSub);
   nh.subscribe(driveStateSub);
   nh.subscribe(driveICCSub);
   nh.subscribe(conveyorSub);
@@ -139,7 +106,6 @@ void setup()
   nh.subscribe(depositOpen);
 
   drivetrain.init();
-  // localizer.init();
   conveyor.init();
   deposit.init();
 
@@ -188,13 +154,6 @@ void loop()
     nh.spinOnce();
 
     drivetrain.loop();
-
-    // localizer.loop();
-
-    // Prints for Drivetrain Speed
-    // String ianOutputString = String(drivetrain.getDriveSpeed());
-    // ianOutputMsg.data = ianOutputString.c_str();
-    // ianOutputPub.publish(&ianOutputMsg);
 
     // update Odom
     odomIterator ++;
