@@ -9,35 +9,37 @@ void ConveyorCANController::init() {
     mcp2515.setNormalMode();
 
     lastTime = 0;
-
-    for (int i = 0; i < 1; i++) {
-        prevAngles[i] = 0.0;
-        errors[i] = 0.0;
-        prevErrors[i] = 0.0;
-        setSpeeds[i] = 0.0;
-        speeds[i] = 0.0;
-        realSpeeds[i] = 0.0;
-        sums[i] = 0.0;
-        setCurrents[i] = 0;
-        speedSetpoints[i] = 0.0;
-        displacements[i] = 0;
-        motorCurrent0 = 0;
-    }
+    prevAngle = 0;
+    error = 0.0;
+    prevError = 0.0;
+    speedSet = 0.0;
+    speed = 0.0;
+    realSpeed = 0.0;
+    sum = 0.0;
+    setCurrent = 0;
+    speedSetpoint = 0.0;
+    displacement = 0;
+    motorCurrent0 = 0;
+    motor0Angle = 0;
+    motor0deltaAngle = 0;
+    time = 0;
+    motor0Speed = 0.0;
 
     motor0Encoder.init(CONVEYOR_ENCODER_ID, CONVEYOR_MULTIPLEXER_ID);
 }
 
-void ConveyorCANController::setMotorCurrent() {
+void ConveyorCANController::setMotorCurrent(int current){
     canMsgOut.can_id = 0x1FF;
     canMsgOut.can_dlc = 2;
 
-    if(setSpeeds[0] > 1) {
-        motorCurrent0 = 3000;
-    } else {
+    if(abs(current) > 100) {
+        motorCurrent0 = current;
+    }
+    else {
         motorCurrent0 = 0;
     }
 
-    // int motorCurrent0 = constrain(setCurrents[0], -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
+    // int motorCurrent0 = constrain(setCurrent, -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
 
     canMsgOut.data[0] = (char)(motorCurrent0 / 256);
     canMsgOut.data[1] = (char)(motorCurrent0 % 256);
@@ -45,37 +47,15 @@ void ConveyorCANController::setMotorCurrent() {
     mcp2515.sendMessage(&canMsgOut);
 }
 
-void ConveyorCANController::speedHandlerPID() {
-
-    // Define Errors for this loop
-    errors[0] = setSpeeds[0] - speeds[0];
-
-    // Integrate the error over time
-    sums[0] = constrain(sums[0] + errors[0], -SPEED_SUMCAP, SPEED_SUMCAP);
-
-    // PID Here
-    if (setSpeeds[0] == 0) {
-        setCurrents[0] = 0;
-        sums[0] = 0;
-    } else if (setSpeeds[0] > 0) {
-        setCurrents[0] = BASE_CURRENT + SPEED_KP * errors[0] + SPEED_KI * sums[0];
-    } else {
-        setCurrents[0] = -BASE_CURRENT + SPEED_KP * errors[0] + SPEED_KI * sums[0];
-    }
-
-    prevErrors[0] = errors[0];
-
-    setMotorCurrent();
-}
-
 void ConveyorCANController::updateMotorSpeeds() {
-    float motor0Angle = motor0Encoder.getRawAngle();
 
-    long time = millis();
+    motor0Angle = motor0Encoder.getRawAngle();
 
-    long deltaTime = time - lastTime;
+    time = millis();
 
-    float motor0deltaAngle = motor0Angle - prevAngles[0];
+    deltaTime = time - lastTime;
+
+    motor0deltaAngle = prevAngle - motor0Angle;
 
     if (motor0deltaAngle > 2048) {
         motor0deltaAngle -= 4096;
@@ -83,43 +63,37 @@ void ConveyorCANController::updateMotorSpeeds() {
         motor0deltaAngle += 4096;
     }
 
-    displacements[0] += motor0deltaAngle;
+    displacement += motor0deltaAngle;
 
-    float motor0Speed = motor0deltaAngle / deltaTime;
+    motor0Speed = motor0deltaAngle / deltaTime;
 
-    realSpeeds[0] = motor0Speed;
+    realSpeed = motor0Speed;
 
-    speeds[0] = mf0.filter(motor0Speed);
+    speed = mf0.filter(motor0Speed);
 
     // Update all last timestep values
     lastTime = time;
-    prevAngles[0] = motor0Angle;
+    prevAngle = motor0Angle;
     
 }
 
-void ConveyorCANController::setSpeed(float sp0) {
-    setSpeeds[0] = sp0;
-
-    speedHandlerPID();
-}
-
-float ConveyorCANController::getSpeed(int motorId) {
-    return speeds[motorId];
+float ConveyorCANController::getSpeed() {
+    return speed;
 }
 
 float ConveyorCANController::getRealSpeed() {
-    return realSpeeds[0];
+    return realSpeed;
 }
 
 void ConveyorCANController::cutCurrent() {
-    setCurrents[0] = 0;
-    setMotorCurrent();
-}
-
-String ConveyorCANController::getSums() {
-    return String(speeds[0]);
+    setCurrent = 0;
+    setMotorCurrent(setCurrent);
 }
 
 int ConveyorCANController::getCurrent() {
     return motorCurrent0;
+}
+
+int ConveyorCANController::getRawAngle() {
+    return motor0Angle;
 }

@@ -222,5 +222,5 @@ void CANController::cutCurrent() {
 }
 
 String CANController::getSums() {
-    return String(speeds[0]) + "  " + String(speeds[1]) + "  " + String(speeds[2]) + "  " + String(speeds[3]);
+    return String(sums[0]);
 }

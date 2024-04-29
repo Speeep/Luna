@@ -12,6 +12,7 @@ public:
     
 private:
     float values[5];
+    float sorted[5];
     int currentIndex;
     void insertionSort(float arr[], int n);
 };

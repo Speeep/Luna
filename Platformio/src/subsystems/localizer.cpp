@@ -9,7 +9,7 @@
 Localizer::Localizer(){}
 
 void Localizer::init() {
-    turnMotor.init(LOCALIZER_L_PWM_PIN, LOCALIZER_R_PWM_PIN);
+    turnMotor.init(LOCALIZER_PWM, false);
     encoder.init(LOCALIZER_ENCODER_ID, MULTIPLEXER_0_ID, LOCALIZER_ENCODER_START_ANGLE);
     enabled = false;
     angle = 0.0;
@@ -50,8 +50,8 @@ float Localizer::getAngle() {
 void Localizer::loop() {
 
     // Always get Data
-    // angle = encoder.getAngle();
-    angle = 0.0;
+    // angle = encoder.getAngle(); Fix Encoder Issue
+    angle = 0;
 
     // Accumulate error and constrain
     errors += error;
@@ -87,24 +87,24 @@ void Localizer::loop() {
             }
 
         } else if (turnClockwise && turning) {
-            turnMotor.setEffort(-100);
+            turnMotor.setEffort24(-100);
             if ((angle < angleSetpoint) && (angle > angleSetpoint - HYSTERESIS_BUFFER)) {
                 turning = false;
                 hysteresis = false;
             }
         } else if (!turnClockwise && turning) {
-            turnMotor.setEffort(100);
+            turnMotor.setEffort24(100);
             if ((angle > angleSetpoint) && (angle < angleSetpoint + HYSTERESIS_BUFFER)) {
                 turning = false;
                 hysteresis = false;
             }
 
         } else {
-            turnMotor.setEffort(int((error * LOCALIZER_MOTOR_KP) + (errors * LOCALIZER_MOTOR_KI)));
+            turnMotor.setEffort24(int((error * LOCALIZER_MOTOR_KP) + (errors * LOCALIZER_MOTOR_KI)));
         }
 
     } else {
-        turnMotor.setEffort(0);
+        turnMotor.setEffort24(0);
     }
 
     // At the end of each loop, update last angle. 

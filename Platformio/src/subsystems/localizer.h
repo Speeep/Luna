@@ -2,7 +2,7 @@
 
 #include "Arduino.h"
 #include "../robotMap.h"
-#include "./peripheral/HBridge.h"
+#include "./peripheral/talon.h"
 #include "./peripheral/encoder.h"
 
 class Localizer {
@@ -28,7 +28,7 @@ class Localizer {
 
     private:
 
-        HBridge turnMotor;
+        Talon turnMotor;
         Encoder encoder;
         bool enabled;
         float angle;

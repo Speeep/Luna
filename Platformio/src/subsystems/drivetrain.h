@@ -2,7 +2,7 @@
 
 #include "Arduino.h"
 #include "../robotMap.h"
-#include "./peripheral/HBridge.h"
+#include "./peripheral/talon.h"
 #include "./peripheral/encoder.h"
 #include "./peripheral/CANController.h"
 #include <std_msgs/Float32MultiArray.h>
@@ -72,8 +72,8 @@ class Drivetrain {
 
 
  private:
-    HBridge left_turn_motor;
-    HBridge right_turn_motor;
+    Talon left_turn_motor;
+    Talon right_turn_motor;
     Encoder left_wheelpod_encoder;
     Encoder right_wheelpod_encoder;
     CANController can_controller;
@@ -103,5 +103,8 @@ class Drivetrain {
     double angleFromWheel3;
     int state;
     float yICC;
-
+    float left_turn_motor_error;
+    float right_turn_motor_error;
+    float leftTurnI;
+    float rightTurnI;
 };

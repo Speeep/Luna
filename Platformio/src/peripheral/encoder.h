@@ -2,6 +2,7 @@
 
 #include "Arduino.h"
 #include "../robotMap.h"
+#include "masterRawEncoder.h"
 
 class Encoder {
  public:
@@ -16,8 +17,5 @@ class Encoder {
     float startAngle;
     float radAngle;
     float rawAngle;
-    int lowbyte;   // raw angle 7:0
-    word highbyte; // raw angle 7:0 and 11:8
-    int encoderNumber;
-    int multiplexerNumber;
+    RawMasterEncoder rawMasterEncoder;
 };

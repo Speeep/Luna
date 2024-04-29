@@ -9,7 +9,7 @@
 Deposit::Deposit(){}
 
 void Deposit::init() {
-    depositMotor.init(DEPOSIT_L_PWM_PIN, DEPOSIT_R_PWM_PIN);
+    depositMotor.init(DEPOSIT_PWM, true);
     encoder.init(DEPOSIT_ENCODER_ID, MULTIPLEXER_1_ID, 0.0);
     enabled = true;
     angle = 0.0;
@@ -65,7 +65,7 @@ void Deposit::loop() {
 
     // Don't set effort if close enough
     if (isInPosition()) {
-        depositMotor.setEffort(0);
+        depositMotor.setEffort24(0);
         return;
     }
 
@@ -85,12 +85,12 @@ void Deposit::loop() {
         // Cap effort at 50
         effort = int((error * DEPOSIT_MOTOR_KP));
         if (effort > 50) {
-            depositMotor.setEffort(50);
+            depositMotor.setEffort24(50);
         } else {
-            depositMotor.setEffort(effort);
+            depositMotor.setEffort24(effort);
         }
     }
     else{
-        depositMotor.setEffort(0);
+        depositMotor.setEffort24(0);
     }
 }

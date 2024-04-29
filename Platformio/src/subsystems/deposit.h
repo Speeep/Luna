@@ -2,7 +2,7 @@
 
 #include "Arduino.h"
 #include "../robotMap.h"
-#include "./peripheral/HBridge.h"
+#include "./peripheral/talon.h"
 #include "./peripheral/encoder.h"
 
 class Deposit {
@@ -30,7 +30,7 @@ class Deposit {
 
     private:
 
-        HBridge depositMotor;
+        Talon depositMotor;
         Encoder encoder;
         bool enabled;
         float angle;

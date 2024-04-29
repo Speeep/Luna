@@ -208,5 +208,7 @@ catkin_install_python(PROGRAMS
   src/e_stop.py
   src/keyboard_control.py
   src/localizer_sweeper.py
+  src/digger_control.py
+  src/watchdog_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

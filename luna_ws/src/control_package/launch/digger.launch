@@ -8,12 +8,12 @@
     output="screen"
   />
   <!-- Keyboard listener -->
-  <node
+  <!-- <node
     pkg="control_package"
     type="keyboard_control.py"
     name="keyboard_control" 
     output="screen"
-  />
+  /> -->
   <!-- RVIZ -->
   <!-- <node 
     type="rviz" 
@@ -29,12 +29,12 @@
     output="screen"
   /> -->
   <!-- Digger Control -->
-  <!-- <node 
+  <node 
     pkg="control_package"
     type="digger_control.py"
     name="digger_control" 
     output="screen"
-  /> -->
+  />
   <!-- <node
     pkg="depth_imaging_package"
     type="contour_subscriber.py"
