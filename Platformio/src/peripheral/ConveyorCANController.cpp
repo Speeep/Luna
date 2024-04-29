@@ -28,28 +28,6 @@ void ConveyorCANController::init() {
     motor0Encoder.init(CONVEYOR_ENCODER_ID, CONVEYOR_MULTIPLEXER_ID);
 }
 
-// void ConveyorCANController::setMotorCurrent() {
-//     canMsgOut.can_id = 0x1FF;
-//     canMsgOut.can_dlc = 2;
-
-//     if(speedSet > 1) {
-//         motorCurrent0 = 3000;
-//     } 
-//     if(speedSet < 1){
-//         motorCurrent0 = -1500;
-//     }
-//     else {
-//         motorCurrent0 = 0;
-//     }
-
-//     // int motorCurrent0 = constrain(setCurrent, -MAX_MOTOR_CURRENT, MAX_MOTOR_CURRENT);
-
-//     canMsgOut.data[0] = (char)(motorCurrent0 / 256);
-//     canMsgOut.data[1] = (char)(motorCurrent0 % 256);
-
-//     mcp2515.sendMessage(&canMsgOut);
-// }
-
 void ConveyorCANController::setMotorCurrent(int current){
     canMsgOut.can_id = 0x1FF;
     canMsgOut.can_dlc = 2;
@@ -68,29 +46,6 @@ void ConveyorCANController::setMotorCurrent(int current){
 
     mcp2515.sendMessage(&canMsgOut);
 }
-
-// void ConveyorCANController::speedHandlerPID() {
-
-//     // Define Errors for this loop
-//     error = speedSet - speed;
-
-//     // Integrate the error over time
-//     sum = constrain(sum + error, -SPEED_SUMCAP, SPEED_SUMCAP);
-
-//     // PID Here
-//     if (speedSet == 0) {
-//         setCurrent = 0;
-//         sum = 0;
-//     } else if (speedSet > 0) {
-//         setCurrent = BASE_CURRENT + SPEED_KP * error + SPEED_KI * sum;
-//     } else {
-//         setCurrent = -BASE_CURRENT + SPEED_KP * error + SPEED_KI * sum;
-//     }
-
-//     prevError = error;
-
-//     setMotorCurrent();
-// }
 
 void ConveyorCANController::updateMotorSpeeds() {
 
@@ -121,11 +76,6 @@ void ConveyorCANController::updateMotorSpeeds() {
     prevAngle = motor0Angle;
     
 }
-
-// void ConveyorCANController::setSpeed(float sp0) {
-//     speedSet = sp0;
-//     speedHandlerPID();
-// }
 
 float ConveyorCANController::getSpeed() {
     return speed;

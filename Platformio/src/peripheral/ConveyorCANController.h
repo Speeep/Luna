@@ -13,15 +13,9 @@ public:
 
     void init();
 
-    // void setMotorCurrent();
-
     void setMotorCurrent(int);
 
-    // void speedHandlerPID();
-
     void updateMotorSpeeds();
-
-    // void setSpeed(float);
 
     float getSpeed();
 
