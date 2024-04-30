@@ -41,7 +41,7 @@ def restart_node():
         rospy.logerr("Done Resetting Power!")
 
 def watchdog_callback(data):
-    global last_time_received
+    global last_time_received, init_en
     if not init_en:
         GPIO.output(37, GPIO.HIGH) # Set the pin to HIGH after receiving first good message
         init_en = True
