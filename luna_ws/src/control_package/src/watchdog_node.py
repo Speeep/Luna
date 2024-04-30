@@ -33,7 +33,7 @@ def restart_node():
         rospy.logerr("Restarting Power Systems!")
         subprocess.call(["rosnode", "kill", "/serial_node"])
         subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
-        for i in range(32):
+        for i in range(40):
             last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
             last_time_received = rospy.get_time() # Reset to prevent auto retriggers
             sleep(0.25)
@@ -92,4 +92,5 @@ if __name__ == '__main__':
     except rospy.ROSInterruptException:
         pass
     finally:
+        GPIO.output(37, GPIO.LOW)
         GPIO.cleanup()  # This ensures all GPIO resources are freed properly
