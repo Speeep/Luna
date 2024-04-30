@@ -120,13 +120,6 @@ void loop()
 {
   currentMillis = millis();
 
-  // Arudino Watchdog TImer gets published every quarter second
-  if (currentMillis - previousWatchdogMillis >= WATCHDOG_INTERVAL) {
-    previousWatchdogMillis = currentMillis;
-
-    watchdogBoolPub.publish(&watchdogBool);
-  }
-
   // Conveyor gets looped every 10 milliseconds
   if (currentMillis - previousConveyorMillis >= CONVEYOR_INTERVAL) {
     previousConveyorMillis = currentMillis;
@@ -172,6 +165,13 @@ void loop()
 
       odomIterator = 0;
     }
+  }
+
+  // Arudino Watchdog TImer gets published every quarter second
+  if (currentMillis - previousWatchdogMillis >= WATCHDOG_INTERVAL) {
+    previousWatchdogMillis = currentMillis;
+
+    watchdogBoolPub.publish(&watchdogBool);
   }
 
 }
