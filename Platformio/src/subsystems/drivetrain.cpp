@@ -94,10 +94,20 @@ void Drivetrain::loop() {
         case ICC_TURN:
             turnICC(yICC, driveSpeed);
             break;
+        case LEFT_WHEELPOD_RECOVERY:
+            can_controller.cutCurrent();
+            leftTurnI = 0;
+            rightTurnI = 0;
+            break;
+        case RIGHT_WHEELPOD_RECOVERY:
+            can_controller.cutCurrent();
+            leftTurnI = 0;
+            rightTurnI = 0;
+            break;
     }
     
     // If enabled, control the steering motors
-    if (state != DISABLED) {
+    if (state != DISABLED && state != LEFT_WHEELPOD_RECOVERY && state != RIGHT_WHEELPOD_RECOVERY) {
 
         // Calculate Errors
         left_turn_motor_error = leftWheelpodAngle - leftWheelpodAngleSetpoint;
@@ -114,6 +124,14 @@ void Drivetrain::loop() {
         // Turn Motors PI Control
         left_turn_motor.setEffort24(int((left_turn_motor_error * TURN_MOTOR_KP) + (TURN_MOTOR_KI * leftTurnI)));
         right_turn_motor.setEffort24(int((right_turn_motor_error * TURN_MOTOR_KP) + (TURN_MOTOR_KI * rightTurnI)));
+
+    } else if (state == LEFT_WHEELPOD_RECOVERY) {
+        left_turn_motor.setEffort24(driveSpeed * RECOVERY_MULTIPLIER);
+        right_turn_motor.setEffort24(0);
+
+    } else if (state == RIGHT_WHEELPOD_RECOVERY) {
+        left_turn_motor.setEffort24(0);
+        right_turn_motor.setEffort24(driveSpeed * RECOVERY_MULTIPLIER);
     }
 }
 

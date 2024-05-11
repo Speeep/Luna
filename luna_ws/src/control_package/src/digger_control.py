@@ -87,6 +87,7 @@ class StateMachine:
             elif key_char == 'o':
                 self.prev_open = not self.prev_open    
                 self.dump_pub.publish(self.prev_open)
+                rospy.logwarn("Toggling Deposit State!")
             elif self.current_state == 3:
                 if key_char == 'w':
                     self.publish_new_drive(1.0)
@@ -94,10 +95,19 @@ class StateMachine:
                     self.publish_new_drive(-1.0)
                 elif key_char == '0':
                     self.publish_new_drive_state(0)
+                    rospy.logwarn("Switching into DISABLED State!")
                 elif key_char == '1':
                     self.publish_new_drive_state(1)
+                    rospy.logwarn("Switching into DRIVING STRAIGHT State!")
                 elif key_char == '2':
                     self.publish_new_drive_state(2)
+                    rospy.logwarn("Switching into POINT TURNING State!")
+                elif key_char == '4':
+                    self.publish_new_drive_state(4)
+                    rospy.logwarn("Switching into LEFT DRIVETRAIN RECOVERY Mode!")
+                elif key_char == '5':
+                    self.publish_new_drive_state(5)
+                    rospy.logwarn("Switching into RIGHT DRIVETRAIN RECOVERY Mode!")
                 else:
                     self.publish_new_drive(0.0)
         except AttributeError:
@@ -122,16 +132,19 @@ class StateMachine:
         if new_drive_val != self.prev_drive_speed:
             self.drive_speed_pub.publish(new_drive_val)
             self.prev_drive_speed = new_drive_val
+            rospy.logwarn(f"Publishing a drive speed of {new_drive_val}")
 
     def publish_new_conveyor(self, new_conveyor_val):
         if new_conveyor_val != self.prev_conveyor_current:
             self.run_conveyor_pub.publish(new_conveyor_val)
             self.prev_conveyor_current = new_conveyor_val
+            rospy.logwarn(f"Publishing a conveyor speed of {new_conveyor_val}")
 
     def publish_new_plunge(self, new_plunge_val):
         if new_plunge_val != self.prev_plunge_speed:
             self.plunge_pub.publish(new_plunge_val)
             self.prev_plunge_speed = new_plunge_val
+            rospy.logwarn(f"Publishing a plunge speed of {new_plunge_val}")
 
     def loop(self, event):
 

@@ -11,7 +11,7 @@ last_time_received = 0
 last_fast_speed = 0
 recent_setpoint = 0
 last_restart_time = 0
-min_restart_interval = 10  # Minimum interval in seconds between restarts
+min_restart_interval = 15  # Minimum interval in seconds between restarts
 
 init_en = False
 
@@ -22,23 +22,26 @@ GPIO.setup(37, GPIO.OUT)  # Pin 37 as an output
 GPIO.output(37, GPIO.LOW) # Initially set the pin to HIGH
 
 def restart_node():
-    global last_restart_time, last_fast_speed, last_time_received
+    global last_restart_time, last_fast_speed, last_time_received, init_en
     current_time = rospy.get_time()
     if current_time - last_restart_time < min_restart_interval:
         rospy.loginfo("Restart requested too soon after last restart.")
         return
-    else:
+    elif init_en:
         last_restart_time = current_time
         GPIO.output(37, GPIO.LOW)  # Set GPIO pin 37 low
         rospy.logerr("Restarting Power Systems!")
         subprocess.call(["rosnode", "kill", "/serial_node"])
         subprocess.Popen(["roslaunch", "robot_package", "serial_node.launch"])
+        init_en = False
         for i in range(40):
             last_fast_speed = rospy.get_time() # Reset to prevent auto retriggers
             last_time_received = rospy.get_time() # Reset to prevent auto retriggers
             sleep(0.25)
         GPIO.output(37, GPIO.HIGH)  # Set back to high
         rospy.logerr("Done Resetting Power!")
+    else:
+        rospy.logerr("Can't reset if we haven't received a first good message yet.")
 
 def watchdog_callback(data):
     global last_time_received, init_en
@@ -74,7 +77,7 @@ def watchdog():
     rospy.Subscriber("/digger/conveyor_current", Int32, setpoint_callback)
     rospy.Subscriber("/jetson/conveyor_speed", Float32, speed_callback)
     rate = rospy.Rate(3)  # check 3 times every second
-    sleep(5)
+    sleep(10) # allow for topics to set up
     last_time_received = rospy.get_time()
 
     while not rospy.is_shutdown():
