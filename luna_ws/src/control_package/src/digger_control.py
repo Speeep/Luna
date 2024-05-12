@@ -102,6 +102,9 @@ class StateMachine:
                 elif key_char == '2':
                     self.publish_new_drive_state(2)
                     rospy.logwarn("Switching into POINT TURNING State!")
+                elif key_char == '3':
+                    self.publish_new_drive_state(3)
+                    rospy.logwarn("Switching into STRAFE State!")
                 elif key_char == '4':
                     self.publish_new_drive_state(4)
                     rospy.logwarn("Switching into LEFT DRIVETRAIN RECOVERY Mode!")

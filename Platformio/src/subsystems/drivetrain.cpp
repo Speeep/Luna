@@ -92,7 +92,10 @@ void Drivetrain::loop() {
             setWheelSpeeds(-driveSpeed, -driveSpeed, driveSpeed, driveSpeed);
             break;
         case ICC_TURN:
-            turnICC(yICC, driveSpeed);
+            // turnICC(yICC, driveSpeed);
+            setLeftWheelpodAngleSetpoint(1.5708);
+            setRightWheelpodAngleSetpoint(-1.5708);
+            setWheelSpeeds(-driveSpeed, driveSpeed, -driveSpeed, driveSpeed);
             break;
         case LEFT_WHEELPOD_RECOVERY:
             can_controller.cutCurrent();
