@@ -162,6 +162,7 @@ class StateMachine:
 
             # Set Digging Started to FALSE
             self.digging_started = False
+            rospy.loginfo("Resetting Digging Started...")
 
             rospy.loginfo("ALL STOP")
 
@@ -175,6 +176,7 @@ class StateMachine:
 
             # Set Digging Started to FALSE
             self.digging_started = False
+            rospy.loginfo("Resetting Digging Started...")
 
             rospy.loginfo("DRIVETRAIN CTRL")
 
@@ -192,11 +194,6 @@ class StateMachine:
                 return
 
             if self.current_state == 0:  # If state is plunging
-
-                # If Digging is not started, make sure to record the start time
-                if self.digging_started == False and self.plunge_top:
-                    self.dig_start_time = rospy.get_time()
-                    self.digging_started = True
 
                 self.publish_new_drive_state(1)
 
@@ -238,12 +235,18 @@ class StateMachine:
                 # If its the start of digging, plunge fast
                 if current_time - self.dig_start_time < 1.0:
                     plunger_speed = FAST_PLUNGER_SPEED
+                    rospy.loginfo("PLUNGING FAST!!!!!!")
                 else:
                     # Plunger publish plunge speed as a function of conveyor speed
                     plunger_speed = self.calculate_plunge_speed(PLUNGE_BASE_EFFORT)
 
                 # If conveyor has had time to speed up or detects further jam
                 if self.num_speed_readings > MIN_PLUNGE_READINGS:
+
+                    # If Digging is not started, make sure to record the start time
+                    if self.digging_started == False and self.plunge_top:
+                        self.dig_start_time = rospy.get_time()
+                        self.digging_started = True
 
                     # Run Plunger
                     self.publish_new_plunge(int(plunger_speed))
@@ -271,6 +274,7 @@ class StateMachine:
 
                 # Set Digging Started to FALSE
                 self.digging_started = False
+                rospy.loginfo("Resetting Digging Started...")
 
                 self.publish_new_drive_state(1)
 
