@@ -20,6 +20,7 @@ CONVEYOR_MAX_EFFORT = 9000
 CONVEYOR_REVERSE_EFFORT = -11000
 PLUNGER_RETRACT_SPEED = -35
 PLUNGER_RETRACT_SPEED_FAST = -45
+FAST_PLUNGER_SPEED = 20
 
 class StateMachine:
     def __init__(self):
@@ -35,6 +36,8 @@ class StateMachine:
         self.plunge_bot = False
         self.prev_time = rospy.get_time()
         self.elapsed_drive_time = 0.0
+        self.digging_started = False
+        self.dig_start_time = 0.0
 
         self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
         self.listener.start()
@@ -157,6 +160,9 @@ class StateMachine:
         # Check for All Stop case first for safety reasons
         if self.current_state == 2:
 
+            # Set Digging Started to FALSE
+            self.digging_started = False
+
             rospy.loginfo("ALL STOP")
 
             # Stop Conveyor and Plunger and Drivetrain
@@ -166,6 +172,9 @@ class StateMachine:
             self.publish_new_drive(0)
 
         elif self.current_state == 3:
+
+            # Set Digging Started to FALSE
+            self.digging_started = False
 
             rospy.loginfo("DRIVETRAIN CTRL")
 
@@ -183,6 +192,11 @@ class StateMachine:
                 return
 
             if self.current_state == 0:  # If state is plunging
+
+                # If Digging is not started, make sure to record the start time
+                if self.digging_started == False and self.plunge_top:
+                    self.dig_start_time = rospy.get_time()
+                    self.digging_started = True
 
                 self.publish_new_drive_state(1)
 
@@ -218,10 +232,17 @@ class StateMachine:
                 # Conveyor publish set effort and monitor speed
                 self.publish_new_conveyor(CONVEYOR_MAX_EFFORT)
 
-                # Plunger publish plunge speed as a function of conveyor speed
-                plunger_speed = self.calculate_plunge_speed(PLUNGE_BASE_EFFORT)
+                # Get current ROS time
+                current_time = rospy.get_time()
 
-                # If conveyor has had time to speed up or detect further jam
+                # If its the start of digging, plunge fast
+                if current_time - self.dig_start_time < 1.0:
+                    plunger_speed = FAST_PLUNGER_SPEED
+                else:
+                    # Plunger publish plunge speed as a function of conveyor speed
+                    plunger_speed = self.calculate_plunge_speed(PLUNGE_BASE_EFFORT)
+
+                # If conveyor has had time to speed up or detects further jam
                 if self.num_speed_readings > MIN_PLUNGE_READINGS:
 
                     # Run Plunger
@@ -247,6 +268,9 @@ class StateMachine:
                     self.jam_time = current_time  # Record the jam start time
 
             elif self.current_state == 1:  # Else if state is retracting
+
+                # Set Digging Started to FALSE
+                self.digging_started = False
 
                 self.publish_new_drive_state(1)
 
