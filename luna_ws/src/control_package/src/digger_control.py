@@ -20,7 +20,8 @@ CONVEYOR_MAX_EFFORT = 9000
 CONVEYOR_REVERSE_EFFORT = -11000
 PLUNGER_RETRACT_SPEED = -35
 PLUNGER_RETRACT_SPEED_FAST = -45
-FAST_PLUNGER_SPEED = 20
+FAST_PLUNGER_SPEED = 28
+FAST_PLUNGE_TIME = 14.0
 
 class StateMachine:
     def __init__(self):
@@ -233,9 +234,9 @@ class StateMachine:
                 current_time = rospy.get_time()
 
                 # If its the start of digging, plunge fast
-                if current_time - self.dig_start_time < 1.0:
+                if current_time - self.dig_start_time < FAST_PLUNGE_TIME:
                     plunger_speed = FAST_PLUNGER_SPEED
-                    rospy.loginfo("PLUNGING FAST!!!!!!")
+                    rospy.loginfo(f"PLUNGING FAST {int((current_time - self.dig_start_time) / FAST_PLUNGE_TIME * 100)}% COMPLETE")
                 else:
                     # Plunger publish plunge speed as a function of conveyor speed
                     plunger_speed = self.calculate_plunge_speed(PLUNGE_BASE_EFFORT)
